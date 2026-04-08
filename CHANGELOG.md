@@ -11,6 +11,33 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.5.0] — 2026-04-08
+
+### Added
+
+- **Typo detection on unknown CLI flags**, with a Levenshtein-based "Did you mean ...?" hint. Previously the parser silently accepted any `--flag` and stored it in `args.flags`, where most code paths then ignored it — users would hit `ba-toolkit init --drry-run`, get no error, and watch the script start an interactive session wondering why their flag did nothing. Now `validateFlags` runs immediately after parsing and rejects anything not in `KNOWN_FLAGS`:
+  ```
+  $ ba-toolkit init --drry-run
+  error: Unknown option: --drry-run
+    Did you mean --dry-run?
+  Run ba-toolkit --help for the full list of options.
+  ```
+  The Levenshtein threshold is calibrated (`max(1, floor(input.length / 3))`) so common typos like `--domian`, `--gloabl`, `--no-installl`, `--foo`/`--for` get matched, but unrelated inputs like `--foobar` (distance 3 from "global") get no suggestion at all — better to say nothing than suggest something wildly off.
+
+### Changed
+
+- **Help output is ~20 lines shorter.** Four nearly-duplicate options sections (`INIT OPTIONS`, `INSTALL OPTIONS`, `UNINSTALL OPTIONS`, `UPGRADE OPTIONS`) collapsed into a single `OPTIONS` section. Each flag is listed exactly once with a per-command scope annotation (`init only — ...`, `install/uninstall/upgrade — ...`). Three sections after v1.4.0 added `uninstall`/`upgrade` repeated the same four flags with only wording differences; the dedup removes the noise without losing any information.
+- **Domain and agent menu column widths are now computed dynamically** from the longest entry instead of being hardcoded to magic constants (`padEnd(13)` and `padEnd(20)`). If a future commit adds a domain or agent with a longer display name, the em-dash column on the right stays aligned automatically. No visible change for the current set.
+
+### Internal
+
+- **`AGENTS.md` template extracted** to `skills/references/templates/agents-template.md`. Previously it lived as a 44-line embedded string in `bin/ba-toolkit.js`, which was the only artifact template not in `skills/references/templates/`. Now follows the same `[NAME]` / `[SLUG]` / `[DOMAIN]` / `[DATE]` placeholder convention as `brief-template.md`, `srs-template.md`, etc. `renderAgentsMd` shrinks from a 60-line string template to a 12-line file read + four `String.replace` calls. Adding a field to the auto-generated AGENTS.md is now a Markdown edit, not a JS edit.
+- **`stringFlag(args, key)` helper extracted** to centralise the `flag && flag !== true` (and inverse `!flag || flag === true`) pattern that was repeated across `cmdInit` (4 sites), `cmdInstall`, `cmdUninstall`, `cmdUpgrade` (3 sites). Returns the string value or `null` for absent / boolean / empty-string flags. The seven call sites collapse to single-line `stringFlag(args, 'name')` reads.
+- **`parseSkillFrontmatter(content)` mini-parser** replaces the three regexes that `skillToMdc` used to extract `name` and `description` from SKILL.md frontmatter. The previous folded-scalar regex (`description:\s*>\s*\r?\n([\s\S]*?)(?:\r?\n\w|$)`) used a fragile `\r?\n\w` lookahead that would have over-captured on multi-paragraph descriptions and silently misparsed the `|` literal block scalar form (no shipped SKILL.md uses it yet, but the trap was there). The new walker handles inline / folded / literal forms uniformly, recognises chomping indicators (`>+`/`>-`/`|+`/`|-`), and correctly collapses multi-paragraph blocks with blank lines. Backward-compat verified by running `ba-toolkit install --for cursor` and confirming all 21 generated `.mdc` files have the same descriptions as before.
+- **Unit-test infrastructure (78 → 91 tests).** Pure helper functions (`sanitiseSlug`, `parseArgs`, `resolveDomain`, `resolveAgent`, `stringFlag`, `parseSkillFrontmatter`, `readSentinel`, `renderAgentsMd`, `levenshtein`, `closestMatch`) are now exported from `bin/ba-toolkit.js` (guarded by `require.main === module` so the CLI still runs directly), and covered by `test/cli.test.js` using Node's built-in `node:test` runner — zero added dependencies. The test file does not ship to npm consumers (`test/` is not in `package.json`'s `files` whitelist). Includes one integration test that loads every shipped `SKILL.md` and asserts the parser produces a non-empty single-line description for each — catches regressions where a future skill is added with a frontmatter form the parser doesn't understand.
+
+---
+
 ## [1.4.0] — 2026-04-08
 
 ### Added
@@ -267,7 +294,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.0...v1.3.1
