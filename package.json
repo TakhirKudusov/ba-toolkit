@@ -29,7 +29,7 @@
   "license": "MIT",
   "author": "TakhirKudusov",
   "bin": {
-    "ba-toolkit": "./bin/ba-toolkit.js"
+    "ba-toolkit": "bin/ba-toolkit.js"
   },
   "files": [
     "bin/",
