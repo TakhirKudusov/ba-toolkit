@@ -38,6 +38,7 @@ Available at any pipeline stage.
 | `/estimate` | `00_estimate_{slug}.md` | Effort estimation for User Stories: Fibonacci SP, T-shirt sizes, or person-days |
 | `/glossary` | `00_glossary_{slug}.md` | Unified project glossary: scans all artifacts, detects terminology drift, undefined terms |
 | `/export [format]` | `export_{slug}_{format}.json` / `.csv` | Export User Stories to Jira, GitHub Issues, Linear, or CSV |
+| `/risk` | `00_risks_{slug}.md` | Risk register: probability × impact matrix, mitigation and contingency per risk |
 
 ---
 

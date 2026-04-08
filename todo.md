@@ -44,7 +44,7 @@ Items are sequential — each unblocks the next.
 
 ---
 
-### 3. `/risk` skill
+### ✅ 3. `/risk` skill
 
 **What:** Dedicated risk register artifact: extract risks from Brief, SRS, and Research, generate `00_risks_{slug}.md` with a probability × impact matrix, risk owner, and mitigation strategy per item.
 
