@@ -869,38 +869,24 @@ ${bold('COMMANDS')}
                                  report which versions are installed where.
                                  Read-only; no flags.
 
-${bold('INIT OPTIONS')}
-  --name <name>                  Skip the project name prompt
-  --slug <slug>                  Skip the slug prompt (auto-derived from name)
-  --domain <id>                  Skip the domain menu (e.g. saas, fintech)
-  --for <agent>                  Skip the agent menu (e.g. claude-code)
-  --no-install                   Create the project structure only; don't
-                                 install skills. Useful for CI or when you
-                                 want to pick the agent later.
-  --global                       Install agent skills user-wide
-  --project                      Install agent skills project-level (default
-                                 when the agent supports it)
-  --dry-run                      Preview the install step without writing
-
-${bold('INSTALL OPTIONS')}
-  --for <agent>                  One of: ${Object.keys(AGENTS).join(', ')}
-  --global                       User-wide install
-  --project                      Project-level install (default when supported)
-  --dry-run                      Preview without writing files
-
-${bold('UNINSTALL OPTIONS')}
-  --for <agent>                  One of: ${Object.keys(AGENTS).join(', ')}
-  --global                       Remove the user-wide install
-  --project                      Remove the project-level install
-                                 (default when the agent supports it)
-  --dry-run                      Preview without removing files
-
-${bold('UPGRADE OPTIONS')}
-  --for <agent>                  One of: ${Object.keys(AGENTS).join(', ')}
-  --global                       Upgrade the user-wide install
-  --project                      Upgrade the project-level install
-                                 (default when the agent supports it)
-  --dry-run                      Preview without writing or removing files
+${bold('OPTIONS')}
+  --name <name>                  init only — skip the project name prompt
+  --slug <slug>                  init only — skip the slug prompt (auto-derived
+                                 from name)
+  --domain <id>                  init only — skip the domain menu
+                                 (e.g. saas, fintech)
+  --no-install                   init only — create the project structure
+                                 without installing skills (useful for CI)
+  --for <agent>                  install/uninstall/upgrade — pick the target
+                                 agent. One of: ${Object.keys(AGENTS).join(', ')}.
+                                 init also accepts this to skip the agent menu.
+  --global                       install/uninstall/upgrade — target the
+                                 user-wide install
+  --project                      install/uninstall/upgrade — target the
+                                 project-level install (default when the
+                                 agent supports it)
+  --dry-run                      init/install/uninstall/upgrade — preview
+                                 without writing or removing files
 
 ${bold('GENERAL OPTIONS')}
   --version, -v                  Print version and exit
