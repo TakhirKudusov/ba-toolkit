@@ -225,11 +225,11 @@ BA Toolkit использует открытую **спецификацию Agen
 
 ```bash
 # Одноразовая настройка проекта — ничего не устанавливать, просто запустить:
-npx ba-toolkit init
-npx ba-toolkit install --for claude-code
+npx @kudusov.takhir/ba-toolkit init
+npx @kudusov.takhir/ba-toolkit install --for claude-code
 
 # Или установить глобально и переиспользовать для всех проектов:
-npm install -g ba-toolkit
+npm install -g @kudusov.takhir/ba-toolkit
 ba-toolkit install --for claude-code --global
 ```
 
@@ -401,7 +401,7 @@ ba-toolkit/
 │
 ├── bin/
 │   └── ba-toolkit.js              # 🧰 Точка входа npm CLI (нулевые рантайм-зависимости)
-├── package.json                   # 📦 Манифест npm-пакета (для `npx ba-toolkit`)
+├── package.json                   # 📦 Манифест npm-пакета (для `npx @kudusov.takhir/ba-toolkit`)
 ├── init.ps1                       # 🚀 Инициализатор проекта (Windows PowerShell)
 ├── init.sh                        # 🚀 Инициализатор проекта (macOS / Linux bash)
 ├── CHANGELOG.md                   # 📋 История версий

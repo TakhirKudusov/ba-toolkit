@@ -224,11 +224,11 @@ Most pipeline skills follow this cycle:
 
 ```bash
 # One-shot project setup — zero install, just run:
-npx ba-toolkit init
-npx ba-toolkit install --for claude-code
+npx @kudusov.takhir/ba-toolkit init
+npx @kudusov.takhir/ba-toolkit install --for claude-code
 
 # Or install globally and reuse across projects:
-npm install -g ba-toolkit
+npm install -g @kudusov.takhir/ba-toolkit
 ba-toolkit install --for claude-code --global
 ```
 
@@ -397,7 +397,7 @@ ba-toolkit/
 │
 ├── bin/
 │   └── ba-toolkit.js              # 🧰 npm CLI entry point (zero runtime deps)
-├── package.json                   # 📦 npm package manifest (for `npx ba-toolkit`)
+├── package.json                   # 📦 npm package manifest (for `npx @kudusov.takhir/ba-toolkit`)
 ├── init.ps1                       # 🚀 Project initialiser (Windows PowerShell)
 ├── init.sh                        # 🚀 Project initialiser (macOS / Linux bash)
 ├── CHANGELOG.md                   # 📋 Version history

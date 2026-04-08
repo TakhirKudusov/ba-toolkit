@@ -11,6 +11,15 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.2.1] — 2026-04-08
+
+### Changed
+
+- npm package renamed from `ba-toolkit` to scoped `@kudusov.takhir/ba-toolkit` to avoid name collisions in the public registry. The CLI binary name (`ba-toolkit`) is unchanged. Install commands are now `npx @kudusov.takhir/ba-toolkit <command>` or `npm install -g @kudusov.takhir/ba-toolkit`.
+- `README.md` and `README.ru.md` updated to use the scoped package name in all `npx` and `npm install -g` examples.
+
+---
+
 ## [1.2.0] — 2026-04-08
 
 ### Added
@@ -119,7 +128,8 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/TakhirKudusov/ba-toolkit/releases/tag/v1.0.0
