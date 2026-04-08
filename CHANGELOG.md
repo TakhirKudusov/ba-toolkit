@@ -11,7 +11,19 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.2.1] — 2026-04-08
+## [1.2.2] — 2026-04-08
+
+### Fixed
+
+- `.github/workflows/release.yml` — added `--force` to the `npm install -g npm@latest` step to work around a known self-upgrade bug where arborist unlinks its own transitive `promise-retry` mid-upgrade and fails with `MODULE_NOT_FOUND`. This broke the `publish-npm` job on the `v1.2.1` tag, so `1.2.1` exists only as a GitHub Release and was never published to npm. `1.2.2` supersedes it and is the first version published under the scoped name.
+
+### Changed
+
+- Supersedes the unpublished `1.2.1` — carries forward all of its documentation and rename changes.
+
+---
+
+## [1.2.1] — 2026-04-08 _(GitHub Release only — npm publish failed, superseded by 1.2.2)_
 
 ### Changed
 
@@ -128,7 +140,8 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.2...HEAD
+[1.2.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.0.0...v1.1.0

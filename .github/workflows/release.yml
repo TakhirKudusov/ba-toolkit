@@ -76,7 +76,10 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Upgrade npm to support Trusted Publishing
-        run: npm install -g npm@latest    # requires npm CLI >= 11.5.1
+        # --force works around a known self-upgrade bug where arborist unlinks
+        # its own transitive deps (e.g. promise-retry) mid-upgrade and leaves
+        # the install in a broken MODULE_NOT_FOUND state. Requires npm >= 11.5.1.
+        run: npm install -g npm@latest --force
 
       - name: Verify tag matches package.json version
         run: |
