@@ -328,12 +328,22 @@ async function cmdInit(args) {
   if (!slug) {
     const derived = sanitiseSlug(name);
     if (nameFromFlag) {
-      // Non-interactive path: silently accept the derived slug.
+      // Non-interactive path. Either accept the derived slug, or fail
+      // loudly with a hint when the name has no ASCII letters/digits to
+      // derive from (e.g. `--name "Проект"` or `--name "🚀"`). Without
+      // this branch the user got an opaque "Invalid or empty slug" with
+      // no clue why.
+      if (!derived) {
+        logError(`Cannot derive a slug from "${name}" — it contains no ASCII letters or digits.`);
+        log('Pass an explicit slug with --slug, e.g. --slug my-project');
+        process.exit(1);
+      }
       slug = derived;
     } else if (derived) {
       const custom = await prompt(`  Project slug [${cyan(derived)}]: `);
       slug = custom || derived;
     } else {
+      log('  ' + gray(`(could not derive a slug from "${name}" — please type one manually)`));
       slug = await prompt('  Project slug (lowercase, hyphens only): ');
     }
   }
