@@ -62,7 +62,7 @@ From project brief to development handoff — 19 skills, fully structured pipeli
 
 ## 🎯 What is this?
 
-BA Toolkit is a set of **16 interconnected skills** that turn your AI coding agent into a business analyst. You walk through a structured pipeline — from a high-level project brief to a development handoff package — and get a complete requirements artifact set ready for engineering.
+BA Toolkit is a set of **19 interconnected skills** that turn your AI coding agent into a business analyst. You walk through a structured pipeline — from a high-level project brief to a development handoff package — and get a complete requirements artifact set ready for engineering.
 
 Each skill **reads the output of previous steps**, maintains cross-references between artifacts (FR → US → UC → AC → NFR → Entities → ADR → API → Screens → Scenarios), and adapts to your project's domain.
 

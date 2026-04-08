@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract release notes from CHANGELOG.md
+        id: changelog
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          VERSION="${TAG#v}"
+
+          # Extract the block between the current version heading and the next ## heading
+          NOTES=$(awk -v ver="## [$VERSION]" '
+            found && /^## \[/ { exit }
+            found { print }
+            $0 ~ ver { found=1 }
+          ' CHANGELOG.md)
+
+          if [ -z "$NOTES" ]; then
+            echo "::error::Version $VERSION not found in CHANGELOG.md"
+            exit 1
+          fi
+
+          # Write to file — safe for multiline content
+          echo "$NOTES" > release_notes.md
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const notes = fs.readFileSync('release_notes.md', 'utf8').trim();
+            const tag = context.ref.replace('refs/tags/', '');
+
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: tag,
+              name: tag,
+              body: notes,
+              draft: false,
+              prerelease: tag.includes('-'),
+            });
