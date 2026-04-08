@@ -110,12 +110,30 @@ jobs:
       - name: Smoke test CLI
         run: node bin/ba-toolkit.js --version
 
+      - name: Strip classic auth from .npmrc (enable OIDC flow)
+        # actions/setup-node with `registry-url` writes an .npmrc containing
+        # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` and
+        # `always-auth=true`. With NODE_AUTH_TOKEN empty this becomes a
+        # configured-but-empty token, so npm thinks classic auth is set and
+        # never starts the OIDC token exchange — publish dies with ENEEDAUTH.
+        #
+        # Remove both lines so npm 11.5.1+ detects GitHub Actions OIDC and
+        # uses Trusted Publishing. The file path comes from the
+        # NPM_CONFIG_USERCONFIG env var that setup-node exports.
+        run: |
+          set -eux
+          NPMRC="${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}"
+          if [ -f "$NPMRC" ]; then
+            sed -i '/:_authToken=/d' "$NPMRC"
+            sed -i '/^always-auth=/d' "$NPMRC"
+            echo "--- .npmrc after strip ---"
+            cat "$NPMRC" || true
+          fi
+
       - name: Publish to npm
         # No NPM_TOKEN needed: npm CLI 11.5.1+ uses the OIDC token automatically
         # when permissions.id-token: write is set. Provenance attestations are
         # published automatically (visible as "verified" badge on npmjs.com).
-        # The empty NODE_AUTH_TOKEN env var clears the default that
-        # actions/setup-node sets — otherwise it interferes with OIDC auth.
+        # Requires Trusted Publisher configured on npmjs.com for this package,
+        # pointing at this repo and workflow filename.
         run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ''

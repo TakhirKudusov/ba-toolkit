@@ -11,7 +11,20 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.2.3] — 2026-04-08
+## [1.2.4] — 2026-04-08
+
+### Fixed
+
+- `.github/workflows/release.yml` — added a "Strip classic auth from .npmrc" step before `npm publish`. `actions/setup-node` with `registry-url` writes `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` into `.npmrc`; with our empty `NODE_AUTH_TOKEN` this registered as a configured-but-empty classic token, so npm refused to start the OIDC flow and failed with `ENEEDAUTH`. Stripping both `:_authToken=` and `always-auth=` lines lets npm 11.5.1+ detect GitHub Actions OIDC and use Trusted Publishing.
+- Also removed the now-unused `NODE_AUTH_TOKEN: ''` override on the publish step — with the `.npmrc` cleaned up, it's redundant.
+
+### Changed
+
+- Supersedes the unpublished `1.2.3` (which reached the publish step but died on auth) — carries forward all prior changes.
+
+---
+
+## [1.2.3] — 2026-04-08 _(GitHub Release only — npm publish failed on auth, superseded by 1.2.4)_
 
 ### Fixed
 
@@ -152,7 +165,8 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.3...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.4...HEAD
+[1.2.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.0...v1.2.1
