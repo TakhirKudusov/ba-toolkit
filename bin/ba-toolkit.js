@@ -359,9 +359,10 @@ async function cmdInit(args) {
   } else {
     log('');
     log('  ' + yellow('Pick a domain:'));
+    const domainNameWidth = Math.max(...DOMAINS.map((d) => d.name.length));
     DOMAINS.forEach((d, i) => {
       const idx = String(i + 1).padStart(2);
-      log(`    ${idx}) ${bold(d.name.padEnd(13))} ${gray('— ' + d.desc)}`);
+      log(`    ${idx}) ${bold(d.name.padEnd(domainNameWidth))} ${gray('— ' + d.desc)}`);
     });
     log('');
     const raw = await prompt(`  Select [1-${DOMAINS.length}]: `);
@@ -388,9 +389,10 @@ async function cmdInit(args) {
       log('');
       log('  ' + yellow('Pick your AI agent:'));
       const agentEntries = Object.entries(AGENTS);
+      const agentNameWidth = Math.max(...agentEntries.map(([, a]) => a.name.length));
       agentEntries.forEach(([id, a], i) => {
         const idx = String(i + 1).padStart(2);
-        log(`    ${idx}) ${bold(a.name.padEnd(20))} ${gray('(' + id + ')')}`);
+        log(`    ${idx}) ${bold(a.name.padEnd(agentNameWidth))} ${gray('(' + id + ')')}`);
       });
       log('');
       const raw = await prompt(`  Select [1-${agentEntries.length}]: `);
