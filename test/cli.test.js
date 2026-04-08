@@ -17,6 +17,7 @@ const {
   resolveDomain,
   resolveAgent,
   stringFlag,
+  parseSkillFrontmatter,
   readSentinel,
   renderAgentsMd,
   DOMAINS,
@@ -297,6 +298,176 @@ test('stringFlag: returns null for empty string value (--key=)', () => {
 test('stringFlag: returns null for boolean flag (--dry-run)', () => {
   const args = parseArgs(['--dry-run']);
   assert.equal(stringFlag(args, 'dry-run'), null);
+});
+
+// --------------------------------------------------------------------
+// parseSkillFrontmatter
+// --------------------------------------------------------------------
+
+test('parseSkillFrontmatter: folded scalar (>) — the canonical SKILL.md form', () => {
+  const input = `---
+name: ba-brief
+description: >
+  Generate a high-level Project Brief for projects in any domain
+  (SaaS, Fintech, E-commerce). First step of the BA Toolkit pipeline.
+---
+
+# /brief — Project Brief
+
+Body content here.
+`;
+  const r = parseSkillFrontmatter(input);
+  assert.equal(r.name, 'ba-brief');
+  assert.equal(
+    r.description,
+    'Generate a high-level Project Brief for projects in any domain (SaaS, Fintech, E-commerce). First step of the BA Toolkit pipeline.',
+  );
+  // Body preserves the original spacing after the closing `---` line,
+  // including any leading blank line. This matches the pre-refactor
+  // regex behavior — skillToMdc concatenates `mdcFrontmatter + body`
+  // verbatim, so trimming body would change the output of every .mdc.
+  assert.match(r.body, /# \/brief — Project Brief/);
+});
+
+test('parseSkillFrontmatter: literal scalar (|) — also flattened to one line', () => {
+  const input = `---
+name: ba-foo
+description: |
+  Line one of the description.
+  Line two of the description.
+---
+
+Body.
+`;
+  const r = parseSkillFrontmatter(input);
+  assert.equal(r.name, 'ba-foo');
+  assert.equal(r.description, 'Line one of the description. Line two of the description.');
+});
+
+test('parseSkillFrontmatter: inline scalar — single-line description on the same line as the key', () => {
+  const input = `---
+name: ba-foo
+description: A one-line description without a block scalar marker.
+---
+
+Body.
+`;
+  const r = parseSkillFrontmatter(input);
+  assert.equal(r.name, 'ba-foo');
+  assert.equal(r.description, 'A one-line description without a block scalar marker.');
+});
+
+test('parseSkillFrontmatter: multi-paragraph block scalar with blank line — collapses to one line', () => {
+  const input = `---
+name: ba-foo
+description: >
+  First paragraph of the description.
+
+  Second paragraph after a blank line.
+---
+
+Body.
+`;
+  const r = parseSkillFrontmatter(input);
+  assert.equal(r.name, 'ba-foo');
+  assert.equal(r.description, 'First paragraph of the description. Second paragraph after a blank line.');
+});
+
+test('parseSkillFrontmatter: chomping indicator (>+) is recognised as a block marker', () => {
+  const input = `---
+name: ba-foo
+description: >+
+  Block content.
+---
+
+Body.
+`;
+  const r = parseSkillFrontmatter(input);
+  assert.equal(r.description, 'Block content.');
+});
+
+test('parseSkillFrontmatter: no frontmatter returns body unchanged', () => {
+  const input = `# Just a markdown file with no frontmatter.
+
+Some content.
+`;
+  const r = parseSkillFrontmatter(input);
+  assert.equal(r.name, null);
+  assert.equal(r.description, '');
+  assert.equal(r.body, input);
+});
+
+test('parseSkillFrontmatter: extra fields are ignored without affecting name/description', () => {
+  const input = `---
+name: ba-foo
+description: A description.
+allowed-tools:
+  - Read
+  - Edit
+license: MIT
+---
+
+Body.
+`;
+  const r = parseSkillFrontmatter(input);
+  assert.equal(r.name, 'ba-foo');
+  assert.equal(r.description, 'A description.');
+});
+
+test('parseSkillFrontmatter: description with embedded colons survives the line scan', () => {
+  // The continuation lines are matched as continuations, not as new keys,
+  // because they're indented. The walk-by-lines logic only treats
+  // column-0 `key:` lines as new fields.
+  const input = `---
+name: ba-foo
+description: >
+  This description mentions ratios like 3:1 and times like 12:30:45.
+  It should still be parsed as a single-line description.
+---
+
+Body.
+`;
+  const r = parseSkillFrontmatter(input);
+  assert.equal(
+    r.description,
+    'This description mentions ratios like 3:1 and times like 12:30:45. It should still be parsed as a single-line description.',
+  );
+});
+
+test('parseSkillFrontmatter: collapses arbitrary whitespace inside the value', () => {
+  const input = `---
+name: ba-foo
+description: >
+  Word1    Word2
+
+      Word3
+---
+
+Body.
+`;
+  const r = parseSkillFrontmatter(input);
+  assert.equal(r.description, 'Word1 Word2 Word3');
+});
+
+test('parseSkillFrontmatter: parses every shipped SKILL.md without losing the description', () => {
+  // Integration check: every skill in the package's skills/ directory
+  // must produce a non-empty name and description through the parser.
+  // Catches the class of regression where a future SKILL.md is added
+  // with a frontmatter form the parser doesn't understand.
+  const skillsDir = path.join(__dirname, '..', 'skills');
+  const skillFolders = fs.readdirSync(skillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && e.name !== 'references')
+    .map((e) => e.name);
+  assert.ok(skillFolders.length >= 20, `expected ~21 skill folders, found ${skillFolders.length}`);
+  for (const folder of skillFolders) {
+    const skillPath = path.join(skillsDir, folder, 'SKILL.md');
+    if (!fs.existsSync(skillPath)) continue;
+    const content = fs.readFileSync(skillPath, 'utf8');
+    const r = parseSkillFrontmatter(content);
+    assert.ok(r.name, `${folder}: expected non-empty name, got ${JSON.stringify(r.name)}`);
+    assert.ok(r.description.length > 20, `${folder}: description too short (${r.description.length} chars)`);
+    assert.ok(!r.description.includes('\n'), `${folder}: description should be flattened to one line`);
+  }
 });
 
 // --------------------------------------------------------------------

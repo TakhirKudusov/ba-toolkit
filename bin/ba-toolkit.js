@@ -241,6 +241,79 @@ function copyDir(src, dest, { dryRun = false, transform = null } = {}) {
   return copied;
 }
 
+// Minimal YAML frontmatter parser for SKILL.md files.
+//
+// Replaces the previous regex-based extraction, which used a fragile
+// lookahead (`description:\s*>\s*\r?\n([\s\S]*?)(?:\r?\n\w|$)`) that
+// didn't handle blank lines inside descriptions, didn't recognise the
+// `|` literal block scalar form, and silently produced wrong output
+// if the description happened to contain a line whose first character
+// wasn't a word character.
+//
+// This is NOT a general YAML parser. It only handles the subset that
+// SKILL.md files actually use:
+//   - Top-level keys at column 0: `key: value`
+//   - Inline scalar values: `name: foo`
+//   - Folded block scalars: `description: >` followed by indented text
+//   - Literal block scalars: `description: |` followed by indented text
+//   - Block chomping indicators (>+, >-, |+, |-)
+//   - Multi-paragraph block scalars with blank lines between paragraphs
+//
+// Unsupported (not used by any SKILL.md and YAGNI for the toolkit):
+//   - Nested mappings, sequences, anchors, aliases, tags
+//   - Quoted scalars (single or double quoted) — names would keep quotes
+//
+// Returns { name, description, body }. `description` is always
+// flattened to a single line (whitespace collapsed) because the .mdc
+// rule format expects a one-line description.
+function parseSkillFrontmatter(content) {
+  const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
+  if (!fmMatch) {
+    return { name: null, description: '', body: content };
+  }
+  const frontmatter = fmMatch[1];
+  const body = fmMatch[2];
+  const lines = frontmatter.split(/\r?\n/);
+
+  const fields = {};
+  let currentKey = null;
+  let buffer = [];
+
+  const flush = () => {
+    if (currentKey !== null) {
+      fields[currentKey] = buffer.join(' ').replace(/\s+/g, ' ').trim();
+    }
+    currentKey = null;
+    buffer = [];
+  };
+
+  for (const line of lines) {
+    // A top-level YAML key starts at column 0 with `name:` style.
+    const m = line.match(/^([A-Za-z_][A-Za-z0-9_-]*)\s*:\s*(.*)$/);
+    if (m) {
+      flush();
+      currentKey = m[1];
+      const inlineValue = m[2].trim();
+      // Block scalar markers (>, |, >+, >-, |+, |-) introduce a block
+      // — they aren't part of the value themselves, so don't push them.
+      if (inlineValue && !/^[>|][+-]?$/.test(inlineValue)) {
+        buffer.push(inlineValue);
+      }
+    } else if (currentKey) {
+      // Continuation line for the active block scalar. Indentation and
+      // blank lines are folded into a single space by `flush()`.
+      buffer.push(line.trim());
+    }
+  }
+  flush();
+
+  return {
+    name: fields.name || null,
+    description: fields.description || '',
+    body,
+  };
+}
+
 // Transform SKILL.md → .mdc for Cursor / Windsurf.
 // Other files (references/, templates/) are copied as-is.
 function skillToMdc(srcPath, destPath) {
@@ -249,21 +322,9 @@ function skillToMdc(srcPath, destPath) {
     return { destPath, content: fs.readFileSync(srcPath) };
   }
   const content = fs.readFileSync(srcPath, 'utf8');
-  const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
-  let frontmatter = '';
-  let body = content;
-  if (fmMatch) {
-    frontmatter = fmMatch[1];
-    body = fmMatch[2];
-  }
-  const nameMatch = frontmatter.match(/^name:\s*(.+)$/m);
-  // description is usually a multi-line block with `description: >`
-  const descMatch = frontmatter.match(/description:\s*>\s*\r?\n([\s\S]*?)(?:\r?\n\w|$)/);
-  const descInlineMatch = frontmatter.match(/^description:\s*(.+)$/m);
-  const ruleName = nameMatch ? nameMatch[1].trim() : path.basename(path.dirname(srcPath));
-  const rawDesc = descMatch ? descMatch[1] : (descInlineMatch ? descInlineMatch[1] : '');
-  const ruleDesc = rawDesc.replace(/\s+/g, ' ').trim();
-  const mdcFrontmatter = `---\ndescription: ${ruleDesc}\nalwaysApply: false\n---\n\n`;
+  const { name, description, body } = parseSkillFrontmatter(content);
+  const ruleName = name || path.basename(path.dirname(srcPath));
+  const mdcFrontmatter = `---\ndescription: ${description}\nalwaysApply: false\n---\n\n`;
   const newDestPath = path.join(path.dirname(destPath), `${ruleName}.mdc`);
   return { destPath: newDestPath, content: mdcFrontmatter + body };
 }
@@ -992,6 +1053,7 @@ module.exports = {
   resolveDomain,
   resolveAgent,
   stringFlag,
+  parseSkillFrontmatter,
   readSentinel,
   renderAgentsMd,
   DOMAINS,
