@@ -11,6 +11,18 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.3.2] — 2026-04-08
+
+### Fixed
+
+- **`bin/ba-toolkit.js` `cmdInit` ignored `runInstall` return value.** When the user declined the "Overwrite? (y/N)" prompt for an existing skill destination, `runInstall` returned `false`, but `cmdInit` ignored it and printed the success path ("Project is ready. Next steps: Restart Claude Code to load the new skills") even though no skills were installed. The next-steps block now branches on the install result and tells the user how to retry: `ba-toolkit install --for {agentId}`.
+- **`parseArgs` did not accept `--key=value` form.** The hand-rolled parser only understood `--key value` (space-separated). Users typing the GNU long-option style accepted by git/npm/gh (`--name=MyApp`, `--domain=saas`) silently lost the value — the flag was stored as `name=MyApp` set to `true` and the script then prompted for the project name interactively. Both forms now work and can be mixed in a single invocation. Splits on the first `=` only, so values containing further `=` characters are preserved (e.g. `--name="Foo=Bar"`).
+- **No SIGINT handler / readline lifecycle issues.** Each `prompt()` call previously created a fresh `readline.Interface` and closed it after the answer. Hitting Ctrl+C mid-prompt killed Node abruptly and left some terminals in raw mode. Piped stdin that closed mid-flow caused the next prompt's promise to hang forever and the process to exit silently with no error message. Fixed by switching to a single shared `readline.Interface` per CLI invocation, adding a `process.on('SIGINT')` handler that prints a clean `Cancelled.` message and exits with code 130, and rejecting in-flight prompt promises with `err.code = 'INPUT_CLOSED'` when the input stream closes prematurely. The outer `main().catch(...)` filters this code to print a friendly two-line message instead of a Node stack trace.
+- **Silent failure when slug could not be derived from a non-ASCII name.** `sanitiseSlug` strips everything outside `[a-z0-9-]`, so `--name "Проект Космос"` or `--name "🚀"` produced an empty derived slug. In the non-interactive path the script then exited with a generic `Invalid or empty slug` error with no clue about why. Now in the non-interactive path it prints `Cannot derive a slug from "{name}" — it contains no ASCII letters or digits` plus a one-line workaround (`Pass an explicit slug with --slug, e.g. --slug my-project`). In the interactive path it prints a gray hint above the manual slug prompt explaining we couldn't auto-derive.
+- **`AGENTS.md` template was missing 8 of the 21 skills.** `renderAgentsMd` emitted a "Pipeline Status" table with 13 rows — the 12 numbered stages + the `7a` sub-step. The 8 cross-cutting utilities added in v1.1 and v1.2 (`/trace`, `/clarify`, `/analyze`, `/estimate`, `/glossary`, `/export`, `/risk`, `/sprint`) were missing entirely. Since `AGENTS.md` is the project context every AI agent reads on entry to a new session, those 8 skills were effectively invisible — agents didn't know they existed without re-reading README. Added a second "Cross-cutting Tools" section below the pipeline table listing all 8, with descriptions copied from the canonical README pipeline table. A `MAINTENANCE` comment above the function reminds future-me to update both tables when adding a new skill.
+
+---
+
 ## [1.3.1] — 2026-04-08
 
 ### Fixed
@@ -234,7 +246,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.1...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.2...HEAD
+[1.3.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.5...v1.3.0
 [1.2.5]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.4...v1.2.5
