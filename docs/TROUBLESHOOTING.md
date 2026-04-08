@@ -12,7 +12,7 @@ Run `/principles` and set the artifact language explicitly. Then re-run the curr
 Run the command again (e.g., `/srs`). The agent will warn that `02_srs_{slug}.md` already exists and offer to overwrite or create a new version.
 
 **A domain reference is not loading:**
-Check that `skills/references/domains/{domain}.md` exists and that the domain name in the brief matches exactly (`igaming`, `fintech`, `saas`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, or `real-estate` — lowercase with hyphens).
+Check that `skills/references/domains/{domain}.md` exists and that the domain name in the brief matches exactly (`saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, or `igaming` — lowercase with hyphens).
 
 **`/analyze` reports findings after you already fixed them:**
 Run `/analyze` again — it always re-reads all artifacts fresh. Cached results are never used.

@@ -8,7 +8,7 @@ Run the first command and the agent takes it from there — it loads domain refe
 
 ```
 You:    /brief
-Agent:  What domain is your project in? (iGaming, Fintech, SaaS, other?)
+Agent:  What domain is your project in? (SaaS, Fintech, E-commerce, other?)
 You:    Fintech — a neobank mobile app
 Agent:  Great. Let me ask a few questions.
         1. What is the primary business goal — acquiring new users, increasing card usage, or something else?

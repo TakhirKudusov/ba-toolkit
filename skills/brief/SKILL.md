@@ -1,7 +1,7 @@
 ---
 name: ba-brief
 description: >
-  Generate a high-level Project Brief for projects in any domain (iGaming, Fintech, SaaS, and others). Use this skill when the user enters /brief, or asks to "create a project brief", "describe the project", "start a new project", "project brief", or mentions the starting stage of the analytical pipeline. Also triggers on requests like "begin with a brief", "describe the product", "form a product description". First step of the BA Toolkit pipeline.
+  Generate a high-level Project Brief for projects in any domain (SaaS, Fintech, E-commerce, Healthcare, Logistics, and others). Use this skill when the user enters /brief, or asks to "create a project brief", "describe the project", "start a new project", "project brief", or mentions the starting stage of the analytical pipeline. Also triggers on requests like "begin with a brief", "describe the product", "form a product description". First step of the BA Toolkit pipeline.
 ---
 
 # /brief — Project Brief
@@ -10,7 +10,7 @@ Starting point of the BA Toolkit pipeline. Generates a structured Project Brief 
 
 ## Loading domain reference
 
-Domain references are located in `references/domains/` relative to the `ba-toolkit` directory. Supported domains: `igaming`, `fintech`, `saas`. For other domains, work without a reference file.
+Domain references are located in `references/domains/` relative to the `ba-toolkit` directory. Supported domains: `saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`. For other domains, work without a reference file.
 
 ## Workflow
 
@@ -26,7 +26,7 @@ If `00_principles_*.md` exists in the output directory, load it and apply its co
 
 ### 3. Domain selection
 
-Ask the user about the project domain. If the domain matches `igaming`, `fintech`, or `saas`, load the corresponding `references/domains/{domain}.md`. Use domain-specific interview questions (section `1. /brief`), typical business goals, risks, and glossary from that file.
+Ask the user about the project domain. If a matching `references/domains/{domain}.md` file exists (currently: `saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`), load it and use its domain-specific interview questions (section `1. /brief`), typical business goals, risks, and glossary.
 
 If the domain does not match any supported one, record it as `custom:{name}` and use general questions only.
 
@@ -54,7 +54,7 @@ If a domain reference is loaded, supplement general questions with domain-specif
 ```markdown
 # Project Brief: {Project Name}
 
-**Domain:** {igaming | fintech | saas | custom:{name}}
+**Domain:** {saas | fintech | ecommerce | healthcare | logistics | on-demand | social-media | real-estate | igaming | custom:{name}}
 **Date:** {date}
 
 ## 1. Project Summary

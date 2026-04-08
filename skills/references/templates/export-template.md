@@ -39,7 +39,7 @@ Actual values are filled in by the skill based on the project's artifacts.
           },
           "issuetype": { "name": "Story" },
           "priority": { "name": "High" },
-          "labels": ["dragon-fortune", "E-01"],
+          "labels": ["nova-analytics", "E-01"],
           "customfield_10016": 3,
           "customfield_10014": null
         }

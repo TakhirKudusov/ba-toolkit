@@ -11,6 +11,28 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.3.1] — 2026-04-08
+
+### Fixed
+
+- **`/brief` and `/srs` now load all 9 domain references, not just 3.** Both `skills/brief/SKILL.md` and `skills/srs/SKILL.md` hardcoded a check for `igaming`, `fintech`, `saas` only — a stale list from v1.0 that was never updated when v1.1.0 added six new domain references (`ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`). As a result, users on any of those six domains silently got no domain-specific interview questions, mandatory entities, or glossary. The check now covers all nine shipped domain files, matching the supported list advertised in the CLI and README. No other skill files had the same stale list — only `brief` and `srs` did hardcoded domain matching.
+
+### Changed
+
+- **`sprint-template.md` rewritten end-to-end as Nova Analytics (SaaS).** The sprint-plan reference template loaded by `/sprint` was previously a Dragon Fortune iGaming example (slot games, RTP, responsible gambling, bonus wagering, Telegram Mini App). It's now a B2B SaaS product analytics plan — workspace sign-up, data source integration, dashboards with funnel/cohort widgets, metric alerts, SSO, and admin workspace management. Structure (sprint goals, DoD, capacity math, epic labels) is unchanged.
+- **`risk-template.md` rewritten end-to-end as Nova Analytics.** The risk-register reference template loaded by `/risk` had iGaming-specific risks (regulated iGaming jurisdiction, Telegram Mini App API breakage, RTP / bonus wagering knowledge gap). It's now a SaaS analytics risk register: third-party data source rate limits, GDPR DPA, columnar query performance at scale, OIDC/SSO library breaking changes, and columnar analytics storage knowledge gap. Structure (probability × impact scoring, priority tiers, mitigation/contingency sections) is unchanged.
+- **`export-template.md`** — one-line fix: the example Jira label changed from `dragon-fortune` to `nova-analytics`.
+- **iGaming-first ordering removed from user-facing documentation.** README intro, README Domain support table, `docs/FAQ.md`, `docs/USAGE.md`, and `docs/TROUBLESHOOTING.md` all listed iGaming first when enumerating the 9 supported domains. They now follow the SaaS-first order the CLI has used since v1.3.0: `saas → fintech → ecommerce → healthcare → logistics → on-demand → social-media → real-estate → igaming`. The iGaming row in the Domain support table stays — it just moved from position 1 to position 9.
+- **`dragon-fortune` slug example in README.md:186 replaced with `nova-analytics`.** This was the last stray placeholder outside the real `example/dragon-fortune/` project.
+
+### Not changed (deliberately)
+
+- `skills/references/domains/igaming.md` — the domain reference itself. iGaming remains a first-class supported domain.
+- `example/dragon-fortune/` — the real end-to-end example project referenced from README.
+- `bin/ba-toolkit.js` / `init.sh` / `init.ps1` `DOMAINS` array iGaming entry — iGaming remains a menu choice in the CLI and shell initialisers.
+
+---
+
 ## [1.3.0] — 2026-04-08
 
 ### Changed
@@ -212,7 +234,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.1...HEAD
+[1.3.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.5...v1.3.0
 [1.2.5]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.3...v1.2.4
