@@ -1,5 +1,5 @@
 ---
-name: ba-estimate
+name: estimate
 description: >
   Effort estimation for BA Toolkit User Stories. Use on /estimate command, or when the user asks to "estimate stories", "add story points", "size the backlog", "estimate effort", "T-shirt sizing", "planning poker". Can target all stories or a specific epic/story. Run after /stories or /ac for best accuracy.
 ---

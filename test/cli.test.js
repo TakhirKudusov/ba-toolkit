@@ -20,7 +20,9 @@ const {
   levenshtein,
   closestMatch,
   parseSkillFrontmatter,
-  readSentinel,
+  skillToMdcContent,
+  readManifest,
+  detectLegacyInstall,
   renderAgentsMd,
   KNOWN_FLAGS,
   DOMAINS,
@@ -537,41 +539,110 @@ test('parseSkillFrontmatter: parses every shipped SKILL.md without losing the de
 });
 
 // --------------------------------------------------------------------
-// readSentinel
+// readManifest
 // --------------------------------------------------------------------
 
-test('readSentinel: directory with valid sentinel returns parsed JSON', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ba-sentinel-'));
+test('readManifest: directory with valid manifest returns parsed JSON', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ba-manifest-'));
   try {
-    const payload = { version: '1.4.0', installedAt: '2026-04-08T19:00:00.000Z' };
-    fs.writeFileSync(path.join(dir, '.ba-toolkit-version'), JSON.stringify(payload));
-    assert.deepEqual(readSentinel(dir), payload);
+    const payload = {
+      version: '2.0.0',
+      installedAt: '2026-04-09T00:00:00.000Z',
+      format: 'skill',
+      items: ['brief', 'srs', 'references'],
+    };
+    fs.writeFileSync(path.join(dir, '.ba-toolkit-manifest.json'), JSON.stringify(payload));
+    assert.deepEqual(readManifest(dir), payload);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('readSentinel: directory without sentinel returns null', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ba-sentinel-'));
+test('readManifest: directory without manifest returns null', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ba-manifest-'));
   try {
-    assert.equal(readSentinel(dir), null);
+    assert.equal(readManifest(dir), null);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('readSentinel: malformed JSON returns null (no throw)', () => {
-  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ba-sentinel-'));
+test('readManifest: malformed JSON returns null (no throw)', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ba-manifest-'));
   try {
-    fs.writeFileSync(path.join(dir, '.ba-toolkit-version'), 'not json {{{');
-    assert.equal(readSentinel(dir), null);
+    fs.writeFileSync(path.join(dir, '.ba-toolkit-manifest.json'), 'not json {{{');
+    assert.equal(readManifest(dir), null);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('readSentinel: nonexistent directory returns null', () => {
-  assert.equal(readSentinel('/definitely/does/not/exist/anywhere'), null);
+test('readManifest: nonexistent directory returns null', () => {
+  assert.equal(readManifest('/definitely/does/not/exist/anywhere'), null);
+});
+
+// --------------------------------------------------------------------
+// detectLegacyInstall
+// --------------------------------------------------------------------
+
+test('detectLegacyInstall: returns empty list when no wrapper folder exists', () => {
+  // Use an obviously fake agent so the candidate paths point at non-existent dirs.
+  const agent = {
+    projectPath: '/tmp/definitely-does-not-exist-' + Date.now(),
+    globalPath: '/tmp/also-not-real-' + Date.now(),
+  };
+  assert.deepEqual(detectLegacyInstall(agent), []);
+});
+
+test('detectLegacyInstall: finds wrapper directory when it exists', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ba-legacy-'));
+  try {
+    // Simulate a v1.x install: dest/<wrapper>/ba-toolkit/ exists
+    const fakeProject = path.join(root, 'project-skills');
+    fs.mkdirSync(path.join(fakeProject, 'ba-toolkit'), { recursive: true });
+    const agent = {
+      projectPath: fakeProject,
+      globalPath: null,
+    };
+    const found = detectLegacyInstall(agent);
+    assert.equal(found.length, 1);
+    assert.ok(found[0].endsWith('ba-toolkit'));
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+// --------------------------------------------------------------------
+// skillToMdcContent
+// --------------------------------------------------------------------
+
+test('skillToMdcContent: produces .mdc frontmatter and preserves the body', () => {
+  const skill = `---
+name: brief
+description: >
+  A short description with multiple
+  lines that should be flattened.
+---
+
+# /brief — Project Brief
+
+Body text here.
+`;
+  const out = skillToMdcContent(skill);
+  assert.match(out, /^---\ndescription: A short description with multiple lines that should be flattened\.\nalwaysApply: false\n---\n/);
+  assert.match(out, /# \/brief — Project Brief/);
+  assert.match(out, /Body text here\./);
+});
+
+test('skillToMdcContent: empty description still produces valid frontmatter', () => {
+  const skill = `---
+name: foo
+---
+
+Body.
+`;
+  const out = skillToMdcContent(skill);
+  assert.match(out, /^---\ndescription: \nalwaysApply: false\n---\n/);
 });
 
 // --------------------------------------------------------------------

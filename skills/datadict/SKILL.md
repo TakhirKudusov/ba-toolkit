@@ -1,5 +1,5 @@
 ---
-name: ba-datadict
+name: datadict
 description: >
   Generate a Data Dictionary: entities, attributes, types, constraints, relationships. Use on /datadict command, or when the user asks for "data dictionary", "data model", "data schema", "describe entities", "ER model", "database structure", "describe tables", "entity attributes", "entity relationships", "domain model". Seventh step of the BA Toolkit pipeline.
 ---

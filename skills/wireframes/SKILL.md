@@ -1,5 +1,5 @@
 ---
-name: ba-wireframes
+name: wireframes
 description: >
   Generate textual wireframe descriptions: screen structure, element placement, navigation, states (loading, empty, error). Use on /wireframes command, or when the user asks for "wireframe descriptions", "wireframes", "screen descriptions", "interface structure", "screen layouts", "UI description", "screen specification", "describe screens", "text prototype", "designer specification", "page descriptions". Ninth and final step of the BA Toolkit pipeline.
 ---

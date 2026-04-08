@@ -1,5 +1,5 @@
 ---
-name: ba-glossary
+name: glossary
 description: >
   Unified project glossary extraction and maintenance for BA Toolkit projects. Use on /glossary command, or when the user asks to "build a glossary", "extract terms", "create a glossary", "consolidate terminology", "find terminology drift", "what terms are defined". Cross-cutting command — can run at any pipeline stage once at least one artifact exists.
 ---

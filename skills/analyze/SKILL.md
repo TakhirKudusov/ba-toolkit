@@ -1,5 +1,5 @@
 ---
-name: ba-analyze
+name: analyze
 description: >
   Cross-artifact quality analysis across all BA Toolkit pipeline artifacts. Use on /analyze command, or when the user asks for "quality check", "analyze artifacts", "find inconsistencies", "cross-artifact check", "check quality", "find duplicates", "terminology check", "coverage analysis", "what is inconsistent". Available at any pipeline stage after /srs. Generates a structured finding report with severity levels.
 ---

@@ -1,5 +1,5 @@
 ---
-name: ba-export
+name: export
 description: >
   Export BA Toolkit artifacts to external formats for import into issue trackers and project management tools. Use on /export command, or when the user asks to "export to Jira", "create GitHub issues", "export stories", "generate Linear tickets", "export to CSV", "import into tracker". Run after /stories and /ac for full export with acceptance criteria.
 ---

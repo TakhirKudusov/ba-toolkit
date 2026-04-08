@@ -1,5 +1,5 @@
 ---
-name: ba-clarify
+name: clarify
 description: >
   Targeted ambiguity-resolution pass over a BA Toolkit artifact. Use on /clarify command, or when the user asks to "clarify requirements", "find ambiguities", "what is unclear", "check vague terms", "resolve ambiguities", "what needs clarification". Can be focused on a specific area: /clarify security, /clarify FR-012. Cross-cutting command available at any pipeline stage after the first artifact exists.
 ---

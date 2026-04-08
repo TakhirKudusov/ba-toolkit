@@ -1,5 +1,5 @@
 ---
-name: ba-usecases
+name: usecases
 description: >
   Generate Use Cases (Cockburn format) based on User Stories. Use on /usecases command, or when the user asks for "use cases", "scenarios", "describe scenarios", "interaction flows", "main and alternative flows", "describe system behavior", "user interaction scenario". Fourth step of the BA Toolkit pipeline.
 ---

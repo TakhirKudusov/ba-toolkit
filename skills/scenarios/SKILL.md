@@ -1,5 +1,5 @@
 ---
-name: ba-scenarios
+name: scenarios
 description: >
   Generate end-to-end validation scenarios linking user stories, acceptance criteria, API endpoints, and wireframes into complete user journeys for acceptance testing. Use on /scenarios command, or when the user asks for "validation scenarios", "end-to-end scenarios", "user journeys", "acceptance test scenarios", "E2E scenarios", "test cases", "walkthrough scenarios", "happy path scenarios", "test the product", "QA scenarios". Optional step — run after /wireframes.
 ---

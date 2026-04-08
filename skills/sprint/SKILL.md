@@ -1,5 +1,5 @@
 ---
-name: ba-sprint
+name: sprint
 description: >
   Sprint planning for BA Toolkit projects. Use on /sprint command, or when the user asks to "create a sprint plan", "plan sprints", "organise backlog into sprints", "sprint breakdown", "velocity planning", "release plan". Run after /estimate (required) and /risk (recommended). Generates 00_sprint_{slug}.md with sprint goals, story assignments, and capacity summary.
 ---

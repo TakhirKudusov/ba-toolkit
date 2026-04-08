@@ -1,5 +1,5 @@
 ---
-name: ba-stories
+name: stories
 description: >
   Generate User Stories based on the SRS. Format: "As a [role], I want [action], so that [value]". Use on /stories command, or when the user asks for "user stories", "create stories", "write user stories", "story decomposition", "epics and stories", "backlog", "break requirements into stories". Third step of the BA Toolkit pipeline.
 ---

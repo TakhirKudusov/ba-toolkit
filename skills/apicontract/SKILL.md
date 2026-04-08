@@ -1,5 +1,5 @@
 ---
-name: ba-apicontract
+name: apicontract
 description: >
   Generate API contracts: endpoints, methods, parameters, request/response schemas, error codes. Markdown format approximating OpenAPI. Use on /apicontract command, or when the user asks for "API contract", "describe API", "endpoints", "REST API", "WebSocket API", "describe API", "integration contract", "swagger", "describe requests and responses", "webhook contract", "API specification". Eighth step of the BA Toolkit pipeline.
 ---

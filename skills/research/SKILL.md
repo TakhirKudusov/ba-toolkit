@@ -1,5 +1,5 @@
 ---
-name: ba-research
+name: research
 description: >
   Generate a technology and constraints research document before committing to API and data design. Covers integration options, API style choices, data storage alternatives, regulatory constraints, and ADR (Architecture Decision Records) with rationale. Use on /research command, or when the user asks for "technology research", "tech decisions", "architecture options", "integration research", "compare options", "what stack to use", "ADR", "architecture decision", "research constraints". Optional step — run after /datadict and before /apicontract.
 ---

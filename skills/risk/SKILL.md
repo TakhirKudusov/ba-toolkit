@@ -1,5 +1,5 @@
 ---
-name: ba-risk
+name: risk
 description: >
   Dedicated risk register for BA Toolkit projects. Use on /risk command, or when the user asks to "identify risks", "create a risk register", "assess project risks", "list risks", "risk matrix". Cross-cutting command — can run at any pipeline stage once Brief or SRS exists. Re-run after Research to capture technical risks.
 ---

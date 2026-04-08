@@ -1,5 +1,5 @@
 ---
-name: ba-trace
+name: trace
 description: >
   Build and update the traceability matrix across all BA Toolkit pipeline artifacts: FR ↔ US ↔ UC ↔ AC ↔ NFR ↔ Data Entity ↔ API Endpoint ↔ Wireframe. Use on /trace command, or when the user asks for "traceability matrix", "requirements traceability", "coverage check", "uncovered requirements", "artifact links", "check coverage", "find missing requirements", "what is not covered". Cross-cutting command available at any stage after /stories.
 ---

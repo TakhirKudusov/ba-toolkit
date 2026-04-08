@@ -1,5 +1,5 @@
 ---
-name: ba-handoff
+name: handoff
 description: >
   Generate a development handoff package summarising the entire BA Toolkit pipeline: artifact inventory, MVP scope, open items, top risks, and recommended next steps. Use on /handoff command, or when the user asks to "prepare handoff", "create handoff document", "summarise the pipeline", "package for developers", "ready for development", "export to Jira", "what is left to do", "pipeline summary". Optional final step — available after /wireframes.
 ---

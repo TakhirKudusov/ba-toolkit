@@ -1,5 +1,5 @@
 ---
-name: ba-srs
+name: srs
 description: >
   Generate a Software Requirements Specification (SRS) based on the Project Brief. Adapted IEEE 830 format. Use on /srs command, or when the user asks for "requirements specification", "SRS", "functional requirements", "system requirements", "describe requirements", "write a technical specification". Second step of the BA Toolkit pipeline.
 ---

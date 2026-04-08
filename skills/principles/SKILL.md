@@ -1,5 +1,5 @@
 ---
-name: ba-principles
+name: principles
 description: >
   Define project-level principles that govern the entire BA Toolkit pipeline: artifact language, ID conventions, traceability requirements, Definition of Ready per artifact type, mandatory NFR categories, and quality gates. Use on /principles command, or when the user asks to "set project standards", "define conventions", "establish principles", "set up pipeline rules", "configure traceability requirements", "define definition of ready". Optional step — run before /brief or immediately after it. All subsequent skills load and apply these principles automatically.
 ---

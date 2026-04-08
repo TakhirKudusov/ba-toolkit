@@ -1,5 +1,5 @@
 ---
-name: ba-ac
+name: ac
 description: >
   Generate Acceptance Criteria in Given/When/Then (Gherkin) format for each User Story. Use on /ac command, or when the user asks for "acceptance criteria", "given when then", "gherkin scenarios", "write AC", "definition of done", "how to verify a story", "test scenarios for stories". Fifth step of the BA Toolkit pipeline.
 ---

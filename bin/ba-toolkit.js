@@ -18,38 +18,54 @@ const PACKAGE_ROOT = path.resolve(__dirname, '..');
 const SKILLS_DIR = path.join(PACKAGE_ROOT, 'skills');
 const PKG = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8'));
 
+// In v2.0 the install paths dropped the previous `ba-toolkit/` wrapper
+// directory. Claude Code, Codex CLI, and Gemini CLI all expect skills
+// to be discoverable as direct subfolders of their skills root —
+// `.claude/skills/<skill-name>/SKILL.md`, not nested one level deeper.
+// The wrapper made all 21 skills invisible to every agent.
+//
+// Cursor and Windsurf load `.mdc` rule files directly from their rules
+// root, so v2.0 also flattens that layout: the per-skill subfolders
+// produced by the previous version are gone, and rules sit at
+// `.cursor/rules/<skill-name>.mdc`.
+//
+// To stay safe sharing the skills root with the user's other skills /
+// rules, every install also drops a `.ba-toolkit-manifest.json` next to
+// the installed items. uninstall and upgrade read this manifest to
+// remove only what the toolkit owns; without it they refuse to touch
+// anything.
 const AGENTS = {
   'claude-code': {
     name: 'Claude Code',
-    projectPath: '.claude/skills/ba-toolkit',
-    globalPath: path.join(os.homedir(), '.claude', 'skills', 'ba-toolkit'),
+    projectPath: '.claude/skills',
+    globalPath: path.join(os.homedir(), '.claude', 'skills'),
     format: 'skill',
     restartHint: 'Restart Claude Code to load the new skills.',
   },
   codex: {
     name: 'OpenAI Codex CLI',
     projectPath: null, // Codex uses only global
-    globalPath: path.join(process.env.CODEX_HOME || path.join(os.homedir(), '.codex'), 'skills', 'ba-toolkit'),
+    globalPath: path.join(process.env.CODEX_HOME || path.join(os.homedir(), '.codex'), 'skills'),
     format: 'skill',
     restartHint: 'Restart the Codex CLI to load the new skills.',
   },
   gemini: {
     name: 'Google Gemini CLI',
-    projectPath: '.gemini/skills/ba-toolkit',
-    globalPath: path.join(os.homedir(), '.gemini', 'skills', 'ba-toolkit'),
+    projectPath: '.gemini/skills',
+    globalPath: path.join(os.homedir(), '.gemini', 'skills'),
     format: 'skill',
     restartHint: 'Reload Gemini CLI to pick up the new skills.',
   },
   cursor: {
     name: 'Cursor',
-    projectPath: '.cursor/rules/ba-toolkit',
+    projectPath: '.cursor/rules',
     globalPath: null, // Cursor rules are project-scoped
     format: 'mdc',
     restartHint: 'Reload the Cursor window to apply new rules.',
   },
   windsurf: {
     name: 'Windsurf',
-    projectPath: '.windsurf/rules/ba-toolkit',
+    projectPath: '.windsurf/rules',
     globalPath: null,
     format: 'mdc',
     restartHint: 'Reload the Windsurf window to apply new rules.',
@@ -296,35 +312,21 @@ function today() {
   return new Date().toISOString().slice(0, 10);
 }
 
-function copyDir(src, dest, { dryRun = false, transform = null } = {}) {
-  if (!fs.existsSync(src)) {
-    throw new Error(`Source directory not found: ${src}`);
-  }
-  const copied = [];
-  (function walk(s, d) {
-    if (!dryRun) fs.mkdirSync(d, { recursive: true });
-    for (const entry of fs.readdirSync(s, { withFileTypes: true })) {
-      const srcPath = path.join(s, entry.name);
-      let destPath = path.join(d, entry.name);
-      if (entry.isDirectory()) {
-        walk(srcPath, destPath);
-        continue;
-      }
-      if (transform) {
-        const result = transform(srcPath, destPath);
-        if (!result) continue;
-        destPath = result.destPath;
-        if (!dryRun) {
-          fs.mkdirSync(path.dirname(destPath), { recursive: true });
-          fs.writeFileSync(destPath, result.content);
-        }
-      } else {
-        if (!dryRun) fs.copyFileSync(srcPath, destPath);
-      }
-      copied.push(destPath);
+// Generic recursive copy that mirrors src into dest. Used by copySkills
+// for the references/ folder and for skill-format skill folders, where
+// the source structure is preserved verbatim.
+function copyDirRecursive(src, dest, { dryRun, copied }) {
+  if (!dryRun) fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const sp = path.join(src, entry.name);
+    const dp = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDirRecursive(sp, dp, { dryRun, copied });
+    } else {
+      if (!dryRun) fs.copyFileSync(sp, dp);
+      copied.push(dp);
     }
-  })(src, dest);
-  return copied;
+  }
 }
 
 // Minimal YAML frontmatter parser for SKILL.md files.
@@ -400,19 +402,74 @@ function parseSkillFrontmatter(content) {
   };
 }
 
-// Transform SKILL.md → .mdc for Cursor / Windsurf.
-// Other files (references/, templates/) are copied as-is.
-function skillToMdc(srcPath, destPath) {
-  const base = path.basename(srcPath);
-  if (base !== 'SKILL.md') {
-    return { destPath, content: fs.readFileSync(srcPath) };
+// Transform a SKILL.md file's contents to the Cursor/Windsurf .mdc rule
+// format: replace the YAML frontmatter with the two fields the rule
+// loader expects (description, alwaysApply), keep the body unchanged.
+function skillToMdcContent(content) {
+  const { description, body } = parseSkillFrontmatter(content);
+  return `---\ndescription: ${description}\nalwaysApply: false\n---\n\n` + body;
+}
+
+// Install the package's skills/ tree into the given destination, picking
+// the layout the target agent expects.
+//
+// For 'skill' format (Claude Code, Codex, Gemini): each source skill
+// folder lands as `<destRoot>/<skillName>/SKILL.md`. The references/
+// folder is copied as-is to `<destRoot>/references/`.
+//
+// For 'mdc' format (Cursor, Windsurf): each source skill folder is
+// flattened to a single `<destRoot>/<skillName>.mdc` file containing
+// the transformed content. References still go to `<destRoot>/references/`
+// — non-.mdc files there are ignored by the rule loaders, but the LLM
+// can still find them at runtime via the Read tool.
+//
+// Skill names come from the SKILL.md `name:` frontmatter field, falling
+// back to the source folder name. Returns:
+//   { copied, items }
+// where `copied` is the list of absolute file paths written and `items`
+// is the list of top-level entries in destRoot that the toolkit owns
+// (used to write the manifest).
+function copySkills(srcRoot, destRoot, { format, dryRun = false }) {
+  if (!fs.existsSync(srcRoot)) {
+    throw new Error(`Source directory not found: ${srcRoot}`);
   }
-  const content = fs.readFileSync(srcPath, 'utf8');
-  const { name, description, body } = parseSkillFrontmatter(content);
-  const ruleName = name || path.basename(path.dirname(srcPath));
-  const mdcFrontmatter = `---\ndescription: ${description}\nalwaysApply: false\n---\n\n`;
-  const newDestPath = path.join(path.dirname(destPath), `${ruleName}.mdc`);
-  return { destPath: newDestPath, content: mdcFrontmatter + body };
+  const copied = [];
+  const items = [];
+
+  if (!dryRun) fs.mkdirSync(destRoot, { recursive: true });
+
+  for (const entry of fs.readdirSync(srcRoot, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const srcPath = path.join(srcRoot, entry.name);
+
+    if (entry.name === 'references') {
+      const refDest = path.join(destRoot, 'references');
+      copyDirRecursive(srcPath, refDest, { dryRun, copied });
+      items.push('references');
+      continue;
+    }
+
+    // Skill folder. Read its SKILL.md to get the canonical name.
+    const skillMdSrc = path.join(srcPath, 'SKILL.md');
+    if (!fs.existsSync(skillMdSrc)) continue; // not a skill folder
+    const content = fs.readFileSync(skillMdSrc, 'utf8');
+    const { name } = parseSkillFrontmatter(content);
+    const skillName = name || entry.name;
+
+    if (format === 'mdc') {
+      const transformed = skillToMdcContent(content);
+      const destFile = path.join(destRoot, `${skillName}.mdc`);
+      if (!dryRun) fs.writeFileSync(destFile, transformed);
+      copied.push(destFile);
+      items.push(`${skillName}.mdc`);
+    } else {
+      const skillDestDir = path.join(destRoot, skillName);
+      copyDirRecursive(srcPath, skillDestDir, { dryRun, copied });
+      items.push(skillName);
+    }
+  }
+
+  return { copied, items };
 }
 
 // Path to the AGENTS.md template file. Lives next to the rest of the
@@ -620,14 +677,18 @@ async function cmdInit(args) {
   log('');
 }
 
-// Marker file written into the install destination after a successful copy.
-// Lets `upgrade` and `status` (future command) tell which package version
-// is currently installed without diffing every file. Hidden file with no
-// `.md` / `.mdc` extension so the agent's skill loader ignores it.
-const SENTINEL_FILENAME = '.ba-toolkit-version';
+// Manifest written into the install destination after a successful copy.
+// Replaces the v1.x version sentinel — now also tracks WHICH items
+// belong to BA Toolkit, so uninstall/upgrade can selectively remove
+// only what we own without touching the user's other skills sitting in
+// the same directory.
+//
+// Hidden filename with no `.md` / `.mdc` extension so the skill loader
+// of every supported agent ignores it.
+const MANIFEST_FILENAME = '.ba-toolkit-manifest.json';
 
-function readSentinel(destDir) {
-  const p = path.join(destDir, SENTINEL_FILENAME);
+function readManifest(destDir) {
+  const p = path.join(destDir, MANIFEST_FILENAME);
   if (!fs.existsSync(p)) return null;
   try {
     return JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -636,45 +697,52 @@ function readSentinel(destDir) {
   }
 }
 
-function writeSentinel(destDir) {
+function writeManifest(destDir, format, items) {
   const payload = {
     version: PKG.version,
     installedAt: new Date().toISOString(),
+    format,
+    items,
   };
   fs.writeFileSync(
-    path.join(destDir, SENTINEL_FILENAME),
+    path.join(destDir, MANIFEST_FILENAME),
     JSON.stringify(payload, null, 2) + '\n',
   );
 }
 
+// Detect the v1.x install layout: every previous install path nested
+// our 21 skills under an extra `ba-toolkit/` folder, which made them
+// invisible to every agent's skill loader. Returns the absolute paths
+// of any legacy folders that still exist for the given agent, so the
+// caller can warn the user to clean them up before installing v2.0.
+function detectLegacyInstall(agent) {
+  const candidates = [];
+  if (agent.projectPath) {
+    candidates.push(path.resolve(process.cwd(), agent.projectPath, 'ba-toolkit'));
+  }
+  if (agent.globalPath) {
+    candidates.push(path.join(agent.globalPath, 'ba-toolkit'));
+  }
+  return candidates.filter((p) => fs.existsSync(p));
+}
+
 // Core install logic. Shared between `cmdInstall` (standalone), `cmdInit`
 // (full setup), and `cmdUpgrade`. Returns true on success, false if the
-// user declined to overwrite an existing destination. Pass `force: true`
-// to skip the overwrite prompt — `cmdUpgrade` uses this because it has
-// already wiped the destination and explicitly knows the overwrite is ok.
+// user declined to overwrite an existing install. Pass `force: true` to
+// skip the overwrite prompt — cmdUpgrade uses this because it has
+// already removed the previous install via the manifest.
+//
+// v2.0 model: the destination directory is shared with the user's other
+// skills. We never wipe destDir wholesale. Before copying we read the
+// manifest (if any) and remove only the items the previous v2.0 install
+// owned, then copy the new tree and write a fresh manifest. Items that
+// don't appear in the manifest are not ours and never get touched.
 async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = true, force = false }) {
-  const agent = AGENTS[agentId];
-  if (!agent) {
-    logError(`Unknown agent: ${agentId}`);
-    log('Supported: ' + Object.keys(AGENTS).join(', '));
-    process.exit(1);
-  }
-
-  let effectiveGlobal = !!isGlobal;
-  if (!isGlobal && !isProject) {
-    // Default: project-level if supported, otherwise global
-    effectiveGlobal = !agent.projectPath;
-  }
-  if (effectiveGlobal && !agent.globalPath) {
-    logError(`${agent.name} does not support --global install.`);
-    process.exit(1);
-  }
-  if (!effectiveGlobal && !agent.projectPath) {
-    logError(`${agent.name} does not support project-level install. Use --global.`);
-    process.exit(1);
-  }
-
-  const destDir = effectiveGlobal ? agent.globalPath : path.resolve(process.cwd(), agent.projectPath);
+  const { agent, destDir, effectiveGlobal } = resolveAgentDestination({
+    agentId,
+    isGlobal,
+    isProject,
+  });
 
   if (showHeader) {
     log('');
@@ -690,32 +758,86 @@ async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = t
   log(`    format:       ${agent.format === 'mdc' ? '.mdc (converted from SKILL.md)' : 'SKILL.md (native)'}`);
   if (dryRun) log('    ' + yellow('mode:         dry-run (no files will be written)'));
 
-  if (fs.existsSync(destDir) && !dryRun && !force) {
-    const answer = await prompt(`    ${destDir} already exists. Overwrite? (y/N): `);
+  // Warn about a v1.x wrapper folder if one is sitting in the same
+  // location. Don't auto-delete — could be the user's working state.
+  warnLegacyInstall(agent);
+
+  // If a previous v2.0 install lives here, ask before replacing it.
+  // The manifest is the only signal that the directory contains our
+  // files; without it we treat the install as fresh and let copySkills
+  // happily add to whatever's already there.
+  const existingManifest = readManifest(destDir);
+  if (existingManifest && !dryRun && !force) {
+    log(`    existing:     v${existingManifest.version} (${existingManifest.items.length} items)`);
+    const answer = await prompt('    Replace existing BA Toolkit install? (y/N): ');
     if (answer.toLowerCase() !== 'y') {
       log('    cancelled.');
       return false;
     }
   }
 
-  const transform = agent.format === 'mdc' ? skillToMdc : null;
-  let copied;
+  // Selectively remove the previous install's items (and only those)
+  // before copying the new tree. Sentinel-style file is removed too.
+  if (existingManifest && !dryRun) {
+    removeManifestItems(destDir, existingManifest);
+  }
+
+  let result;
   try {
-    copied = copyDir(SKILLS_DIR, destDir, { dryRun, transform });
+    result = copySkills(SKILLS_DIR, destDir, { format: agent.format, dryRun });
   } catch (err) {
     logError(err.message);
     process.exit(1);
   }
 
   if (!dryRun) {
-    writeSentinel(destDir);
+    writeManifest(destDir, agent.format, result.items);
   }
 
-  log('    ' + green(`${dryRun ? 'would copy' : 'copied'} ${copied.length} files.`));
+  log('    ' + green(`${dryRun ? 'would copy' : 'copied'} ${result.copied.length} files (${result.items.length} items).`));
   if (!dryRun && agent.format === 'mdc') {
     log('    ' + gray('SKILL.md files converted to .mdc rule format.'));
   }
   return true;
+}
+
+// Remove every item listed in the given manifest from destDir, then
+// remove the manifest file itself. Items are paths relative to destDir
+// — for 'skill' format they're folder names (`brief`, `srs`, ...,
+// `references`), for 'mdc' they're file names (`brief.mdc`, ...,
+// plus the `references` folder). Anything not in the manifest is left
+// alone, including the user's other skills/rules in the same directory.
+function removeManifestItems(destDir, manifest) {
+  for (const item of manifest.items) {
+    const p = path.join(destDir, item);
+    if (fs.existsSync(p)) {
+      fs.rmSync(p, { recursive: true, force: true });
+    }
+  }
+  const manifestPath = path.join(destDir, MANIFEST_FILENAME);
+  if (fs.existsSync(manifestPath)) {
+    fs.rmSync(manifestPath, { force: true });
+  }
+}
+
+// Print a yellow warning if the v1.x wrapper directory is still around
+// in the same skills root. The wrapper made every shipped skill
+// invisible to the agent, so any user upgrading from v1 needs to
+// remove it manually before v2.0 can install correctly.
+function warnLegacyInstall(agent) {
+  const legacy = detectLegacyInstall(agent);
+  if (legacy.length === 0) return;
+  log('');
+  log('  ' + yellow('! Legacy v1.x install detected — must be removed before v2.0 will work:'));
+  for (const p of legacy) {
+    log('  ' + yellow(`    ${p}`));
+  }
+  log('  ' + yellow('  v2.0 dropped the ba-toolkit/ wrapper folder; the agent ignored every skill nested under it.'));
+  log('  ' + yellow('  Remove the legacy folder manually:'));
+  for (const p of legacy) {
+    log('  ' + gray(`    rm -rf "${p}"`));
+  }
+  log('');
 }
 
 async function cmdInstall(args) {
@@ -775,74 +897,82 @@ function cmdStatus() {
   log(`  scanning from:    ${process.cwd()}`);
   log('');
 
-  // Walk every (agent × scope) combination and collect the ones whose
-  // destination directory actually exists. Project-scope paths resolve
-  // against the current working directory; global paths are absolute.
+  // Walk every (agent × scope) combination and collect the ones that
+  // have a v2.0 manifest. Project-scope paths resolve against the
+  // current working directory; global paths are absolute.
   const rows = [];
+  const legacyRows = [];
+
+  const checkLocation = (agent, agentId, scope, dir) => {
+    if (!fs.existsSync(dir)) return;
+    const manifest = readManifest(dir);
+    if (manifest) {
+      rows.push({
+        agentName: agent.name,
+        agentId,
+        scope,
+        path: dir,
+        version: manifest.version,
+        installedAt: manifest.installedAt,
+        itemCount: manifest.items.length,
+      });
+    }
+  };
+
   for (const [agentId, agent] of Object.entries(AGENTS)) {
     if (agent.projectPath) {
       const projectDir = path.resolve(process.cwd(), agent.projectPath);
-      if (fs.existsSync(projectDir)) {
-        const sentinel = readSentinel(projectDir);
-        rows.push({
-          agentName: agent.name,
-          agentId,
-          scope: 'project',
-          path: projectDir,
-          version: sentinel ? sentinel.version : null,
-          installedAt: sentinel ? sentinel.installedAt : null,
-        });
-      }
+      checkLocation(agent, agentId, 'project', projectDir);
     }
     if (agent.globalPath) {
-      if (fs.existsSync(agent.globalPath)) {
-        const sentinel = readSentinel(agent.globalPath);
-        rows.push({
-          agentName: agent.name,
-          agentId,
-          scope: 'global',
-          path: agent.globalPath,
-          version: sentinel ? sentinel.version : null,
-          installedAt: sentinel ? sentinel.installedAt : null,
-        });
-      }
+      checkLocation(agent, agentId, 'global', agent.globalPath);
+    }
+    // Surface any v1.x wrapper folders as a separate "legacy" row.
+    for (const legacyPath of detectLegacyInstall(agent)) {
+      legacyRows.push({ agentName: agent.name, agentId, path: legacyPath });
     }
   }
 
-  if (rows.length === 0) {
+  if (rows.length === 0 && legacyRows.length === 0) {
     log('  ' + gray('No BA Toolkit installations found in any known location.'));
     log('  ' + gray("Run 'ba-toolkit install --for <agent>' to install one."));
     log('');
     return;
   }
 
-  log(`  Found ${bold(rows.length)} installation${rows.length === 1 ? '' : 's'}:`);
-  log('');
-
-  for (const row of rows) {
-    let versionLabel;
-    if (!row.version) {
-      versionLabel = gray('(unknown — pre-1.4 install with no sentinel)');
-    } else if (row.version === PKG.version) {
-      versionLabel = green(row.version + ' (current)');
-    } else {
-      versionLabel = yellow(row.version + ' (outdated)');
-    }
-    log(`  ${bold(row.agentName)} ${gray('(' + row.agentId + ', ' + row.scope + ')')}`);
-    log(`    path:      ${row.path}`);
-    log(`    version:   ${versionLabel}`);
-    if (row.installedAt) {
-      log(`    installed: ${gray(row.installedAt)}`);
-    }
+  if (rows.length > 0) {
+    log(`  Found ${bold(rows.length)} installation${rows.length === 1 ? '' : 's'}:`);
     log('');
+    for (const row of rows) {
+      const versionLabel = row.version === PKG.version
+        ? green(row.version + ' (current)')
+        : yellow(row.version + ' (outdated)');
+      log(`  ${bold(row.agentName)} ${gray('(' + row.agentId + ', ' + row.scope + ')')}`);
+      log(`    path:      ${row.path}`);
+      log(`    version:   ${versionLabel}`);
+      log(`    items:     ${row.itemCount}`);
+      log(`    installed: ${gray(row.installedAt)}`);
+      log('');
+    }
   }
 
-  const stale = rows.filter((r) => !r.version || r.version !== PKG.version);
+  if (legacyRows.length > 0) {
+    log('  ' + yellow(`Found ${legacyRows.length} legacy v1.x install${legacyRows.length === 1 ? '' : 's'} (broken — invisible to the agent):`));
+    log('');
+    for (const row of legacyRows) {
+      log(`  ${bold(row.agentName)} ${gray('(' + row.agentId + ', legacy wrapper)')}`);
+      log(`    path:      ${row.path}`);
+      log(`    fix:       ` + gray(`rm -rf "${row.path}" && ba-toolkit install --for ${row.agentId}`));
+      log('');
+    }
+  }
+
+  const stale = rows.filter((r) => r.version !== PKG.version);
   if (stale.length > 0) {
     log('  ' + yellow(`${stale.length} installation${stale.length === 1 ? '' : 's'} not at version ${PKG.version}.`));
     log('  ' + gray("Run 'ba-toolkit upgrade --for <agent>' to refresh."));
     log('');
-  } else {
+  } else if (rows.length > 0) {
     log('  ' + green('All installations are up to date.'));
     log('');
   }
@@ -869,54 +999,47 @@ async function cmdUpgrade(args) {
   log(`  destination:  ${destDir}`);
   log(`  scope:        ${effectiveGlobal ? 'global (user-wide)' : 'project-level'}`);
 
+  warnLegacyInstall(agent);
+
   if (!fs.existsSync(destDir)) {
     log('');
     log('  ' + gray(`No installation found at ${destDir}.`));
-    log('  ' + gray(`Run \`ba-toolkit install --for ${agentId}\` first.`));
+    log('  ' + gray(`Run 'ba-toolkit install --for ${agentId}' first.`));
     log('');
     return;
   }
 
-  const sentinel = readSentinel(destDir);
-  const currentVersion = PKG.version;
-  const installedVersion = sentinel ? sentinel.version : null;
+  const manifest = readManifest(destDir);
+  if (!manifest) {
+    log('');
+    log('  ' + gray('No BA Toolkit manifest found in this destination.'));
+    log('  ' + gray(`Run 'ba-toolkit install --for ${agentId}' to install fresh.`));
+    log('');
+    return;
+  }
 
-  if (installedVersion === currentVersion) {
-    log(`  installed:    ${installedVersion} (current)`);
+  const currentVersion = PKG.version;
+  if (manifest.version === currentVersion) {
+    log(`  installed:    ${manifest.version} (current)`);
     log(`  package:      ${currentVersion}`);
     log('');
     log('  ' + green('Already up to date.'));
-    log('  ' + gray(`To force a clean reinstall, run \`ba-toolkit install --for ${agentId}\`.`));
+    log('  ' + gray(`To force a clean reinstall, run 'ba-toolkit install --for ${agentId}'.`));
     log('');
     return;
   }
 
-  log(`  installed:    ${installedVersion || gray('(unknown — pre-1.4 install with no sentinel)')}`);
+  log(`  installed:    ${manifest.version}`);
   log(`  package:      ${currentVersion}`);
+  log(`  items:        ${manifest.items.length}`);
   if (dryRun) log('  ' + yellow('mode:         dry-run (no files will be written)'));
   log('');
 
-  // Safety: same guard as cmdUninstall — never rmSync anything that
-  // doesn't look like a ba-toolkit folder.
-  if (path.basename(destDir) !== 'ba-toolkit') {
-    logError(`Refusing to upgrade suspicious destination (not a ba-toolkit folder): ${destDir}`);
-    process.exit(1);
-  }
-
-  // Count files in the existing install for the dry-run preview.
   if (dryRun) {
-    let existingCount = 0;
-    (function walk(d) {
-      for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
-        const p = path.join(d, entry.name);
-        if (entry.isDirectory()) walk(p);
-        else existingCount++;
-      }
-    })(destDir);
-    log('  ' + yellow(`would remove ${existingCount} existing files`));
+    log('  ' + yellow(`would remove ${manifest.items.length} previously-installed items, then re-copy the new tree`));
   } else {
-    log('  ' + green('Removing previous install...'));
-    fs.rmSync(destDir, { recursive: true, force: true });
+    log('  ' + green('Removing previous install (manifest-driven)...'));
+    removeManifestItems(destDir, manifest);
   }
 
   const ok = await runInstall({
@@ -956,51 +1079,49 @@ async function cmdUninstall(args) {
   log(`  destination:  ${destDir}`);
   log(`  scope:        ${effectiveGlobal ? 'global (user-wide)' : 'project-level'}`);
   if (dryRun) log('  ' + yellow('mode:         dry-run (no files will be removed)'));
-  log('');
 
-  // Safety: this is the only place in the CLI that calls fs.rmSync with
-  // recursive: true. Refuse to proceed unless the destination is clearly
-  // a ba-toolkit folder (the install paths in AGENTS all end in
-  // `ba-toolkit/`). Without this check, a corrupted AGENTS entry or a
-  // future bug could turn this into `rm -rf $HOME`.
-  if (path.basename(destDir) !== 'ba-toolkit') {
-    logError(`Refusing to remove suspicious destination (not a ba-toolkit folder): ${destDir}`);
-    process.exit(1);
-  }
+  warnLegacyInstall(agent);
 
   if (!fs.existsSync(destDir)) {
+    log('');
     log('  ' + gray(`Nothing to uninstall — ${destDir} does not exist.`));
     log('');
     return;
   }
 
-  // Count files for the preview message and final confirmation.
-  let fileCount = 0;
-  (function walk(d) {
-    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
-      const p = path.join(d, entry.name);
-      if (entry.isDirectory()) walk(p);
-      else fileCount++;
-    }
-  })(destDir);
-
-  log(`  Found ${bold(fileCount)} files in the destination.`);
-
-  if (dryRun) {
-    log('  ' + yellow(`would remove ${fileCount} files from ${destDir}.`));
+  // The manifest is the proof we own anything in this directory. The
+  // destination is shared with the user's other skills/rules, so we
+  // can't just `rm -rf destDir` — we'd nuke unrelated files. Without
+  // a manifest, refuse and tell the user.
+  const manifest = readManifest(destDir);
+  if (!manifest) {
+    log('');
+    log('  ' + gray('No BA Toolkit manifest found in this destination.'));
+    log('  ' + gray('Either nothing was installed here, or the install pre-dates v2.0.'));
+    log('  ' + gray('For a v1.x legacy wrapper, see the warning above (if any) for the path to remove manually.'));
     log('');
     return;
   }
 
   log('');
-  const answer = await prompt(`  Remove ${destDir}? (y/N): `);
+  log(`  installed:    ${manifest.version}`);
+  log(`  items:        ${bold(manifest.items.length)} (${manifest.items.slice(0, 5).join(', ')}${manifest.items.length > 5 ? ', …' : ''})`);
+
+  if (dryRun) {
+    log('  ' + yellow(`would remove ${manifest.items.length} items + the manifest from ${destDir}`));
+    log('');
+    return;
+  }
+
+  log('');
+  const answer = await prompt(`  Remove ${manifest.items.length} BA Toolkit items from ${destDir}? (y/N): `);
   if (answer.toLowerCase() !== 'y') {
     log('  Cancelled.');
     log('');
     return;
   }
-  fs.rmSync(destDir, { recursive: true, force: true });
-  log('  ' + green(`Removed ${fileCount} files from ${destDir}.`));
+  removeManifestItems(destDir, manifest);
+  log('  ' + green(`Removed ${manifest.items.length} items.`));
   log('  ' + yellow(agent.restartHint));
   log('');
 }
@@ -1143,7 +1264,9 @@ module.exports = {
   levenshtein,
   closestMatch,
   parseSkillFrontmatter,
-  readSentinel,
+  skillToMdcContent,
+  readManifest,
+  detectLegacyInstall,
   renderAgentsMd,
   KNOWN_FLAGS,
   DOMAINS,

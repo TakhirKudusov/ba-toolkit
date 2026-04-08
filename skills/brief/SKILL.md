@@ -1,5 +1,5 @@
 ---
-name: ba-brief
+name: brief
 description: >
   Generate a high-level Project Brief for projects in any domain (SaaS, Fintech, E-commerce, Healthcare, Logistics, and others). Use this skill when the user enters /brief, or asks to "create a project brief", "describe the project", "start a new project", "project brief", or mentions the starting stage of the analytical pipeline. Also triggers on requests like "begin with a brief", "describe the product", "form a product description". First step of the BA Toolkit pipeline.
 ---

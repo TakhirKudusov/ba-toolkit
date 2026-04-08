@@ -55,36 +55,45 @@ Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. Cursor
 
 Use these if you can't use npm or want to track a specific git commit.
 
+**Important — v2.0 layout:** the skills go directly under the agent's skills root, not nested under a `ba-toolkit/` wrapper folder. Versions before v2.0 used a wrapper, which made every skill invisible to the agent. If you're upgrading from v1.x, remove the legacy wrapper folder first.
+
 ### Claude Code CLI
 
 ```bash
 git clone https://github.com/TakhirKudusov/ba-toolkit.git
-cp -r ba-toolkit/skills/ /path/to/project/.claude/skills/ba-toolkit/
 
-# Or install globally:
-cp -r ba-toolkit/skills/ ~/.claude/skills/ba-toolkit/
+# Project-level: copy the contents of skills/ into .claude/skills/
+mkdir -p /path/to/project/.claude/skills
+cp -R ba-toolkit/skills/. /path/to/project/.claude/skills/
+
+# Or globally:
+mkdir -p ~/.claude/skills
+cp -R ba-toolkit/skills/. ~/.claude/skills/
 ```
 
-Keep the full tree: skill folders (`brief/`, `srs/`, …) must stay together with `references/` in the same parent directory.
+Each skill folder (`brief/`, `srs/`, …) lands as a direct child of `.claude/skills/`, and the `references/` folder sits next to them. If you have other skills installed in the same directory, they're left alone.
 
 ### OpenAI Codex CLI
 
 Skills load from `$CODEX_HOME/skills` (default `~/.codex/skills`):
 
 ```bash
-cp -r ba-toolkit/skills/ ~/.codex/skills/ba-toolkit/
+mkdir -p ~/.codex/skills
+cp -R ba-toolkit/skills/. ~/.codex/skills/
 ```
 
-If you use a custom Codex home, set `CODEX_HOME` and copy under `$CODEX_HOME/skills/ba-toolkit/`.
+If you use a custom Codex home, set `CODEX_HOME` and copy under `$CODEX_HOME/skills/`.
 
 ### Google Gemini CLI
 
 ```bash
 # User-wide (all projects)
-cp -r ba-toolkit/skills/ ~/.gemini/skills/ba-toolkit/
+mkdir -p ~/.gemini/skills
+cp -R ba-toolkit/skills/. ~/.gemini/skills/
 
 # Or project-only
-cp -r ba-toolkit/skills/ /path/to/project/.gemini/skills/ba-toolkit/
+mkdir -p /path/to/project/.gemini/skills
+cp -R ba-toolkit/skills/. /path/to/project/.gemini/skills/
 ```
 
 Reload the CLI after copying.
@@ -193,9 +202,9 @@ BA Toolkit uses the open Agent Skills specification (`SKILL.md` format) publishe
 
 | Platform | Support | Installation |
 |----------|:-------:|-------------|
-| **Claude Code** | Native | `cp -r skills/ .claude/skills/ba-toolkit/` |
-| **OpenAI Codex CLI** | Native | `cp -r skills/ ~/.codex/skills/ba-toolkit/` |
-| **Gemini CLI** | Native | Copy `skills/` to `~/.gemini/skills/ba-toolkit/` (user) or `.gemini/skills/ba-toolkit/` (workspace) |
+| **Claude Code** | Native | `cp -R skills/. .claude/skills/` |
+| **OpenAI Codex CLI** | Native | `cp -R skills/. ~/.codex/skills/` |
+| **Gemini CLI** | Native | Copy `skills/.` contents to `~/.gemini/skills/` (user) or `.gemini/skills/` (workspace) |
 | **Cursor** | Convert | `SKILL.md` → `.mdc` rules in `.cursor/rules/` |
 | **Windsurf** | Convert | `SKILL.md` → rules in `.windsurf/rules/` |
 | **Aider** | Convert | `SKILL.md` → conventions file |

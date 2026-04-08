@@ -11,6 +11,62 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [2.0.0] — 2026-04-09
+
+### ⚠️ BREAKING — install layout dropped the `ba-toolkit/` wrapper
+
+**Every previous version of this package was broken.** The CLI installed skills under a `ba-toolkit/` wrapper folder (e.g. `.claude/skills/ba-toolkit/brief/SKILL.md`), but Claude Code, Codex CLI, Gemini CLI, Cursor and Windsurf all expect skills as **direct children** of their skills/rules root (`.claude/skills/<skill-name>/SKILL.md`). The wrapper made every shipped skill invisible to the agent — `/brief`, `/srs`, etc. silently did nothing because the agent didn't know they existed. The README, examples and all documentation referenced `/brief`, but the install path made it impossible for that command to ever resolve. Confirmed against the [official Claude Code skills documentation](https://code.claude.com/docs/en/skills.md): *"Each skill is a directory with `SKILL.md` as the entrypoint"* under `.claude/skills/<skill-name>/`, with no nested-namespace support.
+
+v2.0 fixes this for real:
+
+- **All 5 agent install paths drop the `ba-toolkit/` wrapper.** New paths:
+  - Claude Code: `.claude/skills/` (project) and `~/.claude/skills/` (global)
+  - OpenAI Codex CLI: `~/.codex/skills/` (global only)
+  - Gemini CLI: `.gemini/skills/` and `~/.gemini/skills/`
+  - Cursor: `.cursor/rules/` (project only, flat .mdc files)
+  - Windsurf: `.windsurf/rules/` (project only, flat .mdc files)
+- **Cursor and Windsurf layouts are now flat.** Previously each skill was nested under `.cursor/rules/ba-toolkit/<skill>/<skill>.mdc` (3 levels). Now each becomes a single `.mdc` file at the rules root: `.cursor/rules/<skill>.mdc`. Cursor's rule loader expects flat `.mdc` files, never recurses.
+- **SKILL.md `name:` field renamed.** The 21 SKILL.md files used `name: ba-brief`, `name: ba-srs`, etc. But Claude Code derives the slash command from the `name` field — so the actual command was `/ba-brief`, not `/brief` as the README promised. All 21 files now use bare names (`name: brief`, `name: srs`, ...), and the slash commands `/brief`, `/srs`, `/ac`, … finally match the documentation.
+- **Manifest replaces sentinel.** `runInstall` now writes `.ba-toolkit-manifest.json` listing every item it owns at the destination root. `cmdUninstall` and `cmdUpgrade` read the manifest and remove **only** those items — the destination directory is now shared with the user's other skills, so we can never `rm -rf` the whole root. Without a manifest, uninstall and upgrade refuse to do anything destructive. Manifest format:
+  ```json
+  {
+    "version": "2.0.0",
+    "installedAt": "2026-04-09T...",
+    "format": "skill",
+    "items": ["brief", "srs", "ac", ..., "references"]
+  }
+  ```
+- **Legacy v1.x detection.** `runInstall`, `cmdUpgrade`, `cmdUninstall`, and `cmdStatus` now detect the old `ba-toolkit/` wrapper folder if it's still on disk and print a yellow warning with the exact `rm -rf` command to clean it up. The legacy folder is never auto-deleted — it might contain user state.
+
+### Migration from v1.x
+
+If you have a v1.x install on disk, the legacy `ba-toolkit/` wrapper will be sitting in the same parent directory as the new layout — it doesn't conflict with v2.0 file-wise, but it never worked, so you should remove it:
+
+```bash
+# Manual cleanup (one-time, per agent that had a v1.x install):
+rm -rf .claude/skills/ba-toolkit          # claude-code project-level
+rm -rf ~/.claude/skills/ba-toolkit         # claude-code global
+rm -rf ~/.codex/skills/ba-toolkit          # codex
+rm -rf .gemini/skills/ba-toolkit           # gemini project-level
+rm -rf ~/.gemini/skills/ba-toolkit         # gemini global
+rm -rf .cursor/rules/ba-toolkit            # cursor
+rm -rf .windsurf/rules/ba-toolkit          # windsurf
+
+# Then reinstall with v2.0:
+ba-toolkit install --for claude-code
+```
+
+`ba-toolkit status` lists any legacy wrappers it finds on the system as a warning row, so you can audit before cleaning up.
+
+### Internal
+
+- **`copySkills(srcRoot, destRoot, { format })` replaces the previous `copyDir` + `skillToMdc`** combo. The new copy logic understands the per-format layout (folder-per-skill for `skill` format, flat `.mdc` files for `mdc` format) and reads the SKILL.md frontmatter to derive the canonical skill name from the `name:` field. References go to `<destRoot>/references/` regardless of format — non-`.mdc` files there are ignored by Cursor's rule loader.
+- **Manifest helpers** (`readManifest`, `writeManifest`, `removeManifestItems`) replace the previous `readSentinel` / `writeSentinel`. The sentinel was a 2-field marker; the manifest is also the source of truth for what to remove on uninstall.
+- **`detectLegacyInstall(agent)`** helper, used by every command that touches the install layout.
+- **Test count 91 → 95.** Sentinel tests replaced with manifest tests; new tests for `detectLegacyInstall` (positive and negative cases) and `skillToMdcContent` (frontmatter + body extraction). All 95 tests pass.
+
+---
+
 ## [1.5.0] — 2026-04-08
 
 ### Added
@@ -294,7 +350,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.5.0...v2.0.0
 [1.5.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.1...v1.3.2
