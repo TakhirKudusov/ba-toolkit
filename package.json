@@ -43,6 +43,6 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node bin/ba-toolkit.js --help > /dev/null && echo CLI smoke test passed"
+    "test": "node --test test/cli.test.js"
   }
 }

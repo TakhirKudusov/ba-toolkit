@@ -1019,26 +1019,43 @@ async function main() {
   }
 }
 
-// Clean exit on Ctrl+C: print on a fresh line so we don't append to a
-// half-typed prompt, close the readline interface so the terminal is
-// returned to a sane state, then exit with the conventional 130 code.
-process.on('SIGINT', () => {
-  console.log('\n  ' + yellow('Cancelled.'));
-  closeReadline();
-  process.exit(130);
-});
+// Exports for tests. Pure functions only — anything that prompts or
+// touches the filesystem stays internal. The bin file is still
+// runnable as a CLI; the `require.main === module` guard below
+// prevents `main()` from firing when the file is loaded as a module
+// from the test runner.
+module.exports = {
+  sanitiseSlug,
+  parseArgs,
+  resolveDomain,
+  resolveAgent,
+  readSentinel,
+  DOMAINS,
+  AGENTS,
+};
 
-main()
-  .then(() => {
+if (require.main === module) {
+  // Clean exit on Ctrl+C: print on a fresh line so we don't append to a
+  // half-typed prompt, close the readline interface so the terminal is
+  // returned to a sane state, then exit with the conventional 130 code.
+  process.on('SIGINT', () => {
+    console.log('\n  ' + yellow('Cancelled.'));
     closeReadline();
-  })
-  .catch((err) => {
-    closeReadline();
-    if (err && err.code === 'INPUT_CLOSED') {
-      logError('Input stream closed before all prompts could be answered.');
-      log('Pass remaining values as flags (e.g. --name, --domain, --for) or run interactively.');
-      process.exit(1);
-    }
-    logError(err && (err.stack || err.message) || String(err));
-    process.exit(1);
+    process.exit(130);
   });
+
+  main()
+    .then(() => {
+      closeReadline();
+    })
+    .catch((err) => {
+      closeReadline();
+      if (err && err.code === 'INPUT_CLOSED') {
+        logError('Input stream closed before all prompts could be answered.');
+        log('Pass remaining values as flags (e.g. --name, --domain, --for) or run interactively.');
+        process.exit(1);
+      }
+      logError(err && (err.stack || err.message) || String(err));
+      process.exit(1);
+    });
+}
