@@ -10,6 +10,7 @@ Third step of the BA Toolkit pipeline. Generates User Stories from functional re
 
 ## Context loading
 
+0. If `00_principles_*.md` exists in the output directory, load it and apply its conventions (artifact language, ID format, traceability requirements, Definition of Ready, quality gate threshold).
 1. Read `01_brief_*.md` and `02_srs_*.md`. If SRS is missing, warn and suggest `/srs`.
 2. Extract: slug, domain, roles, FR list, business rules, priorities.
 3. If domain is supported, load `references/domains/{domain}.md`, section `3. /stories`.
@@ -62,8 +63,22 @@ Brief description and business value.
 - `/revise [US-NNN or section]` — rewrite.
 - `/expand [US-NNN]` — add detail.
 - `/split [US-NNN]` — split into smaller stories.
+- `/clarify [focus]` — targeted ambiguity pass.
 - `/validate` — all FR covered; no orphan stories; numbering correct; roles consistent.
 - `/done` — finalize. Next step: `/usecases`.
+
+## Closing message
+
+After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
+
+- Saved file path.
+- Total number of user stories generated, grouped by Epic and MoSCoW priority.
+- Count of Must-priority FR covered.
+- Any stories flagged for `/split` due to complexity.
+
+Available commands: `/clarify [focus]` · `/revise [US-NNN]` · `/expand [US-NNN]` · `/split [US-NNN]` · `/validate` · `/done`
+
+Next step: `/usecases`
 
 ## Style
 

@@ -22,6 +22,8 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 No prior artifacts required. If `01_brief_*.md` already exists, warn the user and offer to overwrite or create a new project.
 
+If `00_principles_*.md` exists in the output directory, load it and apply its conventions for this and all subsequent pipeline steps (artifact language, ID format, traceability requirements, Definition of Ready, quality gate threshold).
+
 ### 3. Domain selection
 
 Ask the user about the project domain. If the domain matches `igaming`, `fintech`, or `saas`, load the corresponding `references/domains/{domain}.md`. Use domain-specific interview questions (section `1. /brief`), typical business goals, risks, and glossary from that file.
@@ -65,12 +67,53 @@ If a domain reference is loaded, supplement general questions with domain-specif
 ## 8. Glossary
 ```
 
-### 6. Iterative refinement
+### 6. AGENTS.md update
+
+After saving `01_brief_{slug}.md`, create or update `AGENTS.md` in the current working directory (project root). This file helps AI agents in future sessions quickly understand the project context without re-reading all artifacts.
+
+```markdown
+# BA Toolkit — Project Context
+
+**Project:** {Project Name}
+**Slug:** {slug}
+**Domain:** {domain}
+**Language:** {artifact language}
+**Pipeline stage:** Brief complete
+
+## Artifacts
+- `{output_dir}/01_brief_{slug}.md` — Project Brief
+
+## Key context
+- **Business goal:** {one-line summary}
+- **Target audience:** {one-line summary}
+- **Key constraints:** {comma-separated list}
+
+## Next step
+Run `/srs` to generate the Requirements Specification.
+```
+
+If `AGENTS.md` already exists and was created by BA Toolkit, update only the "Pipeline stage" and "Artifacts" sections — do not overwrite custom content added by the user.
+
+### 8. Iterative refinement
 
 - `/revise [section]` — rewrite a section.
 - `/expand [section]` — add detail.
+- `/clarify [focus]` — targeted ambiguity pass.
 - `/validate` — check completeness and consistency.
-- `/done` — finalize. Next step: `/srs`.
+- `/done` — finalize and update `AGENTS.md`. Next step: `/srs`.
+
+### 9. Closing message
+
+After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
+
+- Saved file path.
+- Project name, domain, and slug confirmed for the pipeline.
+- Count of business goals documented and key constraints captured.
+- List of identified risks.
+
+Available commands: `/clarify [focus]` · `/revise [section]` · `/expand [section]` · `/validate` · `/done`
+
+Next step: `/srs`
 
 ## Style
 

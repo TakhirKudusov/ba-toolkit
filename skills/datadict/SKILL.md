@@ -10,6 +10,7 @@ Seventh step of the BA Toolkit pipeline. Generates a data dictionary: entities, 
 
 ## Context loading
 
+0. If `00_principles_*.md` exists in the output directory, load it and apply its conventions (artifact language, ID format, entity naming convention, Definition of Ready, quality gate threshold).
 1. Read `01_brief_*.md`, `02_srs_*.md`, `03_stories_*.md`. SRS is the minimum requirement.
 2. Extract: slug, domain, entities (mentioned in FR and US), business rules, roles.
 3. If domain supported, load `references/domains/{domain}.md`, section `7. /datadict`. Use mandatory entities and domain-specific questions.
@@ -75,8 +76,22 @@ Supplement with domain-specific questions and mandatory entities from the refere
 - `/revise [entity]` — rewrite.
 - `/expand [entity]` — add attributes, indexes.
 - `/split [entity]` — separate an entity.
+- `/clarify [focus]` — targeted ambiguity pass.
 - `/validate` — all entities from SRS/stories described; FK references correct; types match DBMS.
 - `/done` — finalize. Next step: `/apicontract`.
+
+## Closing message
+
+After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
+
+- Saved file path.
+- Total number of entities documented and total attribute count.
+- DBMS chosen and naming convention confirmed.
+- Entities flagged for audit trail or versioning.
+
+Available commands: `/clarify [focus]` · `/revise [entity]` · `/expand [entity]` · `/split [entity]` · `/validate` · `/done`
+
+Next step: `/apicontract`
 
 ## Style
 

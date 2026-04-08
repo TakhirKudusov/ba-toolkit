@@ -10,6 +10,7 @@ Sixth step of the BA Toolkit pipeline. Generates NFR with measurable metrics.
 
 ## Context loading
 
+0. If `00_principles_*.md` exists in the output directory, load it and apply its conventions (artifact language, ID format, traceability requirements, Definition of Ready, quality gate threshold). Pay special attention to section 5 (NFR Baseline) — all listed categories are mandatory for this project.
 1. Read `01_brief_*.md`, `02_srs_*.md`, `03_stories_*.md`. SRS is the minimum requirement.
 2. Extract: slug, domain, integrations, roles, FR list.
 3. If domain supported, load `references/domains/{domain}.md`, section `6. /nfr`. Use mandatory NFR categories for the domain.
@@ -62,8 +63,22 @@ After generation, update section 5 of `02_srs_{slug}.md` with links to specific 
 
 - `/revise [NFR-NNN]` — rewrite.
 - `/expand [category]` — add NFR.
+- `/clarify [focus]` — targeted ambiguity pass (especially useful for surfacing NFR without measurable metrics).
 - `/validate` — mandatory categories covered; every NFR has a metric; links correct.
 - `/done` — finalize. Next step: `/datadict`.
+
+## Closing message
+
+After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
+
+- Saved file path.
+- Total number of NFR generated, grouped by category.
+- Confirmation that section 5 of `02_srs_{slug}.md` was updated with NFR links.
+- Any categories flagged as missing or lacking measurable metrics.
+
+Available commands: `/clarify [focus]` · `/revise [NFR-NNN]` · `/expand [category]` · `/validate` · `/done`
+
+Next step: `/datadict`
 
 ## Style
 

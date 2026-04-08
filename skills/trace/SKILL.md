@@ -10,6 +10,7 @@ Cross-cutting command of the BA Toolkit pipeline. Available after `/stories` is 
 
 ## Context loading
 
+0. If `00_principles_*.md` exists in the output directory, load it. Use its traceability requirements (section 3) to determine which links are CRITICAL, HIGH, or MEDIUM severity when flagging gaps.
 1. Read all pipeline artifacts from the output directory. Minimum required: `02_srs_*.md` and `03_stories_*.md`.
 2. Determine which artifacts are available and adapt matrix columns accordingly.
 3. Domain reference not needed for this skill — all information comes from the artifacts.
@@ -65,6 +66,19 @@ Specific actions to close coverage gaps.
 
 - `/revise` — regenerate (re-read all artifacts).
 - `/validate` — extended check: nonexistent IDs, circular dependencies, duplicate links.
+
+## Closing message
+
+After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
+
+- Saved file path.
+- Overall coverage percentage per artifact type.
+- Count of uncovered FRs, orphan US, and US without AC.
+- Specific recommendations to close the highest-severity gaps.
+
+Available commands: `/revise` (regenerate) · `/validate` · `/analyze` (full quality report)
+
+No further pipeline step — use `/analyze` for a detailed cross-artifact quality report.
 
 ## Style
 

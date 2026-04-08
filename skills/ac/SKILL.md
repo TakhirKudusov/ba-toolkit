@@ -10,6 +10,7 @@ Fifth step of the BA Toolkit pipeline. Generates AC in Given/When/Then (Gherkin)
 
 ## Context loading
 
+0. If `00_principles_*.md` exists in the output directory, load it and apply its conventions (artifact language, ID format, traceability requirements, Definition of Ready, quality gate threshold).
 1. Read `01_brief_*.md`, `02_srs_*.md`, `03_stories_*.md`, `04_usecases_*.md`. If usecases missing, warn and suggest `/usecases`.
 2. Extract: slug, domain, US list, UC list, business rules, roles.
 3. If domain supported, load `references/domains/{domain}.md`, section `5. /ac`.
@@ -65,8 +66,22 @@ After generation, update `03_stories_{slug}.md`: fill the "Acceptance Criteria" 
 - `/revise [AC-NNN-NN]` — rewrite.
 - `/expand [US-NNN]` — add AC.
 - `/split [AC-NNN-NN]` — split compound AC.
+- `/clarify [focus]` — targeted ambiguity pass.
 - `/validate` — all US have AC; links correct; Given/When/Then present; stories file updated.
 - `/done` — finalize. Next step: `/nfr`.
+
+## Closing message
+
+After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
+
+- Saved file path.
+- Total number of AC generated: breakdown by type (positive / negative / boundary).
+- Count of user stories covered.
+- Confirmation that back-references in `03_stories_{slug}.md` were updated.
+
+Available commands: `/clarify [focus]` · `/revise [AC-NNN-NN]` · `/expand [US-NNN]` · `/split [AC-NNN-NN]` · `/validate` · `/done`
+
+Next step: `/nfr`
 
 ## Style
 

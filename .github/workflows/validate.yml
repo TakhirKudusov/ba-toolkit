@@ -1,0 +1,68 @@
+name: Validate BA Toolkit Artifacts
+
+on:
+  pull_request:
+    paths:
+      - 'output/**'
+      - 'skills/**'
+
+jobs:
+  validate-artifacts:
+    name: Validate artifact structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run artifact validator
+        run: python .github/scripts/validate_artifacts.py
+
+  validate-skills:
+    name: Validate skill files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check all SKILL.md files have required frontmatter
+        run: |
+          set -e
+          FAIL=0
+          for skill_file in skills/*/SKILL.md; do
+            if ! grep -q "^name:" "$skill_file"; then
+              echo "::error file=$skill_file::Missing 'name:' in frontmatter"
+              FAIL=1
+            fi
+            if ! grep -q "^description:" "$skill_file"; then
+              echo "::error file=$skill_file::Missing 'description:' in frontmatter"
+              FAIL=1
+            fi
+            echo "  ✓ $skill_file"
+          done
+          if [ "$FAIL" -eq 1 ]; then
+            echo "::error::One or more SKILL.md files have invalid frontmatter."
+            exit 1
+          fi
+          echo "All skill files valid."
+
+      - name: Check domain reference files have required sections
+        run: |
+          set -e
+          REQUIRED_SECTIONS=("## 1. /brief" "## 2. /srs" "## 6. /nfr" "## 7. /datadict" "## Domain Glossary")
+          FAIL=0
+          for domain_file in skills/references/domains/*.md; do
+            for section in "${REQUIRED_SECTIONS[@]}"; do
+              if ! grep -qF "$section" "$domain_file"; then
+                echo "::warning file=$domain_file::Missing section: $section"
+              fi
+            done
+            echo "  ✓ $domain_file"
+          done
+          echo "Domain reference check complete."

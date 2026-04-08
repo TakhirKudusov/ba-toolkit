@@ -10,6 +10,7 @@ Fourth step of the BA Toolkit pipeline. Generates Use Cases in simplified Cockbu
 
 ## Context loading
 
+0. If `00_principles_*.md` exists in the output directory, load it and apply its conventions (artifact language, ID format, traceability requirements, Definition of Ready, quality gate threshold).
 1. Read `01_brief_*.md`, `02_srs_*.md`, `03_stories_*.md`. If stories missing, warn and suggest `/stories`.
 2. Extract: slug, domain, roles (actors), US list, FR list, business rules.
 3. If domain supported, load `references/domains/{domain}.md`, section `4. /usecases`.
@@ -68,8 +69,22 @@ Supplement with domain-specific questions and typical exceptional flows from the
 - `/revise [UC-NNN]` — rewrite.
 - `/expand [UC-NNN]` — add flows.
 - `/split [UC-NNN]` — split.
+- `/clarify [focus]` — targeted ambiguity pass.
 - `/validate` — all Must-US covered; references correct; actors consistent.
 - `/done` — finalize. Next step: `/ac`.
+
+## Closing message
+
+After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
+
+- Saved file path.
+- Total number of use cases generated.
+- Count of alternative and exceptional flows documented.
+- External system actors identified.
+
+Available commands: `/clarify [focus]` · `/revise [UC-NNN]` · `/expand [UC-NNN]` · `/split [UC-NNN]` · `/validate` · `/done`
+
+Next step: `/ac`
 
 ## Style
 

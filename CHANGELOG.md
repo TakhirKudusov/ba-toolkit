@@ -1,0 +1,99 @@
+# Changelog
+
+All notable changes to BA Toolkit are documented in this file.
+
+Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
+## [Unreleased]
+
+---
+
+## [1.1.0] — 2026-04-07
+
+### Added
+
+**New skills**
+- `/estimate` — effort estimation for User Stories: Fibonacci Story Points, T-shirt sizes, or person-days. Includes splitting recommendations for oversized stories.
+- `/glossary` — unified project glossary extraction. Scans all artifacts, detects terminology drift, finds undefined terms, generates `00_glossary_{slug}.md`.
+- `/export` — artifact export to external issue trackers: Jira (JSON), GitHub Issues (JSON + `gh` CLI script), Linear (JSON), and universal CSV.
+
+**Templates**
+- Added 12 new artifact templates to `skills/references/templates/`, covering all pipeline stages: `stories`, `usecases`, `ac`, `nfr`, `datadict`, `research`, `apicontract`, `wireframes`, `scenarios`, `trace`, `analyze`, `handoff`.
+
+**Domains**
+- Added 6 new domain reference files: `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`.
+- Domain count increased from 3 to 9.
+
+**Tooling**
+- `init.ps1` — PowerShell project initialiser for Windows. Creates `output/{slug}/` and `AGENTS.md` with full pipeline status table.
+- `init.sh` — Bash project initialiser for macOS / Linux. Same behaviour.
+- `.github/workflows/validate.yml` — GitHub Actions CI workflow. Validates artifact structure on PRs to `output/`. Checks SKILL.md frontmatter and domain reference sections.
+- `.github/scripts/validate_artifacts.py` — Python validator used by the CI workflow.
+
+### Changed
+- `skills badge` updated from 16 to 18 (estimate, glossary, export pending `.skill` packaging).
+- `domains badge` updated from 3 to 9.
+- `README.md`: added "Starting a new project" section to Installation, updated Repository Structure, added `estimate.skill` and `glossary.skill` to Claude.ai install list.
+- `skills/references/templates/README.md`: updated template table to list all 15 templates.
+
+---
+
+## [1.0.0] — 2026-03-15
+
+### Added
+
+**Core pipeline (16 skills)**
+- `/principles` — project constitution: language, ID format, traceability rules, Definition of Ready, NFR baseline, quality gates, output folder structure.
+- `/brief` — project brief: goals, audience, stakeholders, constraints, risks, glossary. Creates `AGENTS.md`.
+- `/srs` — software requirements specification: functional requirements (FR), roles, interfaces, MoSCoW matrix. Updates `AGENTS.md`.
+- `/stories` — user stories with epics, FR links, priority, and size.
+- `/usecases` — use cases with main success scenario, alternative flows, exception flows.
+- `/ac` — acceptance criteria in Given / When / Then format, Definition of Done checklists.
+- `/nfr` — non-functional requirements: performance, scalability, availability, security, maintainability, usability.
+- `/datadict` — data dictionary: entities, fields, types, constraints, relationships, enums.
+- `/research` — technology research and architecture decision records (ADRs), integration map, storage decisions, compliance notes.
+- `/apicontract` — API contract: endpoints (REST/GraphQL), request/response schemas, webhooks, error codes.
+- `/wireframes` — textual wireframe descriptions: layout, states, interactions, design notes per screen.
+- `/scenarios` — end-to-end validation scenarios with persona, steps, expected outcome, failure conditions, coverage summary.
+- `/handoff` — development handoff package: artifact inventory, MVP scope, traceability coverage, risks, recommended dev sequence.
+- `/trace` — cross-artifact traceability matrix: FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario. Coverage gaps and statistics.
+- `/clarify` — targeted ambiguity resolution: metrics-free adjectives, undefined terms, conflicting rules, missing fields, ambiguous actors, duplicates.
+- `/analyze` — cross-artifact quality report: duplication, ambiguity, coverage gaps, terminology drift, invalid references. Severity-rated findings.
+
+**Iterative refinement subcommands**
+- `/revise [section]` — rewrite a specific section.
+- `/expand [section]` — add more detail.
+- `/split [element]` — split a large User Story or FR into smaller elements.
+- `/validate` — completeness and consistency check.
+- `/done` — finalise artifact and advance to the next pipeline step.
+
+**Domain references (3 initial)**
+- `igaming.md` — iGaming: slots, sports betting, casino lobbies, Telegram Mini Apps, promo mechanics.
+- `fintech.md` — Fintech: neobanks, payment systems, crypto exchanges, investment platforms.
+- `saas.md` — SaaS: B2B platforms, CRM, analytics, marketplaces, EdTech, HRTech.
+
+**Reference files**
+- `skills/references/environment.md` — platform-specific output paths and flat/subfolder modes.
+- `skills/references/closing-message.md` — standardised closing message template used by all skills.
+- `skills/references/prerequisites.md` — per-step prerequisite checklists for all 16 skills.
+- `skills/references/templates/` — base artifact templates: `principles`, `brief`, `srs`.
+
+**Packaged skills**
+- 16 `.skill` files in the repo root for direct upload to Claude.ai.
+
+**AGENTS.md synchronisation**
+- `/brief` creates `AGENTS.md` with project context (slug, domain, constraints, pipeline stage).
+- `/srs` updates `AGENTS.md` with roles and integrations.
+
+**Project files**
+- `README.md` — full documentation: pipeline diagram, platform compatibility, usage guide, FAQ, contributing guide, domain table, example artifacts, MVP paths.
+- `LICENSE` — MIT license.
+
+---
+
+[Unreleased]: https://github.com/your-username/ba-toolkit/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/your-username/ba-toolkit/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/your-username/ba-toolkit/releases/tag/v1.0.0

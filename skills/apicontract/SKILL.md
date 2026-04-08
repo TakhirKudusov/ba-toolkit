@@ -10,6 +10,7 @@ Eighth step of the BA Toolkit pipeline. Generates API contracts in Markdown form
 
 ## Context loading
 
+0. If `00_principles_*.md` exists in the output directory, load it and apply its conventions (artifact language, ID format, traceability requirements, Definition of Ready, quality gate threshold).
 1. Read `02_srs_*.md`, `03_stories_*.md`, `07_datadict_*.md`. SRS and Data Dictionary are the minimum.
 2. Extract: slug, domain, FR list, entities and attributes, integrations, roles.
 3. If domain supported, load `references/domains/{domain}.md`, section `8. /apicontract`. Use typical endpoint groups.
@@ -90,8 +91,22 @@ Supplement with domain-specific questions from the reference.
 
 - `/revise [endpoint or group]` — rewrite.
 - `/expand [endpoint]` — add parameters, errors, examples.
+- `/clarify [focus]` — targeted ambiguity pass.
 - `/validate` — all FR with interface requirements covered; types match Data Dictionary; HTTP methods correct.
 - `/done` — finalize. Next step: `/wireframes`.
+
+## Closing message
+
+After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
+
+- Saved file path.
+- Total number of endpoints grouped by HTTP method and domain group.
+- Protocol and authentication method confirmed.
+- WebSocket events and Webhook contracts included (if applicable).
+
+Available commands: `/clarify [focus]` · `/revise [endpoint]` · `/expand [endpoint]` · `/validate` · `/done`
+
+Next step: `/wireframes`
 
 ## Style
 

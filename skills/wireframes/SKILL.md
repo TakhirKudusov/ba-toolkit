@@ -10,6 +10,7 @@ Ninth and final step of the BA Toolkit pipeline. Generates textual screen specif
 
 ## Context loading
 
+0. If `00_principles_*.md` exists in the output directory, load it and apply its conventions (artifact language, ID format, traceability requirements, Definition of Ready, quality gate threshold).
 1. Read `01_brief_*.md`, `02_srs_*.md`, `03_stories_*.md`, `08_apicontract_*.md` (if exists).
 2. Extract: slug, domain, US list, API endpoints, roles, platforms.
 3. If domain supported, load `references/domains/{domain}.md`, section `9. /wireframes`. Use typical screens and domain-specific states.
@@ -84,8 +85,22 @@ Overall navigation structure: sections, hierarchy, transitions.
 - `/revise [WF-NNN]` — rewrite.
 - `/expand [WF-NNN]` — add elements, states.
 - `/split [WF-NNN]` — extract modals etc.
+- `/clarify [focus]` — targeted ambiguity pass.
 - `/validate` — all Must-US have a screen; API links correct; 4 states described; navigation connected.
 - `/done` — pipeline complete. Suggest running `/trace`.
+
+## Closing message
+
+After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
+
+- Saved file path.
+- Total number of screens (WF-NNN) documented and platform(s) covered.
+- Navigation model confirmed (tab bar / sidebar / other).
+- Count of screens with API endpoint links.
+
+Available commands: `/clarify [focus]` · `/revise [WF-NNN]` · `/expand [WF-NNN]` · `/split [WF-NNN]` · `/validate` · `/done`
+
+Pipeline complete. Run `/trace` to check full coverage or `/analyze` for a cross-artifact quality report.
 
 ## Style
 
