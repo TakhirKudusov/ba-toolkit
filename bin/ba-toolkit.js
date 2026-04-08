@@ -584,6 +584,102 @@ async function cmdInstall(args) {
   log('');
 }
 
+// Resolve agent + scope (project vs global) into the target directory
+// path. Shared validation for cmdUninstall — `runInstall` does its own
+// version of this inline; both could be unified later.
+function resolveAgentDestination({ agentId, isGlobal, isProject }) {
+  const agent = AGENTS[agentId];
+  if (!agent) {
+    logError(`Unknown agent: ${agentId}`);
+    log('Supported: ' + Object.keys(AGENTS).join(', '));
+    process.exit(1);
+  }
+  let effectiveGlobal = !!isGlobal;
+  if (!isGlobal && !isProject) {
+    effectiveGlobal = !agent.projectPath;
+  }
+  if (effectiveGlobal && !agent.globalPath) {
+    logError(`${agent.name} does not support --global install.`);
+    process.exit(1);
+  }
+  if (!effectiveGlobal && !agent.projectPath) {
+    logError(`${agent.name} does not support project-level install. Use --global.`);
+    process.exit(1);
+  }
+  const destDir = effectiveGlobal ? agent.globalPath : path.resolve(process.cwd(), agent.projectPath);
+  return { agent, destDir, effectiveGlobal };
+}
+
+async function cmdUninstall(args) {
+  const agentId = args.flags.for;
+  if (!agentId || agentId === true) {
+    logError('--for <agent> is required.');
+    log('Supported agents: ' + Object.keys(AGENTS).join(', '));
+    process.exit(1);
+  }
+  const { agent, destDir, effectiveGlobal } = resolveAgentDestination({
+    agentId,
+    isGlobal: !!args.flags.global,
+    isProject: !!args.flags.project,
+  });
+  const dryRun = !!args.flags['dry-run'];
+
+  log('');
+  log('  ' + cyan(`BA Toolkit — Uninstall from ${agent.name}`));
+  log('  ' + cyan('================================'));
+  log('');
+  log(`  destination:  ${destDir}`);
+  log(`  scope:        ${effectiveGlobal ? 'global (user-wide)' : 'project-level'}`);
+  if (dryRun) log('  ' + yellow('mode:         dry-run (no files will be removed)'));
+  log('');
+
+  // Safety: this is the only place in the CLI that calls fs.rmSync with
+  // recursive: true. Refuse to proceed unless the destination is clearly
+  // a ba-toolkit folder (the install paths in AGENTS all end in
+  // `ba-toolkit/`). Without this check, a corrupted AGENTS entry or a
+  // future bug could turn this into `rm -rf $HOME`.
+  if (path.basename(destDir) !== 'ba-toolkit') {
+    logError(`Refusing to remove suspicious destination (not a ba-toolkit folder): ${destDir}`);
+    process.exit(1);
+  }
+
+  if (!fs.existsSync(destDir)) {
+    log('  ' + gray(`Nothing to uninstall — ${destDir} does not exist.`));
+    log('');
+    return;
+  }
+
+  // Count files for the preview message and final confirmation.
+  let fileCount = 0;
+  (function walk(d) {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, entry.name);
+      if (entry.isDirectory()) walk(p);
+      else fileCount++;
+    }
+  })(destDir);
+
+  log(`  Found ${bold(fileCount)} files in the destination.`);
+
+  if (dryRun) {
+    log('  ' + yellow(`would remove ${fileCount} files from ${destDir}.`));
+    log('');
+    return;
+  }
+
+  log('');
+  const answer = await prompt(`  Remove ${destDir}? (y/N): `);
+  if (answer.toLowerCase() !== 'y') {
+    log('  Cancelled.');
+    log('');
+    return;
+  }
+  fs.rmSync(destDir, { recursive: true, force: true });
+  log('  ' + green(`Removed ${fileCount} files from ${destDir}.`));
+  log('  ' + yellow(agent.restartHint));
+  log('');
+}
+
 function cmdHelp() {
   log(`${bold('ba-toolkit')} v${PKG.version} — AI-powered Business Analyst pipeline
 
@@ -597,6 +693,9 @@ ${bold('COMMANDS')}
                                  skills into the chosen agent's directory.
   install --for <agent>          Install (or re-install) skills into an
                                  agent's directory without creating a project.
+  uninstall --for <agent>        Remove BA Toolkit skills from an agent's
+                                 directory. Asks for confirmation before
+                                 deleting; supports --dry-run.
 
 ${bold('INIT OPTIONS')}
   --name <name>                  Skip the project name prompt
@@ -617,6 +716,13 @@ ${bold('INSTALL OPTIONS')}
   --project                      Project-level install (default when supported)
   --dry-run                      Preview without writing files
 
+${bold('UNINSTALL OPTIONS')}
+  --for <agent>                  One of: ${Object.keys(AGENTS).join(', ')}
+  --global                       Remove the user-wide install
+  --project                      Remove the project-level install
+                                 (default when the agent supports it)
+  --dry-run                      Preview without removing files
+
 ${bold('GENERAL OPTIONS')}
   --version, -v                  Print version and exit
   --help, -h                     Print this help and exit
@@ -634,6 +740,11 @@ ${bold('EXAMPLES')}
   # Re-install skills after a toolkit update (no project changes).
   ba-toolkit install --for claude-code
   ba-toolkit install --for cursor --dry-run
+
+  # Remove skills from an agent (asks for confirmation).
+  ba-toolkit uninstall --for claude-code
+  ba-toolkit uninstall --for claude-code --global
+  ba-toolkit uninstall --for cursor --dry-run
 
 ${bold('LEARN MORE')}
   https://github.com/TakhirKudusov/ba-toolkit
@@ -662,6 +773,9 @@ async function main() {
       break;
     case 'install':
       await cmdInstall(args);
+      break;
+    case 'uninstall':
+      await cmdUninstall(args);
       break;
     case 'help':
       cmdHelp();
