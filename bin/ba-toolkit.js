@@ -94,6 +94,15 @@ function parseArgs(argv) {
       break;
     }
     if (a.startsWith('--')) {
+      // Support --key=value form (in addition to --key value). The `=` must
+      // come after at least one character of key, so `--=value` and `--`
+      // alone fall through. Splits on the FIRST `=` only — values may
+      // contain further `=` characters.
+      const eqIdx = a.indexOf('=');
+      if (eqIdx > 2) {
+        args.flags[a.slice(2, eqIdx)] = a.slice(eqIdx + 1);
+        continue;
+      }
       const key = a.slice(2);
       const next = argv[i + 1];
       if (next !== undefined && !next.startsWith('-')) {
