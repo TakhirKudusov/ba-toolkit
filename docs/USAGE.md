@@ -174,18 +174,18 @@ After `/brief` completes, the agent creates or updates `AGENTS.md` in your proje
 ```markdown
 # BA Toolkit — Project Context
 
-**Project:** Dragon Fortune
-**Slug:** dragon-fortune
-**Domain:** iGaming
+**Project:** My App
+**Slug:** my-app
+**Domain:** saas
 **Language:** English
 **Pipeline stage:** Brief complete
 
 ## Artifacts
-- `/outputs/01_brief_dragon-fortune.md` — Project Brief
+- `/outputs/01_brief_my-app.md` — Project Brief
 
 ## Key context
-- **Business goal:** Telegram Mini App slot for CIS markets, 50k MAU in 6 months
-- **Key constraints:** Telegram API limits, AML/KYC compliance, certified RTP
+- **Business goal:** B2B SaaS analytics platform, 500 paying teams in year one
+- **Key constraints:** GDPR compliance, SSO via OIDC, sub-second dashboard queries
 
 ## Next step
 Run /srs to generate the Requirements Specification.

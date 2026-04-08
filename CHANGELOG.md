@@ -11,6 +11,38 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.3.0] — 2026-04-08
+
+### Changed
+
+- **`ba-toolkit init` is now a one-command setup.** It prompts for project name, slug (auto-derived from the name), domain, and AI agent, then creates `output/{slug}/`, writes `AGENTS.md`, and installs the skills into the chosen agent's directory — in a single interactive flow. Previously this required two commands: `ba-toolkit init` followed by `ba-toolkit install --for <agent>`. The old two-step flow is still available via `ba-toolkit init --no-install` + `ba-toolkit install --for <agent>`.
+- **Domain and agent selection now use numbered menus** instead of free-text input. Domains are listed 1–10 with name and short description; agents are listed 1–5 with their registered id. Users can type either the menu number (`1`, `2`, …) or the id (`saas`, `claude-code`, …).
+- **`DOMAINS` reordered** so general-purpose industries (SaaS, Fintech, E-commerce, Healthcare) appear first; iGaming moved to position 9. The toolkit is no longer iGaming-first in its defaults.
+- **Setup placeholders no longer use "Dragon Fortune"** (the iGaming example project). The CLI, `init.sh`, `init.ps1`, `docs/USAGE.md` AGENTS.md example, and `skills/references/environment.md` file listings now use neutral placeholders (`My App` / `my-app` / `saas`). The actual example project in `example/dragon-fortune/` and the skill templates that reference it are unchanged — they remain a real iGaming walkthrough.
+
+### Added
+
+- `ba-toolkit init --for <agent>` flag — skip the agent menu (e.g. `--for claude-code`). Accepts the same set as `ba-toolkit install --for`.
+- `ba-toolkit init --no-install` flag — create the project structure only; don't install skills. Restores the pre-1.3.0 behavior for CI pipelines that run `init` and `install` as separate steps.
+- `ba-toolkit init --global` / `--project` / `--dry-run` flags — forwarded to the embedded install step.
+- `init.sh` and `init.ps1` shell fallbacks now use the same numbered domain menu and auto-derived slug UX as the CLI, with pointers to `npx @kudusov.takhir/ba-toolkit install --for <agent>` for the skill install step (they remain zero-dependency scripts and don't install skills themselves).
+
+### Migration note
+
+CI scripts that relied on the old behaviour (`init` creates files only, `install` is a separate step) need one of:
+
+- Pass all the new flags to get fully non-interactive behaviour:
+  ```bash
+  npx @kudusov.takhir/ba-toolkit init --name "My App" --domain saas --for claude-code
+  ```
+- Or add `--no-install` to keep the two-step flow:
+  ```bash
+  npx @kudusov.takhir/ba-toolkit init --name "My App" --domain saas --no-install
+  npx @kudusov.takhir/ba-toolkit install --for claude-code
+  ```
+
+---
+
 ## [1.2.5] — 2026-04-08
 
 ### Changed
@@ -180,7 +212,8 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.5...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.5...v1.3.0
 [1.2.5]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.2...v1.2.3

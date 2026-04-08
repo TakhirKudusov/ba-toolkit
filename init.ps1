@@ -1,70 +1,117 @@
 # BA Toolkit — Project Initialiser (PowerShell)
 # Usage: .\init.ps1
-# Creates the output folder structure and a starter AGENTS.md for a new project.
+#
+# Creates the output folder structure and a starter AGENTS.md for a new
+# project. This is a zero-dependency fallback for environments without
+# Node.js. The recommended one-command setup is `npx @kudusov.takhir/ba-toolkit init`,
+# which also installs skills into the chosen AI agent's directory.
 
 param(
-    [string]$Slug = "",
     [string]$Name = "",
+    [string]$Slug = "",
     [string]$Domain = ""
 )
+
+$Domains = @(
+    @{ id = "saas";         name = "SaaS";         desc = "B2B platforms, CRM, analytics, EdTech, HRTech" },
+    @{ id = "fintech";      name = "Fintech";      desc = "Neobanks, payments, crypto, P2P lending" },
+    @{ id = "ecommerce";    name = "E-commerce";   desc = "Stores, marketplaces, D2C brands, digital goods" },
+    @{ id = "healthcare";   name = "Healthcare";   desc = "Telemedicine, EHR, patient portals, clinic management" },
+    @{ id = "logistics";    name = "Logistics";    desc = "Delivery, courier, WMS, fleet management" },
+    @{ id = "on-demand";    name = "On-demand";    desc = "Ride-hailing, home services, task marketplaces" },
+    @{ id = "social-media"; name = "Social/Media"; desc = "Social networks, creator platforms, community forums" },
+    @{ id = "real-estate";  name = "Real Estate";  desc = "Property portals, agency CRM, rental management" },
+    @{ id = "igaming";      name = "iGaming";      desc = "Slots, betting, casino, Telegram Mini Apps" },
+    @{ id = "custom";       name = "Custom";       desc = "Any other domain — general interview questions" }
+)
+
+function Sanitise-Slug([string]$input) {
+    ($input.ToLower() -replace '[^a-z0-9-]', '-' -replace '-+', '-' -replace '^-|-$', '')
+}
 
 Write-Host ""
 Write-Host "  BA Toolkit — New Project Setup" -ForegroundColor Cyan
 Write-Host "  ================================" -ForegroundColor Cyan
 Write-Host ""
 
-# --- Collect project info ---
-
-if (-not $Slug) {
-    $Slug = Read-Host "  Project slug (lowercase, hyphens only, e.g. dragon-fortune)"
-}
-$Slug = $Slug.ToLower() -replace '[^a-z0-9-]', '-' -replace '-+', '-' -replace '^-|-$', ''
+# --- 1. Project name ---
 
 if (-not $Name) {
-    $Name = Read-Host "  Project name (human-readable, e.g. Dragon Fortune)"
+    $Name = Read-Host "  Project name (e.g. My App)"
 }
+$Name = $Name.Trim()
+if (-not $Name) {
+    Write-Host "  error: Project name is required." -ForegroundColor Red
+    exit 1
+}
+
+# --- 2. Slug (auto-derived, user can override) ---
+
+if (-not $Slug) {
+    $Derived = Sanitise-Slug $Name
+    if ($Derived) {
+        $Custom = Read-Host "  Project slug [$Derived]"
+        if ($Custom) { $Slug = $Custom } else { $Slug = $Derived }
+    } else {
+        $Slug = Read-Host "  Project slug (lowercase, hyphens only)"
+    }
+}
+$Slug = Sanitise-Slug $Slug
+if (-not $Slug) {
+    Write-Host "  error: Invalid or empty slug." -ForegroundColor Red
+    exit 1
+}
+
+# --- 3. Domain (numbered menu) ---
 
 if (-not $Domain) {
     Write-Host ""
-    Write-Host "  Available domains:" -ForegroundColor Yellow
-    Write-Host "    igaming      iGaming — slots, betting, casino, Telegram Mini Apps"
-    Write-Host "    fintech      Fintech — neobanks, payments, crypto, P2P lending"
-    Write-Host "    saas         SaaS — B2B platforms, CRM, analytics, EdTech"
-    Write-Host "    ecommerce    E-commerce — stores, marketplaces, D2C brands"
-    Write-Host "    healthcare   Healthcare — telemedicine, EHR, patient portals"
-    Write-Host "    logistics    Logistics — delivery, courier, WMS, fleet"
-    Write-Host "    on-demand    On-demand — ride-hailing, home services, marketplace"
-    Write-Host "    social-media Social/Media — social networks, creator platforms"
-    Write-Host "    real-estate  Real Estate — property portals, CRM, rental management"
-    Write-Host "    custom       Custom — any other domain"
+    Write-Host "  Pick a domain:" -ForegroundColor Yellow
+    for ($i = 0; $i -lt $Domains.Count; $i++) {
+        $d = $Domains[$i]
+        $idx = ($i + 1).ToString().PadLeft(2)
+        Write-Host ("    {0}) {1,-13} — {2}" -f $idx, $d.name, $d.desc)
+    }
     Write-Host ""
-    $Domain = Read-Host "  Domain"
-}
-$Domain = $Domain.ToLower().Trim()
+    $DomainChoice = Read-Host "  Select [1-$($Domains.Count)]"
 
-# --- Determine output directory ---
+    # Resolve digit or id
+    if ($DomainChoice -match '^\d+$') {
+        $n = [int]$DomainChoice
+        if ($n -ge 1 -and $n -le $Domains.Count) {
+            $Domain = $Domains[$n - 1].id
+        }
+    } else {
+        $DomainChoice = $DomainChoice.ToLower().Trim()
+        foreach ($d in $Domains) {
+            if ($d.id -eq $DomainChoice) {
+                $Domain = $d.id
+                break
+            }
+        }
+    }
+
+    if (-not $Domain) {
+        Write-Host "  error: Invalid selection." -ForegroundColor Red
+        exit 1
+    }
+}
+
+# --- 4. Create folder structure ---
 
 $OutputDir = "output\$Slug"
-
-# --- Create folder structure ---
 
 Write-Host ""
 Write-Host "  Creating project structure..." -ForegroundColor Green
 
-$dirs = @(
-    $OutputDir
-)
-
-foreach ($dir in $dirs) {
-    if (-not (Test-Path $dir)) {
-        New-Item -ItemType Directory -Path $dir | Out-Null
-        Write-Host "    created  $dir" -ForegroundColor DarkGreen
-    } else {
-        Write-Host "    exists   $dir" -ForegroundColor DarkYellow
-    }
+if (-not (Test-Path $OutputDir)) {
+    New-Item -ItemType Directory -Path $OutputDir | Out-Null
+    Write-Host "    created  $OutputDir" -ForegroundColor DarkGreen
+} else {
+    Write-Host "    exists   $OutputDir" -ForegroundColor DarkYellow
 }
 
-# --- Create AGENTS.md ---
+# --- 5. Create AGENTS.md ---
 
 $today = Get-Date -Format "yyyy-MM-dd"
 $agentsPath = "AGENTS.md"
@@ -72,7 +119,7 @@ $agentsPath = "AGENTS.md"
 if (Test-Path $agentsPath) {
     $overwrite = Read-Host "  AGENTS.md already exists. Overwrite? (y/N)"
     if ($overwrite -ne "y" -and $overwrite -ne "Y") {
-        Write-Host "  Skipped AGENTS.md." -ForegroundColor DarkYellow
+        Write-Host "    skipped  AGENTS.md" -ForegroundColor DarkYellow
         $agentsPath = $null
     }
 }
@@ -127,15 +174,18 @@ if ($agentsPath) {
     Write-Host "    created  AGENTS.md" -ForegroundColor DarkGreen
 }
 
-# --- Done ---
+# --- 6. Done ---
 
 Write-Host ""
 Write-Host "  Project '$Name' ($Slug) initialised." -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Next steps:" -ForegroundColor Yellow
-Write-Host "    1. Open your AI assistant (Claude, Cursor, etc.)"
-Write-Host "    2. Optional: run /principles to define project-wide conventions"
-Write-Host "    3. Run /brief to start the pipeline"
+Write-Host "    1. Install skills into your AI agent. The npm CLI does this in one shot:"
+Write-Host "         npx @kudusov.takhir/ba-toolkit install --for claude-code" -ForegroundColor DarkGray
+Write-Host "       Or copy ``skills/`` manually — see the Manual install section in README.md."
+Write-Host "    2. Open your AI assistant (Claude, Cursor, etc.)"
+Write-Host "    3. Optional: run /principles to define project-wide conventions"
+Write-Host "    4. Run /brief to start the BA pipeline"
 Write-Host ""
 Write-Host "  Artifacts will be saved to: output\$Slug\" -ForegroundColor DarkGray
 Write-Host ""

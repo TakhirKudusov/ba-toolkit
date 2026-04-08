@@ -33,16 +33,20 @@ Artifacts are generated in whatever language you write in — ask in English, ge
 ## Install
 
 ```bash
-# One-shot project setup — zero install, just run:
+# Full setup in one command — prompts for project name, domain, and
+# AI agent, then creates output/{slug}/, AGENTS.md, and installs the
+# skills into the chosen agent's directory.
 npx @kudusov.takhir/ba-toolkit init
-npx @kudusov.takhir/ba-toolkit install --for claude-code
+
+# Non-interactive (e.g. for CI): pass every choice on the command line.
+npx @kudusov.takhir/ba-toolkit init --name "My App" --domain saas --for claude-code
 
 # Or install globally and reuse across projects:
 npm install -g @kudusov.takhir/ba-toolkit
-ba-toolkit install --for claude-code --global
+ba-toolkit init
 ```
 
-Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. Cursor and Windsurf installs auto-convert `SKILL.md` into the `.mdc` rule format. Use `--dry-run` to preview without writing.
+Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. Cursor and Windsurf installs auto-convert `SKILL.md` into the `.mdc` rule format. Pass `--dry-run` to preview the install step without writing files, or `--no-install` to create only the project structure and install skills later with `ba-toolkit install --for <agent>`.
 
 `ba-toolkit --help` shows the full CLI reference. Zero runtime dependencies — only Node.js ≥ 18.
 

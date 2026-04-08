@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 # BA Toolkit — Project Initialiser (bash)
 # Usage: bash init.sh
-# Creates the output folder structure and a starter AGENTS.md for a new project.
+#
+# Creates the output folder structure and a starter AGENTS.md for a new
+# project. This is a zero-dependency fallback for environments without
+# Node.js. The recommended one-command setup is `npx @kudusov.takhir/ba-toolkit init`,
+# which also installs skills into the chosen AI agent's directory.
 
 set -e
 
@@ -9,48 +13,98 @@ CYAN='\033[0;36m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 DARK_GRAY='\033[0;90m'
+BOLD='\033[1m'
 RESET='\033[0m'
+
+DOMAINS=(
+    "saas|SaaS|B2B platforms, CRM, analytics, EdTech, HRTech"
+    "fintech|Fintech|Neobanks, payments, crypto, P2P lending"
+    "ecommerce|E-commerce|Stores, marketplaces, D2C brands, digital goods"
+    "healthcare|Healthcare|Telemedicine, EHR, patient portals, clinic management"
+    "logistics|Logistics|Delivery, courier, WMS, fleet management"
+    "on-demand|On-demand|Ride-hailing, home services, task marketplaces"
+    "social-media|Social/Media|Social networks, creator platforms, community forums"
+    "real-estate|Real Estate|Property portals, agency CRM, rental management"
+    "igaming|iGaming|Slots, betting, casino, Telegram Mini Apps"
+    "custom|Custom|Any other domain — general interview questions"
+)
 
 echo ""
 echo -e "  ${CYAN}BA Toolkit — New Project Setup${RESET}"
 echo -e "  ${CYAN}================================${RESET}"
 echo ""
 
-# --- Collect project info ---
-
-if [ -z "$SLUG" ]; then
-    read -rp "  Project slug (lowercase, hyphens only, e.g. dragon-fortune): " SLUG
-fi
-# Sanitise slug
-SLUG=$(echo "$SLUG" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/-\+/-/g' | sed 's/^-\|-$//g')
+# --- 1. Project name ---
 
 if [ -z "$NAME" ]; then
-    read -rp "  Project name (human-readable, e.g. Dragon Fortune): " NAME
+    read -rp "  Project name (e.g. My App): " NAME
 fi
+NAME=$(echo "$NAME" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+if [ -z "$NAME" ]; then
+    echo -e "  \033[0;31merror:\033[0m Project name is required." >&2
+    exit 1
+fi
+
+# --- 2. Slug (auto-derived from name, user can override) ---
+
+sanitise_slug() {
+    echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g' | sed 's/-\+/-/g' | sed 's/^-\|-$//g'
+}
+
+if [ -z "$SLUG" ]; then
+    DERIVED=$(sanitise_slug "$NAME")
+    if [ -n "$DERIVED" ]; then
+        read -rp "  Project slug [${DERIVED}]: " SLUG
+        SLUG="${SLUG:-$DERIVED}"
+    else
+        read -rp "  Project slug (lowercase, hyphens only): " SLUG
+    fi
+fi
+SLUG=$(sanitise_slug "$SLUG")
+if [ -z "$SLUG" ]; then
+    echo -e "  \033[0;31merror:\033[0m Invalid or empty slug." >&2
+    exit 1
+fi
+
+# --- 3. Domain (numbered menu) ---
 
 if [ -z "$DOMAIN" ]; then
     echo ""
-    echo -e "  ${YELLOW}Available domains:${RESET}"
-    echo "    igaming      iGaming — slots, betting, casino, Telegram Mini Apps"
-    echo "    fintech      Fintech — neobanks, payments, crypto, P2P lending"
-    echo "    saas         SaaS — B2B platforms, CRM, analytics, EdTech"
-    echo "    ecommerce    E-commerce — stores, marketplaces, D2C brands"
-    echo "    healthcare   Healthcare — telemedicine, EHR, patient portals"
-    echo "    logistics    Logistics — delivery, courier, WMS, fleet"
-    echo "    on-demand    On-demand — ride-hailing, home services, marketplace"
-    echo "    social-media Social/Media — social networks, creator platforms"
-    echo "    real-estate  Real Estate — property portals, CRM, rental management"
-    echo "    custom       Custom — any other domain"
+    echo -e "  ${YELLOW}Pick a domain:${RESET}"
+    i=1
+    for entry in "${DOMAINS[@]}"; do
+        IFS='|' read -r id name desc <<< "$entry"
+        printf "    %2d) ${BOLD}%-13s${RESET} ${DARK_GRAY}— %s${RESET}\n" "$i" "$name" "$desc"
+        i=$((i + 1))
+    done
     echo ""
-    read -rp "  Domain: " DOMAIN
-fi
-DOMAIN=$(echo "$DOMAIN" | tr '[:upper:]' '[:lower:]' | xargs)
+    read -rp "  Select [1-${#DOMAINS[@]}]: " DOMAIN_CHOICE
 
-# --- Determine output directory ---
+    # Resolve digit or id
+    if [[ "$DOMAIN_CHOICE" =~ ^[0-9]+$ ]]; then
+        if [ "$DOMAIN_CHOICE" -ge 1 ] && [ "$DOMAIN_CHOICE" -le "${#DOMAINS[@]}" ]; then
+            IFS='|' read -r DOMAIN _ _ <<< "${DOMAINS[$((DOMAIN_CHOICE - 1))]}"
+        fi
+    else
+        DOMAIN_CHOICE=$(echo "$DOMAIN_CHOICE" | tr '[:upper:]' '[:lower:]' | xargs)
+        for entry in "${DOMAINS[@]}"; do
+            IFS='|' read -r id _ _ <<< "$entry"
+            if [ "$id" = "$DOMAIN_CHOICE" ]; then
+                DOMAIN="$id"
+                break
+            fi
+        done
+    fi
+
+    if [ -z "$DOMAIN" ]; then
+        echo -e "  \033[0;31merror:\033[0m Invalid selection." >&2
+        exit 1
+    fi
+fi
+
+# --- 4. Create folder structure ---
 
 OUTPUT_DIR="output/$SLUG"
-
-# --- Create folder structure ---
 
 echo ""
 echo -e "  ${GREEN}Creating project structure...${RESET}"
@@ -62,7 +116,7 @@ else
     echo -e "    exists   $OUTPUT_DIR"
 fi
 
-# --- Create AGENTS.md ---
+# --- 5. Create AGENTS.md ---
 
 TODAY=$(date +%Y-%m-%d)
 AGENTS_PATH="AGENTS.md"
@@ -70,7 +124,7 @@ AGENTS_PATH="AGENTS.md"
 if [ -f "$AGENTS_PATH" ]; then
     read -rp "  AGENTS.md already exists. Overwrite? (y/N): " OVERWRITE
     if [ "$OVERWRITE" != "y" ] && [ "$OVERWRITE" != "Y" ]; then
-        echo "  Skipped AGENTS.md."
+        echo "    skipped  AGENTS.md"
         AGENTS_PATH=""
     fi
 fi
@@ -123,15 +177,18 @@ EOF
     echo -e "    created  AGENTS.md"
 fi
 
-# --- Done ---
+# --- 6. Done ---
 
 echo ""
 echo -e "  ${CYAN}Project '$NAME' ($SLUG) initialised.${RESET}"
 echo ""
 echo -e "  ${YELLOW}Next steps:${RESET}"
-echo "    1. Open your AI assistant (Claude, Cursor, etc.)"
-echo "    2. Optional: run /principles to define project-wide conventions"
-echo "    3. Run /brief to start the pipeline"
+echo "    1. Install skills into your AI agent. The npm CLI does this in one shot:"
+echo -e "         ${DARK_GRAY}npx @kudusov.takhir/ba-toolkit install --for claude-code${RESET}"
+echo "       Or copy \`skills/\` manually — see the Manual install section in README.md."
+echo "    2. Open your AI assistant (Claude, Cursor, etc.)"
+echo "    3. Optional: run /principles to define project-wide conventions"
+echo "    4. Run /brief to start the BA pipeline"
 echo ""
 echo -e "  ${DARK_GRAY}Artifacts will be saved to: output/$SLUG/${RESET}"
 echo ""

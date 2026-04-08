@@ -37,9 +37,9 @@ By default, all artifacts are saved flat in the output directory:
 
 ```
 output_dir/
-  00_principles_dragon-fortune.md
-  01_brief_dragon-fortune.md
-  02_srs_dragon-fortune.md
+  00_principles_my-app.md
+  01_brief_my-app.md
+  02_srs_my-app.md
   ...
 ```
 
@@ -47,10 +47,10 @@ If the user prefers a project-scoped subfolder (useful when managing multiple pr
 
 ```
 output_dir/
-  dragon-fortune/
-    00_principles_dragon-fortune.md
-    01_brief_dragon-fortune.md
-    02_srs_dragon-fortune.md
+  my-app/
+    00_principles_my-app.md
+    01_brief_my-app.md
+    02_srs_my-app.md
     ...
 ```
 

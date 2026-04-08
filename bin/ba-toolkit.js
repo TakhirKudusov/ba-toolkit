@@ -57,16 +57,16 @@ const AGENTS = {
 };
 
 const DOMAINS = [
-  { id: 'igaming', desc: 'iGaming — slots, betting, casino, Telegram Mini Apps' },
-  { id: 'fintech', desc: 'Fintech — neobanks, payments, crypto, P2P lending' },
-  { id: 'saas', desc: 'SaaS — B2B platforms, CRM, analytics, EdTech' },
-  { id: 'ecommerce', desc: 'E-commerce — stores, marketplaces, D2C brands' },
-  { id: 'healthcare', desc: 'Healthcare — telemedicine, EHR, patient portals' },
-  { id: 'logistics', desc: 'Logistics — delivery, courier, WMS, fleet' },
-  { id: 'on-demand', desc: 'On-demand — ride-hailing, home services, marketplace' },
-  { id: 'social-media', desc: 'Social/Media — social networks, creator platforms' },
-  { id: 'real-estate', desc: 'Real Estate — property portals, CRM, rental management' },
-  { id: 'custom', desc: 'Custom — any other domain' },
+  { id: 'saas',         name: 'SaaS',         desc: 'B2B platforms, CRM, analytics, EdTech, HRTech' },
+  { id: 'fintech',      name: 'Fintech',      desc: 'Neobanks, payments, crypto, P2P lending' },
+  { id: 'ecommerce',    name: 'E-commerce',   desc: 'Stores, marketplaces, D2C brands, digital goods' },
+  { id: 'healthcare',   name: 'Healthcare',   desc: 'Telemedicine, EHR, patient portals, clinic management' },
+  { id: 'logistics',    name: 'Logistics',    desc: 'Delivery, courier, WMS, fleet management' },
+  { id: 'on-demand',    name: 'On-demand',    desc: 'Ride-hailing, home services, task marketplaces' },
+  { id: 'social-media', name: 'Social/Media', desc: 'Social networks, creator platforms, community forums' },
+  { id: 'real-estate',  name: 'Real Estate',  desc: 'Property portals, agency CRM, rental management' },
+  { id: 'igaming',      name: 'iGaming',      desc: 'Slots, betting, casino, Telegram Mini Apps' },
+  { id: 'custom',       name: 'Custom',       desc: 'Any other domain — general interview questions' },
 ];
 
 // --- Terminal helpers --------------------------------------------------
@@ -132,6 +132,32 @@ function sanitiseSlug(input) {
     .replace(/[^a-z0-9-]/g, '-')
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+// Accepts a 1-based menu index ("3") or a domain id ("fintech"). Returns the
+// resolved id or null if nothing matched.
+function resolveDomain(raw) {
+  const trimmed = String(raw || '').toLowerCase().trim();
+  if (!trimmed) return null;
+  if (/^\d+$/.test(trimmed)) {
+    const n = parseInt(trimmed, 10);
+    return n >= 1 && n <= DOMAINS.length ? DOMAINS[n - 1].id : null;
+  }
+  const match = DOMAINS.find((d) => d.id === trimmed);
+  return match ? match.id : null;
+}
+
+// Accepts a 1-based menu index ("1") or an agent id ("claude-code"). Returns
+// the resolved id or null if nothing matched.
+function resolveAgent(raw) {
+  const trimmed = String(raw || '').toLowerCase().trim();
+  if (!trimmed) return null;
+  const ids = Object.keys(AGENTS);
+  if (/^\d+$/.test(trimmed)) {
+    const n = parseInt(trimmed, 10);
+    return n >= 1 && n <= ids.length ? ids[n - 1] : null;
+  }
+  return AGENTS[trimmed] ? trimmed : null;
 }
 
 function today() {
@@ -250,34 +276,93 @@ async function cmdInit(args) {
   log('  ' + cyan('================================'));
   log('');
 
-  let slug = args.flags.slug;
-  if (!slug) slug = await prompt('  Project slug (lowercase, hyphens only, e.g. dragon-fortune): ');
+  // --- 1. Project name (slug derives from it) ---
+  const nameFromFlag = !!(args.flags.name && args.flags.name !== true);
+  let name = nameFromFlag ? args.flags.name : null;
+  if (!name) name = await prompt('  Project name (e.g. My App): ');
+  name = String(name || '').trim();
+  if (!name) {
+    logError('Project name is required.');
+    process.exit(1);
+  }
+
+  // --- 2. Slug (auto-derived from name; confirmed interactively unless
+  //     both --name and --slug were passed on the command line) ---
+  const slugFromFlag = !!(args.flags.slug && args.flags.slug !== true);
+  let slug = slugFromFlag ? args.flags.slug : null;
+  if (!slug) {
+    const derived = sanitiseSlug(name);
+    if (nameFromFlag) {
+      // Non-interactive path: silently accept the derived slug.
+      slug = derived;
+    } else if (derived) {
+      const custom = await prompt(`  Project slug [${cyan(derived)}]: `);
+      slug = custom || derived;
+    } else {
+      slug = await prompt('  Project slug (lowercase, hyphens only): ');
+    }
+  }
   slug = sanitiseSlug(slug);
   if (!slug) {
     logError('Invalid or empty slug.');
     process.exit(1);
   }
 
-  let name = args.flags.name;
-  if (!name) name = await prompt('  Project name (human-readable, e.g. Dragon Fortune): ');
-  if (!name) {
-    logError('Project name is required.');
-    process.exit(1);
-  }
-
+  // --- 3. Domain (numbered menu) ---
   let domain = args.flags.domain;
-  if (!domain) {
-    log('');
-    log('  ' + yellow('Available domains:'));
-    for (const d of DOMAINS) {
-      log(`    ${d.id.padEnd(14)} ${d.desc}`);
+  if (domain && domain !== true) {
+    domain = resolveDomain(String(domain));
+    if (!domain) {
+      logError(`Unknown domain: ${args.flags.domain}`);
+      log('Valid ids: ' + DOMAINS.map((d) => d.id).join(', '));
+      process.exit(1);
     }
+  } else {
     log('');
-    domain = await prompt('  Domain: ');
+    log('  ' + yellow('Pick a domain:'));
+    DOMAINS.forEach((d, i) => {
+      const idx = String(i + 1).padStart(2);
+      log(`    ${idx}) ${bold(d.name.padEnd(13))} ${gray('— ' + d.desc)}`);
+    });
+    log('');
+    const raw = await prompt(`  Select [1-${DOMAINS.length}]: `);
+    domain = resolveDomain(raw);
+    if (!domain) {
+      logError(`Invalid selection: ${raw || '(empty)'}`);
+      process.exit(1);
+    }
   }
-  domain = String(domain || '').toLowerCase().trim();
-  if (!domain) domain = 'custom';
 
+  // --- 4. Agent (numbered menu), unless --no-install ---
+  const skipInstall = !!args.flags['no-install'];
+  let agentId = args.flags.for;
+  if (!skipInstall) {
+    if (agentId && agentId !== true) {
+      agentId = resolveAgent(String(agentId));
+      if (!agentId) {
+        logError(`Unknown agent: ${args.flags.for}`);
+        log('Supported: ' + Object.keys(AGENTS).join(', '));
+        process.exit(1);
+      }
+    } else {
+      log('');
+      log('  ' + yellow('Pick your AI agent:'));
+      const agentEntries = Object.entries(AGENTS);
+      agentEntries.forEach(([id, a], i) => {
+        const idx = String(i + 1).padStart(2);
+        log(`    ${idx}) ${bold(a.name.padEnd(20))} ${gray('(' + id + ')')}`);
+      });
+      log('');
+      const raw = await prompt(`  Select [1-${agentEntries.length}]: `);
+      agentId = resolveAgent(raw);
+      if (!agentId) {
+        logError(`Invalid selection: ${raw || '(empty)'}`);
+        process.exit(1);
+      }
+    }
+  }
+
+  // --- 5. Create project structure ---
   log('');
   log('  ' + green('Creating project structure...'));
 
@@ -303,27 +388,43 @@ async function cmdInit(args) {
     log('    created  AGENTS.md');
   }
 
+  // --- 6. Install skills for the selected agent ---
+  if (!skipInstall && agentId) {
+    log('');
+    await runInstall({
+      agentId,
+      isGlobal: !!args.flags.global,
+      isProject: !!args.flags.project,
+      dryRun: !!args.flags['dry-run'],
+      showHeader: false,
+    });
+  }
+
+  // --- 7. Final message ---
   log('');
-  log('  ' + cyan(`Project '${name}' (${slug}) initialised.`));
+  log('  ' + cyan(`Project '${name}' (${slug}) is ready.`));
   log('');
   log('  ' + yellow('Next steps:'));
-  log('    1. Install skills for your agent:');
-  log('         ' + gray('ba-toolkit install --for claude-code'));
-  log('    2. Open your AI assistant (Claude, Cursor, etc.)');
-  log('    3. Optional: run /principles to define project-wide conventions');
-  log('    4. Run /brief to start the pipeline');
+  if (!skipInstall && agentId) {
+    log('    1. ' + AGENTS[agentId].restartHint);
+    log('    2. Optional: run /principles to define project-wide conventions');
+    log('    3. Run /brief to start the BA pipeline');
+  } else {
+    log('    1. Install skills for your agent:');
+    log('         ' + gray('ba-toolkit install --for claude-code'));
+    log('    2. Open your AI assistant (Claude, Cursor, etc.)');
+    log('    3. Optional: run /principles to define project-wide conventions');
+    log('    4. Run /brief to start the BA pipeline');
+  }
   log('');
   log('  ' + gray(`Artifacts will be saved to: ${outputDir}/`));
   log('');
 }
 
-async function cmdInstall(args) {
-  const agentId = args.flags.for;
-  if (!agentId || agentId === true) {
-    logError('--for <agent> is required.');
-    log('Supported agents: ' + Object.keys(AGENTS).join(', '));
-    process.exit(1);
-  }
+// Core install logic. Shared between `cmdInstall` (standalone) and `cmdInit`
+// (full setup). Returns true on success, false if the user declined to
+// overwrite an existing destination.
+async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = true }) {
   const agent = AGENTS[agentId];
   if (!agent) {
     logError(`Unknown agent: ${agentId}`);
@@ -331,41 +432,41 @@ async function cmdInstall(args) {
     process.exit(1);
   }
 
-  const requestedGlobal = !!args.flags.global;
-  const requestedProject = !!args.flags.project;
-  let isGlobal = requestedGlobal;
-  if (!requestedGlobal && !requestedProject) {
+  let effectiveGlobal = !!isGlobal;
+  if (!isGlobal && !isProject) {
     // Default: project-level if supported, otherwise global
-    isGlobal = !agent.projectPath;
+    effectiveGlobal = !agent.projectPath;
   }
-  if (isGlobal && !agent.globalPath) {
+  if (effectiveGlobal && !agent.globalPath) {
     logError(`${agent.name} does not support --global install.`);
     process.exit(1);
   }
-  if (!isGlobal && !agent.projectPath) {
+  if (!effectiveGlobal && !agent.projectPath) {
     logError(`${agent.name} does not support project-level install. Use --global.`);
     process.exit(1);
   }
 
-  const destDir = isGlobal ? agent.globalPath : path.resolve(process.cwd(), agent.projectPath);
-  const dryRun = !!args.flags['dry-run'];
+  const destDir = effectiveGlobal ? agent.globalPath : path.resolve(process.cwd(), agent.projectPath);
 
-  log('');
-  log('  ' + cyan(`BA Toolkit — Install for ${agent.name}`));
-  log('  ' + cyan('================================'));
-  log('');
-  log(`  Source:       ${SKILLS_DIR}`);
-  log(`  Destination:  ${destDir}`);
-  log(`  Scope:        ${isGlobal ? 'global (user-wide)' : 'project-level'}`);
-  log(`  Format:       ${agent.format === 'mdc' ? '.mdc (converted from SKILL.md)' : 'SKILL.md (native)'}`);
-  if (dryRun) log('  ' + yellow('Mode:         dry-run (no files will be written)'));
-  log('');
+  if (showHeader) {
+    log('');
+    log('  ' + cyan(`BA Toolkit — Install for ${agent.name}`));
+    log('  ' + cyan('================================'));
+    log('');
+  } else {
+    log('  ' + green(`Installing skills for ${agent.name}...`));
+  }
+  log(`    source:       ${SKILLS_DIR}`);
+  log(`    destination:  ${destDir}`);
+  log(`    scope:        ${effectiveGlobal ? 'global (user-wide)' : 'project-level'}`);
+  log(`    format:       ${agent.format === 'mdc' ? '.mdc (converted from SKILL.md)' : 'SKILL.md (native)'}`);
+  if (dryRun) log('    ' + yellow('mode:         dry-run (no files will be written)'));
 
   if (fs.existsSync(destDir) && !dryRun) {
-    const answer = await prompt(`  ${destDir} already exists. Overwrite? (y/N): `);
+    const answer = await prompt(`    ${destDir} already exists. Overwrite? (y/N): `);
     if (answer.toLowerCase() !== 'y') {
-      log('  Cancelled.');
-      return;
+      log('    cancelled.');
+      return false;
     }
   }
 
@@ -378,14 +479,31 @@ async function cmdInstall(args) {
     process.exit(1);
   }
 
-  log('  ' + green(`${dryRun ? 'Would copy' : 'Copied'} ${copied.length} files.`));
+  log('    ' + green(`${dryRun ? 'would copy' : 'copied'} ${copied.length} files.`));
+  if (!dryRun && agent.format === 'mdc') {
+    log('    ' + gray('SKILL.md files converted to .mdc rule format.'));
+  }
+  return true;
+}
+
+async function cmdInstall(args) {
+  const agentId = args.flags.for;
+  if (!agentId || agentId === true) {
+    logError('--for <agent> is required.');
+    log('Supported agents: ' + Object.keys(AGENTS).join(', '));
+    process.exit(1);
+  }
+  const ok = await runInstall({
+    agentId,
+    isGlobal: !!args.flags.global,
+    isProject: !!args.flags.project,
+    dryRun: !!args.flags['dry-run'],
+    showHeader: true,
+  });
   log('');
-  if (!dryRun) {
+  if (ok && !args.flags['dry-run']) {
     log('  ' + cyan('Install complete.'));
-    if (agent.format === 'mdc') {
-      log('  ' + gray('SKILL.md files converted to .mdc rule format.'));
-    }
-    log('  ' + yellow(agent.restartHint));
+    log('  ' + yellow(AGENTS[agentId].restartHint));
   }
   log('');
 }
@@ -397,9 +515,25 @@ ${bold('USAGE')}
   ba-toolkit <command> [options]
 
 ${bold('COMMANDS')}
-  init                           Interactive project initialiser. Creates
-                                 output/{slug}/ and a starter AGENTS.md.
-  install --for <agent>          Install skills into an agent's directory.
+  init                           One-command project setup: prompts for name,
+                                 slug, domain, and AI agent, then creates
+                                 output/{slug}/, AGENTS.md, and installs the
+                                 skills into the chosen agent's directory.
+  install --for <agent>          Install (or re-install) skills into an
+                                 agent's directory without creating a project.
+
+${bold('INIT OPTIONS')}
+  --name <name>                  Skip the project name prompt
+  --slug <slug>                  Skip the slug prompt (auto-derived from name)
+  --domain <id>                  Skip the domain menu (e.g. saas, fintech)
+  --for <agent>                  Skip the agent menu (e.g. claude-code)
+  --no-install                   Create the project structure only; don't
+                                 install skills. Useful for CI or when you
+                                 want to pick the agent later.
+  --global                       Install agent skills user-wide
+  --project                      Install agent skills project-level (default
+                                 when the agent supports it)
+  --dry-run                      Preview the install step without writing
 
 ${bold('INSTALL OPTIONS')}
   --for <agent>                  One of: ${Object.keys(AGENTS).join(', ')}
@@ -407,22 +541,23 @@ ${bold('INSTALL OPTIONS')}
   --project                      Project-level install (default when supported)
   --dry-run                      Preview without writing files
 
-${bold('INIT OPTIONS')}
-  --slug <slug>                  Skip the slug prompt
-  --name <name>                  Skip the project name prompt
-  --domain <domain>              Skip the domain prompt
-
 ${bold('GENERAL OPTIONS')}
   --version, -v                  Print version and exit
   --help, -h                     Print this help and exit
 
 ${bold('EXAMPLES')}
+  # Full interactive setup — one command does everything.
   ba-toolkit init
-  ba-toolkit init --slug dragon-fortune --name "Dragon Fortune" --domain igaming
+
+  # Non-interactive: all choices on the command line.
+  ba-toolkit init --name "My App" --domain saas --for claude-code
+
+  # Create the project structure now, pick the agent later.
+  ba-toolkit init --name "My App" --domain saas --no-install
+
+  # Re-install skills after a toolkit update (no project changes).
   ba-toolkit install --for claude-code
-  ba-toolkit install --for claude-code --global
-  ba-toolkit install --for cursor
-  ba-toolkit install --for gemini --dry-run
+  ba-toolkit install --for cursor --dry-run
 
 ${bold('LEARN MORE')}
   https://github.com/TakhirKudusov/ba-toolkit
