@@ -389,9 +389,13 @@ async function cmdInit(args) {
   }
 
   // --- 6. Install skills for the selected agent ---
+  // installed: null = no install attempted (--no-install or no agentId),
+  //            true = install succeeded,
+  //            false = install was cancelled (e.g. user declined overwrite).
+  let installed = null;
   if (!skipInstall && agentId) {
     log('');
-    await runInstall({
+    installed = await runInstall({
       agentId,
       isGlobal: !!args.flags.global,
       isProject: !!args.flags.project,
@@ -405,10 +409,16 @@ async function cmdInit(args) {
   log('  ' + cyan(`Project '${name}' (${slug}) is ready.`));
   log('');
   log('  ' + yellow('Next steps:'));
-  if (!skipInstall && agentId) {
+  if (installed === true) {
     log('    1. ' + AGENTS[agentId].restartHint);
     log('    2. Optional: run /principles to define project-wide conventions');
     log('    3. Run /brief to start the BA pipeline');
+  } else if (installed === false) {
+    log('    1. Skill install was cancelled. To install later, run:');
+    log('         ' + gray(`ba-toolkit install --for ${agentId}`));
+    log('    2. Open your AI assistant (Claude, Cursor, etc.)');
+    log('    3. Optional: run /principles to define project-wide conventions');
+    log('    4. Run /brief to start the BA pipeline');
   } else {
     log('    1. Install skills for your agent:');
     log('         ' + gray('ba-toolkit install --for claude-code'));
