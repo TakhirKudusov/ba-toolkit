@@ -1,4 +1,4 @@
-# Adding a New Domain
+# Adding a new domain
 
 Domain references live in `skills/references/domains/` — one Markdown file per domain, loaded automatically when `/brief` detects a matching domain name. Each skill reads **only its own section** from the reference file, keeping context usage efficient.
 

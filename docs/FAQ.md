@@ -19,4 +19,4 @@ Yes. Run `/revise [section]` at any step, or re-invoke the skill command (e.g., 
 The structured Markdown format and explicit cross-references help smaller models stay on track. For best results, use a model with a context window of at least 32k tokens — the later pipeline steps load multiple large artifacts simultaneously.
 
 **How do I update BA Toolkit after a new version is released?**
-See the update instructions in the [Installation](../README.md#-installation) section of the main README.
+See the update instructions in the [Install](../README.md#install) section of the main README.

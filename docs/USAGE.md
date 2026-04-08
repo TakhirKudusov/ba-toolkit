@@ -1,4 +1,4 @@
-# Usage Guide
+# Usage guide
 
 Detailed walkthrough of the BA Toolkit pipeline in day-to-day use. For a high-level overview, see the main [README](../README.md). For problems, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md).
 
@@ -195,7 +195,7 @@ Run /srs to generate the Requirements Specification.
 
 ---
 
-## Appendix: Time estimates
+## Appendix: time estimates
 
 Approximate, depends on project complexity and interview depth.
 
