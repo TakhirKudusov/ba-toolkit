@@ -14,6 +14,11 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `/sprint` skill — sprint planning from estimated User Stories: groups stories into sprints by velocity and capacity, applies risk-weighted prioritisation, outputs sprint goals and Definition of Done per sprint (`00_sprint_{slug}.md`).
 - `skills/references/templates/sprint-template.md` — full example sprint plan for the Dragon Fortune project.
 - `example/dragon-fortune/` — complete example project with all 15 pipeline artifacts for an iGaming Telegram Mini App. Fully cross-referenced: FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario + Risk Register + Sprint Plan.
+- `README.ru.md` — full Russian translation of `README.md`. Language switcher added to both versions (🇺🇸 English / 🇷🇺 Русский). EN remains the source of truth per sync rule.
+
+### Fixed
+
+- README.md tagline: outdated "19 skills" → "21 skills" (matches badge and body counters).
 
 ---
 

@@ -3,7 +3,9 @@
 # 📋 BA Toolkit
 
 <strong>AI-powered Business Analyst pipeline</strong><br>
-From project brief to development handoff — 19 skills, fully structured pipeline
+From project brief to development handoff — 21 skills, fully structured pipeline
+
+🇺🇸 **English** · [🇷🇺 Русский](README.ru.md)
 
 <img src="https://img.shields.io/badge/skills-21-blue" alt="Skills">
 <img src="https://img.shields.io/badge/domains-9-green" alt="Domains">
