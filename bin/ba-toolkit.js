@@ -206,6 +206,92 @@ function stringFlag(args, key) {
   return (typeof v === 'string' && v.length > 0) ? v : null;
 }
 
+// Every flag the CLI accepts. Typos that don't match anything in this
+// set are rejected by validateFlags() with a "Did you mean ...?" hint.
+// Single-letter aliases (-v, -h) are listed by their letter form.
+const KNOWN_FLAGS = new Set([
+  'name', 'slug', 'domain', 'for', 'no-install',
+  'global', 'project', 'dry-run',
+  'version', 'v', 'help', 'h',
+]);
+
+// Levenshtein distance with the standard two-row optimisation. Used by
+// closestMatch() to suggest a fix for unknown flags. Pure, exported for
+// tests.
+function levenshtein(a, b) {
+  if (a === b) return 0;
+  const m = a.length;
+  const n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  let prev = new Array(n + 1);
+  let curr = new Array(n + 1);
+  for (let j = 0; j <= n; j++) prev[j] = j;
+  for (let i = 1; i <= m; i++) {
+    curr[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      curr[j] = Math.min(
+        prev[j] + 1,        // deletion
+        curr[j - 1] + 1,    // insertion
+        prev[j - 1] + cost, // substitution
+      );
+    }
+    [prev, curr] = [curr, prev];
+  }
+  return prev[n];
+}
+
+// Find the candidate with the lowest Levenshtein distance to `input`,
+// but only if the distance is small enough to be a plausible typo.
+// Threshold scales with the input length: ~1 edit per 3 input chars,
+// minimum 1. This catches the common cases (transposition like
+// `--domian` for `--domain`, single insertion like `--drry-run` for
+// `--dry-run`) without producing absurd suggestions for things that
+// happen to share a few letters (`--foobar` should NOT suggest
+// `--global` even though they have distance 3).
+function closestMatch(input, candidates) {
+  if (!input) return null;
+  const threshold = Math.max(1, Math.floor(input.length / 3));
+  let best = null;
+  let bestDist = Infinity;
+  for (const c of candidates) {
+    const d = levenshtein(input, c);
+    if (d < bestDist && d <= threshold) {
+      best = c;
+      bestDist = d;
+    }
+  }
+  return best;
+}
+
+// Reject unknown flags with a helpful "Did you mean ...?" suggestion
+// when one is plausible. Called from main() after parseArgs.
+//
+// This catches typos like `--drry-run` or `--for-claude-code` (instead
+// of `--for claude-code`) that the previous version of the CLI would
+// silently store and then ignore. Both cases used to leave the user
+// staring at an interactive prompt wondering why their flag did
+// nothing.
+function validateFlags(args) {
+  const unknown = [];
+  for (const key of Object.keys(args.flags)) {
+    if (!KNOWN_FLAGS.has(key)) unknown.push(key);
+  }
+  if (unknown.length === 0) return;
+  for (const flag of unknown) {
+    const dashes = flag.length === 1 ? '-' : '--';
+    logError(`Unknown option: ${dashes}${flag}`);
+    const suggestion = closestMatch(flag, [...KNOWN_FLAGS]);
+    if (suggestion) {
+      const sugDashes = suggestion.length === 1 ? '-' : '--';
+      log(`  Did you mean ${cyan(sugDashes + suggestion)}?`);
+    }
+  }
+  log('Run ' + cyan('ba-toolkit --help') + ' for the full list of options.');
+  process.exit(1);
+}
+
 function today() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -1003,6 +1089,7 @@ ${bold('LEARN MORE')}
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+  validateFlags(args);
 
   if (args.flags.version || args.flags.v) {
     log(PKG.version);
@@ -1053,9 +1140,12 @@ module.exports = {
   resolveDomain,
   resolveAgent,
   stringFlag,
+  levenshtein,
+  closestMatch,
   parseSkillFrontmatter,
   readSentinel,
   renderAgentsMd,
+  KNOWN_FLAGS,
   DOMAINS,
   AGENTS,
 };

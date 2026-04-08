@@ -17,9 +17,12 @@ const {
   resolveDomain,
   resolveAgent,
   stringFlag,
+  levenshtein,
+  closestMatch,
   parseSkillFrontmatter,
   readSentinel,
   renderAgentsMd,
+  KNOWN_FLAGS,
   DOMAINS,
   AGENTS,
 } = require('../bin/ba-toolkit.js');
@@ -447,6 +450,69 @@ Body.
 `;
   const r = parseSkillFrontmatter(input);
   assert.equal(r.description, 'Word1 Word2 Word3');
+});
+
+// --------------------------------------------------------------------
+// levenshtein + closestMatch (typo suggestion)
+// --------------------------------------------------------------------
+
+test('levenshtein: identical strings → 0', () => {
+  assert.equal(levenshtein('foo', 'foo'), 0);
+});
+
+test('levenshtein: empty vs non-empty → length of non-empty', () => {
+  assert.equal(levenshtein('', 'foo'), 3);
+  assert.equal(levenshtein('foo', ''), 3);
+});
+
+test('levenshtein: single insertion', () => {
+  assert.equal(levenshtein('dry-run', 'drry-run'), 1);
+});
+
+test('levenshtein: transposition counts as 2 (plain Levenshtein)', () => {
+  // domain → domian: i and a swapped. Plain Levenshtein scores this as
+  // 2 substitutions; Damerau-Levenshtein would score 1. The threshold
+  // in closestMatch is calibrated for this.
+  assert.equal(levenshtein('domain', 'domian'), 2);
+});
+
+test('levenshtein: complete mismatch', () => {
+  assert.equal(levenshtein('abc', 'xyz'), 3);
+});
+
+test('closestMatch: --drry-run finds dry-run', () => {
+  assert.equal(closestMatch('drry-run', [...KNOWN_FLAGS]), 'dry-run');
+});
+
+test('closestMatch: --domian finds domain', () => {
+  assert.equal(closestMatch('domian', [...KNOWN_FLAGS]), 'domain');
+});
+
+test('closestMatch: --foo finds for (single substitution, short input)', () => {
+  assert.equal(closestMatch('foo', [...KNOWN_FLAGS]), 'for');
+});
+
+test('closestMatch: --gloabl finds global', () => {
+  assert.equal(closestMatch('gloabl', [...KNOWN_FLAGS]), 'global');
+});
+
+test('closestMatch: --no-installl finds no-install (extra char)', () => {
+  assert.equal(closestMatch('no-installl', [...KNOWN_FLAGS]), 'no-install');
+});
+
+test('closestMatch: --foobar finds nothing (too far from any flag)', () => {
+  // Distance to "global" is 3, but threshold for input length 6 is
+  // floor(6/3) = 2. The match is rejected — we'd rather say nothing
+  // than suggest something wildly off.
+  assert.equal(closestMatch('foobar', [...KNOWN_FLAGS]), null);
+});
+
+test('closestMatch: completely unrelated input → null', () => {
+  assert.equal(closestMatch('xyzzy', [...KNOWN_FLAGS]), null);
+});
+
+test('closestMatch: empty input → null', () => {
+  assert.equal(closestMatch('', [...KNOWN_FLAGS]), null);
 });
 
 test('parseSkillFrontmatter: parses every shipped SKILL.md without losing the description', () => {
