@@ -75,11 +75,28 @@ jobs:
           node-version: '22'    # Trusted Publishing requires Node >= 22.14.0
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Upgrade npm to support Trusted Publishing
-        # --force works around a known self-upgrade bug where arborist unlinks
-        # its own transitive deps (e.g. promise-retry) mid-upgrade and leaves
-        # the install in a broken MODULE_NOT_FOUND state. Requires npm >= 11.5.1.
-        run: npm install -g npm@latest --force
+      - name: Install npm 11.5.1 (bypass broken bundled npm)
+        # The npm bundled with Node 22.22.2 in the runner toolcache is broken:
+        # @npmcli/arborist is missing its transitive dep `promise-retry`, so
+        # any `npm install` (including self-upgrade, even with --force) dies
+        # with MODULE_NOT_FOUND before it can reify anything.
+        #
+        # We bypass the broken npm entirely: download the npm tarball from the
+        # registry with curl and drop it into node_modules in place of the
+        # broken copy. No npm is invoked during the replacement.
+        #
+        # Trusted Publishing (OIDC) requires npm CLI >= 11.5.1.
+        run: |
+          set -eux
+          NPM_VERSION=11.5.1
+          NODE_PREFIX="$(node -p 'path.dirname(path.dirname(process.execPath))')"
+          NODE_MODULES_DIR="$NODE_PREFIX/lib/node_modules"
+          TMPDIR="$(mktemp -d)"
+          curl -fsSL "https://registry.npmjs.org/npm/-/npm-${NPM_VERSION}.tgz" \
+            | tar -xz -C "$TMPDIR"
+          rm -rf "$NODE_MODULES_DIR/npm"
+          mv "$TMPDIR/package" "$NODE_MODULES_DIR/npm"
+          npm --version
 
       - name: Verify tag matches package.json version
         run: |

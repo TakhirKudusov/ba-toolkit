@@ -11,11 +11,23 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [1.2.2] — 2026-04-08
+## [1.2.3] — 2026-04-08
 
 ### Fixed
 
-- `.github/workflows/release.yml` — added `--force` to the `npm install -g npm@latest` step to work around a known self-upgrade bug where arborist unlinks its own transitive `promise-retry` mid-upgrade and fails with `MODULE_NOT_FOUND`. This broke the `publish-npm` job on the `v1.2.1` tag, so `1.2.1` exists only as a GitHub Release and was never published to npm. `1.2.2` supersedes it and is the first version published under the scoped name.
+- `.github/workflows/release.yml` — replaced the `npm install -g npm@latest` step with a direct tarball download via `curl`, bypassing the broken bundled npm in Node 22.22.2 (whose `@npmcli/arborist` is missing its transitive `promise-retry` dep, causing any `npm install` — including self-upgrade, with or without `--force` — to die with `MODULE_NOT_FOUND`). The workaround pulls `npm-11.5.1.tgz` directly from the registry and drops it into the toolcache's `node_modules` without invoking npm at all. Both `1.2.1` and `1.2.2` failed the `publish-npm` job for this reason and were never published to npm; `1.2.3` supersedes both.
+
+### Changed
+
+- Supersedes the unpublished `1.2.1` and `1.2.2` — carries forward all of their documentation, rename, and CI changes.
+
+---
+
+## [1.2.2] — 2026-04-08 _(GitHub Release only — npm publish failed, superseded by 1.2.3)_
+
+### Fixed
+
+- `.github/workflows/release.yml` — added `--force` to the `npm install -g npm@latest` step to work around a known self-upgrade bug where arborist unlinks its own transitive `promise-retry` mid-upgrade and fails with `MODULE_NOT_FOUND`. _(This workaround was insufficient — the bundled npm is broken at rest, not just during self-upgrade. Fixed properly in 1.2.3.)_
 
 ### Changed
 
@@ -140,7 +152,8 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.2...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.3...HEAD
+[1.2.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.1.0...v1.2.0
