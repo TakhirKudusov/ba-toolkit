@@ -123,14 +123,40 @@ function parseArgs(argv) {
 
 // --- Prompt helper -----------------------------------------------------
 
+// Shared across all prompts in a single CLI invocation. Creating a new
+// readline.Interface for every question (the previous approach) made Ctrl+C
+// handling unreliable, leaked listeners on stdin, and broke when stdin was
+// piped (EOF on the second create). One interface per process, closed by
+// closeReadline() once main() finishes (or by the SIGINT handler).
+let sharedRl = null;
+
 function prompt(question) {
-  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
+  if (!sharedRl) {
+    sharedRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  }
+  return new Promise((resolve, reject) => {
+    let answered = false;
+    const onClose = () => {
+      if (!answered) {
+        const err = new Error('input stream closed before answer');
+        err.code = 'INPUT_CLOSED';
+        reject(err);
+      }
+    };
+    sharedRl.once('close', onClose);
+    sharedRl.question(question, (answer) => {
+      answered = true;
+      sharedRl.removeListener('close', onClose);
       resolve(answer.trim());
     });
   });
+}
+
+function closeReadline() {
+  if (sharedRl) {
+    sharedRl.close();
+    sharedRl = null;
+  }
 }
 
 // --- Utilities ---------------------------------------------------------
@@ -616,7 +642,26 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  logError(err && (err.stack || err.message) || String(err));
-  process.exit(1);
+// Clean exit on Ctrl+C: print on a fresh line so we don't append to a
+// half-typed prompt, close the readline interface so the terminal is
+// returned to a sane state, then exit with the conventional 130 code.
+process.on('SIGINT', () => {
+  console.log('\n  ' + yellow('Cancelled.'));
+  closeReadline();
+  process.exit(130);
 });
+
+main()
+  .then(() => {
+    closeReadline();
+  })
+  .catch((err) => {
+    closeReadline();
+    if (err && err.code === 'INPUT_CLOSED') {
+      logError('Input stream closed before all prompts could be answered.');
+      log('Pass remaining values as flags (e.g. --name, --domain, --for) or run interactively.');
+      process.exit(1);
+    }
+    logError(err && (err.stack || err.message) || String(err));
+    process.exit(1);
+  });
