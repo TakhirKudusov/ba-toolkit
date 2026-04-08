@@ -9,6 +9,10 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [1.2.0] — 2026-04-08
+
 ### Added
 
 - `/sprint` skill — sprint planning from estimated User Stories: groups stories into sprints by velocity and capacity, applies risk-weighted prioritisation, outputs sprint goals and Definition of Done per sprint (`00_sprint_{slug}.md`).
@@ -22,11 +26,13 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   - Zero runtime dependencies; Node.js ≥ 18.
 - `bin/ba-toolkit.js` — CLI entry point (~450 lines, single file, no framework).
 - `package.json` — npm manifest with `bin`, `files` whitelist, and repository metadata.
-- `.github/workflows/release.yml` extended with a `publish-npm` job that runs on version tag push after the GitHub Release step. Verifies tag matches `package.json` version, runs a CLI smoke test, then publishes to npm (requires `NPM_TOKEN` secret).
+- `.github/workflows/release.yml` extended with a `publish-npm` job that runs on version tag push after the GitHub Release step. Uses **npm Trusted Publishing via OIDC** — no `NPM_TOKEN` secret required, publishes provenance attestations automatically. Verifies tag matches `package.json` version and runs a CLI smoke test before publishing.
 
 ### Fixed
 
 - README.md tagline: outdated "19 skills" → "21 skills" (matches badge and body counters).
+- `release.yml` — fixed broken `awk` regex that interpreted `[` and `]` in version headings as character class metacharacters; now uses literal `index()` matching, so release notes are correctly extracted from `## [X.Y.Z]` sections.
+- `CHANGELOG.md` compare links — replaced `your-username` placeholder with actual GitHub user `TakhirKudusov`.
 
 ---
 
@@ -113,6 +119,7 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/your-username/ba-toolkit/compare/v1.1.0...HEAD
-[1.1.0]: https://github.com/your-username/ba-toolkit/compare/v1.0.0...v1.1.0
-[1.0.0]: https://github.com/your-username/ba-toolkit/releases/tag/v1.0.0
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.1.0...v1.2.0
+[1.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.0.0...v1.1.0
+[1.0.0]: https://github.com/TakhirKudusov/ba-toolkit/releases/tag/v1.0.0
