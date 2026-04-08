@@ -220,7 +220,25 @@ Most pipeline skills follow this cycle:
 
 ## 📦 Installation
 
-### Option A: Claude Code CLI ✨ Recommended
+### 🚀 Easiest: via npm (no clone required)
+
+```bash
+# One-shot project setup — zero install, just run:
+npx ba-toolkit init
+npx ba-toolkit install --for claude-code
+
+# Or install globally and reuse across projects:
+npm install -g ba-toolkit
+ba-toolkit install --for claude-code --global
+```
+
+Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. Cursor and Windsurf installs automatically convert `SKILL.md` files into the `.mdc` rule format. Use `--dry-run` to preview without writing.
+
+Run `ba-toolkit --help` for the full CLI reference. The npm package has **zero runtime dependencies** — only Node.js ≥ 18.
+
+---
+
+### Option A: Claude Code CLI ✨ Manual install
 
 ```bash
 # Clone and copy the skills directory (includes domain references)
@@ -377,11 +395,16 @@ ba-toolkit/
 │           ├── social-media.md    #    📱 Social / Media domain knowledge
 │           └── real-estate.md     #    🏠 Real Estate domain knowledge
 │
+├── bin/
+│   └── ba-toolkit.js              # 🧰 npm CLI entry point (zero runtime deps)
+├── package.json                   # 📦 npm package manifest (for `npx ba-toolkit`)
 ├── init.ps1                       # 🚀 Project initialiser (Windows PowerShell)
 ├── init.sh                        # 🚀 Project initialiser (macOS / Linux bash)
 ├── CHANGELOG.md                   # 📋 Version history
+├── COMMANDS.md                    # 📜 Command cheat sheet
 ├── LICENSE                        # MIT license text
-├── README.md
+├── README.md                      # English version
+├── README.ru.md                   # Russian version
 ├── .gitignore
 └── .github/
     ├── workflows/

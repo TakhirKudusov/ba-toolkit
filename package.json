@@ -1,0 +1,49 @@
+{
+  "name": "ba-toolkit",
+  "version": "1.2.0",
+  "description": "AI-powered Business Analyst pipeline — 21 skills from project brief to development handoff. Works with Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf.",
+  "keywords": [
+    "business-analyst",
+    "requirements",
+    "srs",
+    "user-stories",
+    "ba-toolkit",
+    "claude",
+    "claude-code",
+    "codex",
+    "gemini",
+    "cursor",
+    "windsurf",
+    "ai-skills",
+    "agent-skills",
+    "cli"
+  ],
+  "homepage": "https://github.com/TakhirKudusov/ba-toolkit",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TakhirKudusov/ba-toolkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TakhirKudusov/ba-toolkit/issues"
+  },
+  "license": "MIT",
+  "author": "TakhirKudusov",
+  "bin": {
+    "ba-toolkit": "./bin/ba-toolkit.js"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "LICENSE",
+    "README.md",
+    "README.ru.md",
+    "CHANGELOG.md",
+    "COMMANDS.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node bin/ba-toolkit.js --help > /dev/null && echo CLI smoke test passed"
+  }
+}

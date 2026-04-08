@@ -221,7 +221,25 @@ BA Toolkit использует открытую **спецификацию Agen
 
 ## 📦 Установка
 
-### Вариант A: Claude Code CLI ✨ Рекомендуется
+### 🚀 Самый простой способ: через npm (без клонирования)
+
+```bash
+# Одноразовая настройка проекта — ничего не устанавливать, просто запустить:
+npx ba-toolkit init
+npx ba-toolkit install --for claude-code
+
+# Или установить глобально и переиспользовать для всех проектов:
+npm install -g ba-toolkit
+ba-toolkit install --for claude-code --global
+```
+
+Поддерживаемые агенты: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. Установка для Cursor и Windsurf автоматически конвертирует `SKILL.md` в формат правил `.mdc`. Используйте `--dry-run`, чтобы посмотреть результат без записи файлов.
+
+Запустите `ba-toolkit --help` для полного списка команд CLI. У npm-пакета **нулевые рантайм-зависимости** — нужен только Node.js ≥ 18.
+
+---
+
+### Вариант A: Claude Code CLI ✨ Ручная установка
 
 ```bash
 # Клонирование и копирование директории skills (включает доменные референсы)
@@ -381,6 +399,9 @@ ba-toolkit/
 ├── example/
 │   └── dragon-fortune/            # 📚 Полный пример проекта (iGaming Telegram Mini App)
 │
+├── bin/
+│   └── ba-toolkit.js              # 🧰 Точка входа npm CLI (нулевые рантайм-зависимости)
+├── package.json                   # 📦 Манифест npm-пакета (для `npx ba-toolkit`)
 ├── init.ps1                       # 🚀 Инициализатор проекта (Windows PowerShell)
 ├── init.sh                        # 🚀 Инициализатор проекта (macOS / Linux bash)
 ├── CHANGELOG.md                   # 📋 История версий

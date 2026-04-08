@@ -15,6 +15,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `skills/references/templates/sprint-template.md` — full example sprint plan for the Dragon Fortune project.
 - `example/dragon-fortune/` — complete example project with all 15 pipeline artifacts for an iGaming Telegram Mini App. Fully cross-referenced: FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario + Risk Register + Sprint Plan.
 - `README.ru.md` — full Russian translation of `README.md`. Language switcher added to both versions (🇺🇸 English / 🇷🇺 Русский). EN remains the source of truth per sync rule.
+- **npm package** — BA Toolkit is now publishable to npm as `ba-toolkit`. Two commands supported:
+  - `npx ba-toolkit init` — interactive project initialiser (creates `output/{slug}/` and `AGENTS.md`).
+  - `npx ba-toolkit install --for <agent>` — copies skills to the correct path for Claude Code, Codex CLI, Gemini CLI, Cursor, or Windsurf. Supports `--global`, `--project`, and `--dry-run` flags.
+  - Cursor and Windsurf installs auto-convert `SKILL.md` → `.mdc` rule format.
+  - Zero runtime dependencies; Node.js ≥ 18.
+- `bin/ba-toolkit.js` — CLI entry point (~450 lines, single file, no framework).
+- `package.json` — npm manifest with `bin`, `files` whitelist, and repository metadata.
+- `.github/workflows/release.yml` extended with a `publish-npm` job that runs on version tag push after the GitHub Release step. Verifies tag matches `package.json` version, runs a CLI smoke test, then publishes to npm (requires `NPM_TOKEN` secret).
 
 ### Fixed
 
