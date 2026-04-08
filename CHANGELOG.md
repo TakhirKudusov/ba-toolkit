@@ -53,7 +53,7 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - npm package renamed from `ba-toolkit` to scoped `@kudusov.takhir/ba-toolkit` to avoid name collisions in the public registry. The CLI binary name (`ba-toolkit`) is unchanged. Install commands are now `npx @kudusov.takhir/ba-toolkit <command>` or `npm install -g @kudusov.takhir/ba-toolkit`.
-- `README.md` and `README.ru.md` updated to use the scoped package name in all `npx` and `npm install -g` examples.
+- `README.md` updated to use the scoped package name in all `npx` and `npm install -g` examples.
 
 ---
 
@@ -64,7 +64,6 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `/sprint` skill — sprint planning from estimated User Stories: groups stories into sprints by velocity and capacity, applies risk-weighted prioritisation, outputs sprint goals and Definition of Done per sprint (`00_sprint_{slug}.md`).
 - `skills/references/templates/sprint-template.md` — full example sprint plan for the Dragon Fortune project.
 - `example/dragon-fortune/` — complete example project with all 15 pipeline artifacts for an iGaming Telegram Mini App. Fully cross-referenced: FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario + Risk Register + Sprint Plan.
-- `README.ru.md` — full Russian translation of `README.md`. Language switcher added to both versions (🇺🇸 English / 🇷🇺 Русский). EN remains the source of truth per sync rule.
 - **npm package** — BA Toolkit is now publishable to npm as `ba-toolkit`. Two commands supported:
   - `npx ba-toolkit init` — interactive project initialiser (creates `output/{slug}/` and `AGENTS.md`).
   - `npx ba-toolkit install --for <agent>` — copies skills to the correct path for Claude Code, Codex CLI, Gemini CLI, Cursor, or Windsurf. Supports `--global`, `--project`, and `--dry-run` flags.

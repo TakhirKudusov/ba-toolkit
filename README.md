@@ -5,8 +5,6 @@
 <strong>AI-powered Business Analyst pipeline</strong><br>
 From project brief to development handoff — 21 skills, fully structured pipeline
 
-🇺🇸 **English** · [🇷🇺 Русский](README.ru.md)
-
 <img src="https://img.shields.io/badge/skills-21-blue" alt="Skills">
 <img src="https://img.shields.io/badge/domains-9-green" alt="Domains">
 <img src="https://img.shields.io/badge/format-Markdown-orange" alt="Format">
@@ -44,19 +42,11 @@ From project brief to development handoff — 21 skills, fully structured pipeli
 - [Minimum Viable Pipeline](#-minimum-viable-pipeline)
 - [Quick Start](#-quick-start)
 - [What the Output Looks Like](#️-what-the-output-looks-like)
-- [Usage Guide](#-usage-guide)
-  - [1. Starting a project](#1-starting-a-project)
-  - [2. Moving through the pipeline](#2-moving-through-the-pipeline)
-  - [3. Using /clarify](#3-using-clarify)
-  - [4. Using /analyze](#4-using-analyze)
-  - [5. Using /trace](#5-using-trace)
-  - [6. Splitting large elements](#6-splitting-large-elements)
-  - [7. Working with multiple projects](#7-working-with-multiple-projects)
-  - [8. Troubleshooting](#8-troubleshooting)
-  - [9. AGENTS.md — persistent project context](#9-agentsmd--persistent-project-context)
-- [FAQ](#-faq)
-- [Contributing](#-contributing)
-- [Adding a New Domain](#adding-a-new-domain)
+- [Usage Guide](docs/USAGE.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [FAQ](docs/FAQ.md)
+- [Contributing](CONTRIBUTING.md)
+- [Adding a New Domain](docs/DOMAINS.md)
 - [Changelog](CHANGELOG.md)
 - [License](#-license)
 
@@ -68,7 +58,7 @@ BA Toolkit is a set of **21 interconnected skills** that turn your AI coding age
 
 Each skill **reads the output of previous steps**, maintains cross-references between artifacts (FR → US → UC → AC → NFR → Entities → ADR → API → Screens → Scenarios), and adapts to your project's domain.
 
-**Artifacts are generated in the language you write in.** Ask in English — get English docs. Ask in Russian, Spanish, or any other language — the output follows.
+**Artifacts are generated in the language you write in.** Ask in English — get English docs. Ask in any other language — the output follows.
 
 ### Who is this for?
 
@@ -172,7 +162,7 @@ The pipeline is **domain-agnostic** by default. At the `/brief` stage, you pick 
 | 🏠 **Real Estate** | Property portals, agency CRM, rental management, property management, mortgage tools |
 | ✏️ **Custom** | Any other domain — works with general interview questions |
 
-> ➕ **Adding a new domain** = creating one Markdown file in `skills/references/domains/`. See [Adding a New Domain](#adding-a-new-domain) below.
+> ➕ **Adding a new domain** = creating one Markdown file in `skills/references/domains/`. See [docs/DOMAINS.md](docs/DOMAINS.md).
 
 ---
 
@@ -402,9 +392,14 @@ ba-toolkit/
 ├── init.sh                        # 🚀 Project initialiser (macOS / Linux bash)
 ├── CHANGELOG.md                   # 📋 Version history
 ├── COMMANDS.md                    # 📜 Command cheat sheet
+├── CONTRIBUTING.md                # 🤝 Contribution workflow
 ├── LICENSE                        # MIT license text
-├── README.md                      # English version
-├── README.ru.md                   # Russian version
+├── README.md                      # Project documentation
+├── docs/
+│   ├── USAGE.md                   # 📖 Detailed usage guide
+│   ├── TROUBLESHOOTING.md         # 🔧 Common issues and fixes
+│   ├── FAQ.md                     # ❓ Frequently asked questions
+│   └── DOMAINS.md                 # 🌍 Adding a new domain reference
 ├── .gitignore
 └── .github/
     ├── workflows/
@@ -491,7 +486,7 @@ Use `/clarify` at any step to resolve ambiguities before moving on.
 # Optional: define conventions before starting
 You:    /principles
 Agent:  What language should artifacts be in? What severity blocks /done?
-You:    Russian, block on CRITICAL only
+You:    English, block on CRITICAL only
 Agent:  [generates 00_principles_dragon-fortune.md — applied by all subsequent skills]
 
 You:    /brief
@@ -544,296 +539,21 @@ A complete example project — **Dragon Fortune** (iGaming Telegram Mini App) �
 
 ## 📖 Usage Guide
 
-### 1. Starting a project
+Full walkthrough of the pipeline in day-to-day use — starting a project, moving between steps, `/clarify`, `/analyze`, `/trace`, `/split`, working with multiple projects, and `AGENTS.md` — lives in [docs/USAGE.md](docs/USAGE.md).
 
-Run the first command and the agent takes it from there — it loads domain references, asks questions, and generates the artifact. You never edit SKILL.md files directly.
-
-```
-You:    /brief
-Agent:  What domain is your project in? (iGaming, Fintech, SaaS, other?)
-You:    Fintech — a neobank mobile app
-Agent:  Great. Let me ask a few questions.
-        1. What is the primary business goal — acquiring new users, increasing card usage, or something else?
-        2. What geography and currency does the app target?
-        3. Are there existing banking partners or will the app be a standalone product?
-You:    [answer all three]
-Agent:  Two more questions...
-        [1-2 more rounds]
-Agent:  [generates 01_brief_neobank-app.md]
-
-        Artifact saved: 01_brief_neobank-app.md
-        Covered: 3 business goals, 5 stakeholders, 4 risks.
-        Slug fixed for this pipeline: neobank-app
-
-        Available: /clarify · /revise · /expand · /validate · /done
-        Next step: /srs
-```
-
-The **slug** (`neobank-app`) is derived from the project name at `/brief` and used as a suffix for every subsequent file: `02_srs_neobank-app.md`, `03_stories_neobank-app.md`, and so on.
-
----
-
-### 2. Moving through the pipeline
-
-After reviewing the generated artifact, either refine it or finalize it:
-
-```
-# Not happy with a section — rewrite it
-You:    /revise section 3
-Agent:  [asks what to change, rewrites section 3, saves the file]
-
-# Want more detail
-You:    /expand section 7
-Agent:  [adds detail to section 7]
-
-# Happy with the result — move to the next step
-You:    /done
-Agent:  Brief finalized. Artifact saved.
-        Next step: /srs
-```
-
-Each step reads the output of all previous steps automatically. You do not need to paste or reference prior files — the agent finds them by slug in the output directory.
-
----
-
-### 3. Using /clarify
-
-Run `/clarify` after generating any artifact to surface ambiguities before moving on. It is faster than realising a problem three steps later.
-
-```
-You:    /clarify
-Agent:  Found 4 ambiguities in 02_srs_neobank-app.md:
-
-        1. [FR-003] "The system must respond quickly" — what is the target response time in ms?
-        2. [FR-011] "Admin" role is used but not defined in section 2.2 — same as "Compliance Officer"?
-        3. [NFR-001] "High availability" — what is the numeric SLA target (%)?
-        4. [FR-019 vs FR-024] Both describe currency conversion — are these the same feature?
-
-You:    1. Under 200ms at p95. 2. No, Admin is a separate internal role. 3. 99.9%. 4. Yes, merge them.
-Agent:  [updates FR-003, adds Admin to roles, adds 99.9% to NFR-001, merges FR-019 and FR-024]
-        Updated: 02_srs_neobank-app.md — 4 ambiguities resolved.
-```
-
-You can also focus on a specific area:
-
-```
-You:    /clarify security
-You:    /clarify FR-015
-```
-
----
-
-### 4. Using /analyze
-
-Run `/analyze` at any point after `/srs` to get a cross-artifact quality report. Unlike `/trace` (which checks links), `/analyze` also catches duplicates, ambiguous language, and terminology drift.
-
-```
-You:    /analyze
-Agent:  [reads all existing artifacts]
-
-        Artifact saved: 00_analyze_neobank-app.md
-
-        Finding Report:
-        | ID | Category      | Severity | Location          | Summary                          | Recommendation        |
-        |----|---------------|----------|-------------------|----------------------------------|-----------------------|
-        | A1 | Coverage Gap  | CRITICAL | srs:FR-008        | No linked user story             | Create US or remove   |
-        | A2 | Ambiguity     | HIGH     | nfr:NFR-004       | "Scalable" without metric        | Add target RPS        |
-        | A3 | Terminology   | HIGH     | srs + stories     | "Wallet" vs "Balance" drift      | Standardize in glossary |
-        | A4 | Duplication   | MEDIUM   | srs:FR-012,FR-017 | Near-duplicate login requirements| Merge                 |
-
-        Overall coverage: FR→US 87% · US→AC 94%
-        CRITICAL: 1 · HIGH: 2 · MEDIUM: 1
-
-        Top actions: fix A1 with /stories, fix A2 with /clarify NFR-004, fix A3 with /revise glossary
-```
-
-**Severity guide:**
-
-| Severity | Meaning | Action |
-|----------|---------|--------|
-| CRITICAL | Blocks pipeline integrity — missing mandatory link, non-existent ID | Fix before `/done` |
-| HIGH | Significant quality risk — missing metric, key term drift | Fix before handoff |
-| MEDIUM | Quality concern, does not block | Document or defer |
-| LOW | Style suggestion | Optional |
-
-Re-run `/analyze` after fixes to track progress.
-
----
-
-### 5. Using /trace
-
-Run `/trace` after `/stories` to check traceability coverage. It builds the full FR → US → UC → AC → ... matrix.
-
-```
-You:    /trace
-Agent:  [generates 00_trace_neobank-app.md]
-
-        Coverage Summary:
-        FR → US:       24/27 (89%) — FR-008, FR-019, FR-022 uncovered
-        US → AC:       41/41 (100%) ✓
-        Entity → FR:   18/20 (90%) — Transaction, AuditLog not linked
-
-        Recommendations:
-        — Create user stories for FR-008, FR-019, FR-022 or remove them from SRS
-        — Link Transaction and AuditLog to relevant FR in /datadict
-```
-
-Run `/trace` again after fixing gaps — it re-reads all artifacts and recomputes the matrix.
-
----
-
-### 6. Splitting large elements
-
-If a user story or requirement is too broad, split it:
-
-```
-You:    /split US-014
-Agent:  US-014 covers 4 distinct actions. Suggested split:
-        — US-014a: Player views transaction history (read-only)
-        — US-014b: Player filters transactions by date and type
-        — US-014c: Player exports transactions as PDF
-        — US-014d: Player disputes a transaction
-
-        Shall I apply this split?
-You:    Yes, but combine 014a and 014b
-Agent:  [rewrites US-014 as two stories: US-014 and US-014b]
-```
-
----
-
-### 7. Working with multiple projects
-
-Each project gets its own slug and its own set of files. If you work on multiple projects in the same directory, run `/principles` first for each and set `output mode: subfolder` — files will be organised under `{slug}/` subfolders automatically.
-
-If you start a new project without changing the output directory, the agent detects existing `01_brief_*.md` files and warns you before overwriting anything.
-
----
-
-### 8. Troubleshooting
-
-**Agent says it can't find the brief / SRS / previous artifact:**
-The skill looks for files matching `01_brief_*.md` in the output directory. If the file was saved elsewhere, either move it or tell the agent the full path.
-
-**Artifact was generated in the wrong language:**
-Run `/principles` and set the artifact language explicitly. Then re-run the current step — all subsequent skills will use the language from `00_principles_{slug}.md`.
-
-**Want to redo a step from scratch:**
-Run the command again (e.g., `/srs`). The agent will warn that `02_srs_{slug}.md` already exists and offer to overwrite or create a new version.
-
-**A domain reference is not loading:**
-Check that `skills/references/domains/{domain}.md` exists and that the domain name in the brief matches exactly (`igaming`, `fintech`, `saas`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, or `real-estate` — lowercase with hyphens).
-
-**`/analyze` reports findings after you already fixed them:**
-Run `/analyze` again — it always re-reads all artifacts fresh. Cached results are never used.
-
----
-
-### 9. AGENTS.md — persistent project context
-
-After `/brief` completes, the agent creates or updates `AGENTS.md` in your project root. This file stores the project slug, domain, key constraints, artifact paths, and the current pipeline stage.
-
-```markdown
-# BA Toolkit — Project Context
-
-**Project:** Dragon Fortune
-**Slug:** dragon-fortune
-**Domain:** iGaming
-**Language:** English
-**Pipeline stage:** Brief complete
-
-## Artifacts
-- `/outputs/01_brief_dragon-fortune.md` — Project Brief
-
-## Key context
-- **Business goal:** Telegram Mini App slot for CIS markets, 50k MAU in 6 months
-- **Key constraints:** Telegram API limits, AML/KYC compliance, certified RTP
-
-## Next step
-Run /srs to generate the Requirements Specification.
-```
-
-`AGENTS.md` is updated again after `/srs` with roles, integrations, and FR count. Any AI agent (Claude Code, Codex, Gemini CLI) that reads this file will understand the project context without re-reading all artifacts — useful when resuming work in a new session.
+For common issues and fixes, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
 ---
 
 ## ❓ FAQ
 
-**Do I need all 21 skills?**
-No. The lean pipeline (`/brief → /srs → /stories → /ac → /nfr → /datadict → /apicontract → /wireframes → /handoff`) covers the essentials in ~3–4 hours. Add `/usecases`, `/research`, `/scenarios`, `/trace`, and `/analyze` when you need deeper coverage.
-
-**Can I use it in any language?**
-Yes. The agent detects the language of your first message and generates all artifacts in that language. Set it explicitly with `/principles` if you want to lock it regardless of the conversation language.
-
-**Does it work offline / without internet?**
-Yes. All skills are local Markdown files. The only network dependency is your AI agent itself (Claude Code, Codex CLI, etc.). No BA Toolkit component calls any external API.
-
-**My domain isn't iGaming, Fintech, or SaaS — can I still use it?**
-Yes. Select "Custom" at `/brief` and the skills use general interview questions. You can add your own domain in 30 minutes by creating one Markdown file — see [Adding a New Domain](#adding-a-new-domain).
-
-**Can I go back and edit a previous artifact?**
-Yes. Run `/revise [section]` at any step, or re-invoke the skill command (e.g., `/srs`) to regenerate from scratch. The agent warns before overwriting. Subsequent skills will read the updated version automatically.
-
-**Does it work with smaller / faster models?**
-The structured Markdown format and explicit cross-references help smaller models stay on track. For best results, use a model with a context window of at least 32k tokens — the later pipeline steps load multiple large artifacts simultaneously.
-
-**How do I update BA Toolkit after a new version is released?**
-See the update instructions in the [Installation](#-installation) section below.
+Answers to common questions — language support, offline use, custom domains, editing past artifacts, model size, updates — are in [docs/FAQ.md](docs/FAQ.md).
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome. The most useful additions are:
-
-**New domains** (highest impact, no code required):
-Create `skills/references/domains/{domain}.md` following the template in [Adding a New Domain](#adding-a-new-domain). Open a PR with the file and a brief description of the domain.
-
-**Skill improvements:**
-Edit the relevant `skills/{name}/SKILL.md`. Keep changes backward-compatible — avoid renaming sections or changing output file names, as other skills depend on them.
-
-**Bug reports:**
-Open a GitHub issue with: the skill name, the command you ran, the agent/platform you used, and what happened vs. what you expected.
-
-**Guidelines:**
-- One PR per domain or skill.
-- Test the skill end-to-end before submitting (run the full command, check the output file).
-- Keep the style consistent with existing skills: formal, neutral, no emoji in artifact body, language follows user input.
-
----
-
-<h2 id="adding-a-new-domain">➕ Adding a New Domain</h2>
-
-Create `skills/references/domains/{domain}.md` following this structure:
-
-```markdown
-# Domain Reference: {Name}
-
-## 1. /brief — Project Brief
-### Domain-specific interview questions
-### Typical business goals
-### Typical risks
-
-## 2. /srs — Requirements Specification
-### Domain-specific interview questions
-### Typical functional areas
-
-## 3. /stories — User Stories
-### Domain-specific interview questions
-### Typical epics
-
-## 4. /usecases — Use Cases
-## 5. /ac — Acceptance Criteria
-## 6. /nfr — Non-functional Requirements
-## 7. /datadict — Data Dictionary
-## 8. /apicontract — API Contract
-## 9. /wireframes — Wireframe Descriptions
-
-## Domain Glossary
-| Term | Definition |
-|------|-----------|
-```
-
-Each skill loads **only its own section** from the reference file — keeping context usage efficient.
+New domains and skill improvements are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the PR workflow, and [docs/DOMAINS.md](docs/DOMAINS.md) for the domain file template.
 
 ---
 

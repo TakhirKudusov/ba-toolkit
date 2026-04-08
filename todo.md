@@ -103,24 +103,6 @@ Items are sequential — each unblocks the next.
 
 ---
 
-### 6. `README.ru.md` — Russian translation
-
-**What:** Full Russian translation of `README.md`. Maintained in parallel.
-
-**Why:** Project was built in a Russian-speaking context. Lowers the barrier for Russian-speaking BA/PM audience.
-
-**Blocked by:** Item 5 — wait for the example project and new skills to stabilise the EN README before translating.
-
-**Approach:**
-- Direct translation of all sections.
-- Keep code blocks, command names, and file paths in English.
-- Add a language switcher badge at the top of both READMEs: `🇺🇸 English | 🇷🇺 Russian`.
-- **Sync rule:** EN is the source of truth — update `README.md` first, then `README.ru.md`. Never update only the Russian version.
-
-**Effort:** Medium (~900 lines).
-
----
-
 ## Medium priority
 
 Independent of High priority items — can be done in parallel or between tasks.
