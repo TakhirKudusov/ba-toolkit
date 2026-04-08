@@ -1,6 +1,6 @@
 {
   "name": "@kudusov.takhir/ba-toolkit",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "AI-powered Business Analyst pipeline — 21 skills from project brief to development handoff. Works with Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf.",
   "keywords": [
     "business-analyst",
