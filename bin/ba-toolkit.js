@@ -643,6 +643,88 @@ function resolveAgentDestination({ agentId, isGlobal, isProject }) {
   return { agent, destDir, effectiveGlobal };
 }
 
+function cmdStatus() {
+  log('');
+  log('  ' + cyan('BA Toolkit — Installation Status'));
+  log('  ' + cyan('================================'));
+  log('');
+  log(`  package version:  ${PKG.version}`);
+  log(`  scanning from:    ${process.cwd()}`);
+  log('');
+
+  // Walk every (agent × scope) combination and collect the ones whose
+  // destination directory actually exists. Project-scope paths resolve
+  // against the current working directory; global paths are absolute.
+  const rows = [];
+  for (const [agentId, agent] of Object.entries(AGENTS)) {
+    if (agent.projectPath) {
+      const projectDir = path.resolve(process.cwd(), agent.projectPath);
+      if (fs.existsSync(projectDir)) {
+        const sentinel = readSentinel(projectDir);
+        rows.push({
+          agentName: agent.name,
+          agentId,
+          scope: 'project',
+          path: projectDir,
+          version: sentinel ? sentinel.version : null,
+          installedAt: sentinel ? sentinel.installedAt : null,
+        });
+      }
+    }
+    if (agent.globalPath) {
+      if (fs.existsSync(agent.globalPath)) {
+        const sentinel = readSentinel(agent.globalPath);
+        rows.push({
+          agentName: agent.name,
+          agentId,
+          scope: 'global',
+          path: agent.globalPath,
+          version: sentinel ? sentinel.version : null,
+          installedAt: sentinel ? sentinel.installedAt : null,
+        });
+      }
+    }
+  }
+
+  if (rows.length === 0) {
+    log('  ' + gray('No BA Toolkit installations found in any known location.'));
+    log('  ' + gray("Run 'ba-toolkit install --for <agent>' to install one."));
+    log('');
+    return;
+  }
+
+  log(`  Found ${bold(rows.length)} installation${rows.length === 1 ? '' : 's'}:`);
+  log('');
+
+  for (const row of rows) {
+    let versionLabel;
+    if (!row.version) {
+      versionLabel = gray('(unknown — pre-1.4 install with no sentinel)');
+    } else if (row.version === PKG.version) {
+      versionLabel = green(row.version + ' (current)');
+    } else {
+      versionLabel = yellow(row.version + ' (outdated)');
+    }
+    log(`  ${bold(row.agentName)} ${gray('(' + row.agentId + ', ' + row.scope + ')')}`);
+    log(`    path:      ${row.path}`);
+    log(`    version:   ${versionLabel}`);
+    if (row.installedAt) {
+      log(`    installed: ${gray(row.installedAt)}`);
+    }
+    log('');
+  }
+
+  const stale = rows.filter((r) => !r.version || r.version !== PKG.version);
+  if (stale.length > 0) {
+    log('  ' + yellow(`${stale.length} installation${stale.length === 1 ? '' : 's'} not at version ${PKG.version}.`));
+    log('  ' + gray("Run 'ba-toolkit upgrade --for <agent>' to refresh."));
+    log('');
+  } else {
+    log('  ' + green('All installations are up to date.'));
+    log('');
+  }
+}
+
 async function cmdUpgrade(args) {
   const agentId = args.flags.for;
   if (!agentId || agentId === true) {
@@ -821,6 +903,10 @@ ${bold('COMMANDS')}
                                  against the package version, wipes the old
                                  install on mismatch, and re-runs install.
                                  Aliased as 'update'.
+  status                         Scan all known install locations for every
+                                 supported agent (project + global) and
+                                 report which versions are installed where.
+                                 Read-only; no flags.
 
 ${bold('INIT OPTIONS')}
   --name <name>                  Skip the project name prompt
@@ -882,6 +968,9 @@ ${bold('EXAMPLES')}
   ba-toolkit upgrade --for claude-code
   ba-toolkit upgrade --for cursor --dry-run
 
+  # See where (and which version) BA Toolkit is installed.
+  ba-toolkit status
+
 ${bold('LEARN MORE')}
   https://github.com/TakhirKudusov/ba-toolkit
 `);
@@ -916,6 +1005,9 @@ async function main() {
     case 'upgrade':
     case 'update':
       await cmdUpgrade(args);
+      break;
+    case 'status':
+      cmdStatus();
       break;
     case 'help':
       cmdHelp();
