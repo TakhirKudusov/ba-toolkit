@@ -5,7 +5,7 @@
 <strong>AI-powered Business Analyst pipeline</strong><br>
 From project brief to development handoff — 19 skills, fully structured pipeline
 
-<img src="https://img.shields.io/badge/skills-19-blue" alt="Skills">
+<img src="https://img.shields.io/badge/skills-21-blue" alt="Skills">
 <img src="https://img.shields.io/badge/domains-9-green" alt="Domains">
 <img src="https://img.shields.io/badge/format-Markdown-orange" alt="Format">
 <img src="https://img.shields.io/badge/language-auto--detect-purple" alt="Language">
@@ -62,7 +62,7 @@ From project brief to development handoff — 19 skills, fully structured pipeli
 
 ## 🎯 What is this?
 
-BA Toolkit is a set of **19 interconnected skills** that turn your AI coding agent into a business analyst. You walk through a structured pipeline — from a high-level project brief to a development handoff package — and get a complete requirements artifact set ready for engineering.
+BA Toolkit is a set of **21 interconnected skills** that turn your AI coding agent into a business analyst. You walk through a structured pipeline — from a high-level project brief to a development handoff package — and get a complete requirements artifact set ready for engineering.
 
 Each skill **reads the output of previous steps**, maintains cross-references between artifacts (FR → US → UC → AC → NFR → Entities → ADR → API → Screens → Scenarios), and adapts to your project's domain.
 
@@ -143,6 +143,11 @@ To customize for your setup, edit `skills/references/environment.md` — all ski
 | — | `/trace` | 🔍 Traceability Matrix + coverage gaps | `00_trace_{slug}.md` |
 | — | `/clarify [focus]` | 🔎 Targeted ambiguity resolution for any artifact | _(updates existing artifact)_ |
 | — | `/analyze` | 📊 Cross-artifact quality report with severity table | `00_analyze_{slug}.md` |
+| — | `/estimate` | 📏 Effort estimation — Fibonacci SP, T-shirt sizes, or person-days | `00_estimate_{slug}.md` |
+| — | `/glossary` | 📖 Unified project glossary with terminology drift detection | `00_glossary_{slug}.md` |
+| — | `/export [format]` | 📤 Export User Stories to Jira / GitHub Issues / Linear / CSV | `export_{slug}_{format}.json` / `.csv` |
+| — | `/risk` | ⚠️ Risk register — probability × impact matrix, mitigation per risk | `00_risks_{slug}.md` |
+| — | `/sprint` | 🗓️ Sprint plan — stories grouped by velocity and capacity with sprint goals | `00_sprint_{slug}.md` |
 
 > 💡 The project **slug** (e.g., `dragon-fortune`) is set at `/brief` and reused across all files automatically.
 
@@ -333,6 +338,11 @@ ba-toolkit/
 │   ├── research/SKILL.md          #    Step 7a (optional): Technology Research & ADRs
 │   ├── scenarios/SKILL.md         #    Step 10 (optional): End-to-end Validation Scenarios
 │   ├── handoff/SKILL.md           #    Step 11 (optional): Development Handoff Package
+│   ├── estimate/SKILL.md          #    Utility: Effort Estimation (SP / T-shirt / person-days)
+│   ├── glossary/SKILL.md          #    Utility: Unified Project Glossary
+│   ├── export/SKILL.md            #    Utility: Export to Jira / GitHub Issues / Linear / CSV
+│   ├── risk/SKILL.md              #    Utility: Risk Register (probability × impact matrix)
+│   ├── sprint/SKILL.md            #    Utility: Sprint Plan (velocity-based story grouping)
 │   └── references/
 │       ├── environment.md         #    🖥️ Platform-specific output paths
 │       ├── closing-message.md     #    📋 Closing message template (used by all skills)
@@ -373,7 +383,8 @@ ba-toolkit/
 ├── .gitignore
 └── .github/
     ├── workflows/
-    │   └── validate.yml           # ✅ CI: validate artifacts and skill files on PR
+    │   ├── validate.yml           # ✅ CI: validate artifacts and skill files on PR
+    │   └── release.yml            # 🚀 CD: create GitHub Release on version tag push
     └── scripts/
         └── validate_artifacts.py  # Python validator used by CI
 ```
@@ -411,7 +422,7 @@ The `/trace` command builds the **complete matrix** of these links and highlight
 
 ## ⚡ Minimum Viable Pipeline
 
-Not every project needs all 16 skills. Two common paths:
+Not every project needs all 21 skills. Two common paths:
 
 **Lean** (fastest path to handoff — 9 steps):
 ```
@@ -809,7 +820,7 @@ Run /srs to generate the Requirements Specification.
 
 ## ❓ FAQ
 
-**Do I need all 16 skills?**
+**Do I need all 21 skills?**
 No. The lean pipeline (`/brief → /srs → /stories → /ac → /nfr → /datadict → /apicontract → /wireframes → /handoff`) covers the essentials in ~3–4 hours. Add `/usecases`, `/research`, `/scenarios`, `/trace`, and `/analyze` when you need deeper coverage.
 
 **Can I use it in any language?**

@@ -1,6 +1,6 @@
 # BA Toolkit — Command Reference
 
-Quick reference for all 19 skills and subcommands.
+Quick reference for all 21 skills and subcommands.
 
 ---
 
@@ -39,6 +39,7 @@ Available at any pipeline stage.
 | `/glossary` | `00_glossary_{slug}.md` | Unified project glossary: scans all artifacts, detects terminology drift, undefined terms |
 | `/export [format]` | `export_{slug}_{format}.json` / `.csv` | Export User Stories to Jira, GitHub Issues, Linear, or CSV |
 | `/risk` | `00_risks_{slug}.md` | Risk register: probability × impact matrix, mitigation and contingency per risk |
+| `/sprint` | `00_sprint_{slug}.md` | Sprint plan: stories grouped into sprints by velocity, capacity, and risk priority |
 
 ---
 

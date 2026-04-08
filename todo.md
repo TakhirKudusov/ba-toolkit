@@ -61,7 +61,7 @@ Items are sequential — each unblocks the next.
 
 ---
 
-### 4. `/sprint` skill
+### ✅ 4. `/sprint` skill
 
 **What:** Generate a sprint plan from estimated User Stories: group by priority and team capacity, output sprint goal, velocity, and story list per sprint. Generates `00_sprint_{slug}.md`.
 

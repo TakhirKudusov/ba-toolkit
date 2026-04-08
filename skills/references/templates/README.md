@@ -23,6 +23,8 @@ Skills use these templates as the structural baseline when generating artifacts.
 | `trace-template.md` | _(inline in chat)_ | `/trace` |
 | `analyze-template.md` | `00_analyze_{slug}.md` | `/analyze` |
 | `handoff-template.md` | `11_handoff_{slug}.md` | `/handoff` |
+| `risk-template.md` | `00_risks_{slug}.md` | `/risk` |
+| `sprint-template.md` | `00_sprint_{slug}.md` | `/sprint` |
 
 All templates use `[TOKEN]` placeholders in `UPPER_CASE` brackets for all variable content.
 
