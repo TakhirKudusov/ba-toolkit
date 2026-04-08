@@ -497,10 +497,39 @@ async function cmdInit(args) {
   log('');
 }
 
-// Core install logic. Shared between `cmdInstall` (standalone) and `cmdInit`
-// (full setup). Returns true on success, false if the user declined to
-// overwrite an existing destination.
-async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = true }) {
+// Marker file written into the install destination after a successful copy.
+// Lets `upgrade` and `status` (future command) tell which package version
+// is currently installed without diffing every file. Hidden file with no
+// `.md` / `.mdc` extension so the agent's skill loader ignores it.
+const SENTINEL_FILENAME = '.ba-toolkit-version';
+
+function readSentinel(destDir) {
+  const p = path.join(destDir, SENTINEL_FILENAME);
+  if (!fs.existsSync(p)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function writeSentinel(destDir) {
+  const payload = {
+    version: PKG.version,
+    installedAt: new Date().toISOString(),
+  };
+  fs.writeFileSync(
+    path.join(destDir, SENTINEL_FILENAME),
+    JSON.stringify(payload, null, 2) + '\n',
+  );
+}
+
+// Core install logic. Shared between `cmdInstall` (standalone), `cmdInit`
+// (full setup), and `cmdUpgrade`. Returns true on success, false if the
+// user declined to overwrite an existing destination. Pass `force: true`
+// to skip the overwrite prompt — `cmdUpgrade` uses this because it has
+// already wiped the destination and explicitly knows the overwrite is ok.
+async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = true, force = false }) {
   const agent = AGENTS[agentId];
   if (!agent) {
     logError(`Unknown agent: ${agentId}`);
@@ -538,7 +567,7 @@ async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = t
   log(`    format:       ${agent.format === 'mdc' ? '.mdc (converted from SKILL.md)' : 'SKILL.md (native)'}`);
   if (dryRun) log('    ' + yellow('mode:         dry-run (no files will be written)'));
 
-  if (fs.existsSync(destDir) && !dryRun) {
+  if (fs.existsSync(destDir) && !dryRun && !force) {
     const answer = await prompt(`    ${destDir} already exists. Overwrite? (y/N): `);
     if (answer.toLowerCase() !== 'y') {
       log('    cancelled.');
@@ -553,6 +582,10 @@ async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = t
   } catch (err) {
     logError(err.message);
     process.exit(1);
+  }
+
+  if (!dryRun) {
+    writeSentinel(destDir);
   }
 
   log('    ' + green(`${dryRun ? 'would copy' : 'copied'} ${copied.length} files.`));
@@ -608,6 +641,93 @@ function resolveAgentDestination({ agentId, isGlobal, isProject }) {
   }
   const destDir = effectiveGlobal ? agent.globalPath : path.resolve(process.cwd(), agent.projectPath);
   return { agent, destDir, effectiveGlobal };
+}
+
+async function cmdUpgrade(args) {
+  const agentId = args.flags.for;
+  if (!agentId || agentId === true) {
+    logError('--for <agent> is required.');
+    log('Supported agents: ' + Object.keys(AGENTS).join(', '));
+    process.exit(1);
+  }
+  const { agent, destDir, effectiveGlobal } = resolveAgentDestination({
+    agentId,
+    isGlobal: !!args.flags.global,
+    isProject: !!args.flags.project,
+  });
+  const dryRun = !!args.flags['dry-run'];
+
+  log('');
+  log('  ' + cyan(`BA Toolkit — Upgrade for ${agent.name}`));
+  log('  ' + cyan('================================'));
+  log('');
+  log(`  destination:  ${destDir}`);
+  log(`  scope:        ${effectiveGlobal ? 'global (user-wide)' : 'project-level'}`);
+
+  if (!fs.existsSync(destDir)) {
+    log('');
+    log('  ' + gray(`No installation found at ${destDir}.`));
+    log('  ' + gray(`Run \`ba-toolkit install --for ${agentId}\` first.`));
+    log('');
+    return;
+  }
+
+  const sentinel = readSentinel(destDir);
+  const currentVersion = PKG.version;
+  const installedVersion = sentinel ? sentinel.version : null;
+
+  if (installedVersion === currentVersion) {
+    log(`  installed:    ${installedVersion} (current)`);
+    log(`  package:      ${currentVersion}`);
+    log('');
+    log('  ' + green('Already up to date.'));
+    log('  ' + gray(`To force a clean reinstall, run \`ba-toolkit install --for ${agentId}\`.`));
+    log('');
+    return;
+  }
+
+  log(`  installed:    ${installedVersion || gray('(unknown — pre-1.4 install with no sentinel)')}`);
+  log(`  package:      ${currentVersion}`);
+  if (dryRun) log('  ' + yellow('mode:         dry-run (no files will be written)'));
+  log('');
+
+  // Safety: same guard as cmdUninstall — never rmSync anything that
+  // doesn't look like a ba-toolkit folder.
+  if (path.basename(destDir) !== 'ba-toolkit') {
+    logError(`Refusing to upgrade suspicious destination (not a ba-toolkit folder): ${destDir}`);
+    process.exit(1);
+  }
+
+  // Count files in the existing install for the dry-run preview.
+  if (dryRun) {
+    let existingCount = 0;
+    (function walk(d) {
+      for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+        const p = path.join(d, entry.name);
+        if (entry.isDirectory()) walk(p);
+        else existingCount++;
+      }
+    })(destDir);
+    log('  ' + yellow(`would remove ${existingCount} existing files`));
+  } else {
+    log('  ' + green('Removing previous install...'));
+    fs.rmSync(destDir, { recursive: true, force: true });
+  }
+
+  const ok = await runInstall({
+    agentId,
+    isGlobal: effectiveGlobal,
+    isProject: !effectiveGlobal,
+    dryRun,
+    showHeader: false,
+    force: true,
+  });
+  log('');
+  if (ok && !dryRun) {
+    log('  ' + cyan(`Upgraded to ${currentVersion}.`));
+    log('  ' + yellow(agent.restartHint));
+  }
+  log('');
 }
 
 async function cmdUninstall(args) {
@@ -696,6 +816,11 @@ ${bold('COMMANDS')}
   uninstall --for <agent>        Remove BA Toolkit skills from an agent's
                                  directory. Asks for confirmation before
                                  deleting; supports --dry-run.
+  upgrade --for <agent>          Refresh skills after a toolkit version bump.
+                                 Compares the installed version sentinel
+                                 against the package version, wipes the old
+                                 install on mismatch, and re-runs install.
+                                 Aliased as 'update'.
 
 ${bold('INIT OPTIONS')}
   --name <name>                  Skip the project name prompt
@@ -723,6 +848,13 @@ ${bold('UNINSTALL OPTIONS')}
                                  (default when the agent supports it)
   --dry-run                      Preview without removing files
 
+${bold('UPGRADE OPTIONS')}
+  --for <agent>                  One of: ${Object.keys(AGENTS).join(', ')}
+  --global                       Upgrade the user-wide install
+  --project                      Upgrade the project-level install
+                                 (default when the agent supports it)
+  --dry-run                      Preview without writing or removing files
+
 ${bold('GENERAL OPTIONS')}
   --version, -v                  Print version and exit
   --help, -h                     Print this help and exit
@@ -745,6 +877,10 @@ ${bold('EXAMPLES')}
   ba-toolkit uninstall --for claude-code
   ba-toolkit uninstall --for claude-code --global
   ba-toolkit uninstall --for cursor --dry-run
+
+  # After 'npm update -g @kudusov.takhir/ba-toolkit', refresh the skills.
+  ba-toolkit upgrade --for claude-code
+  ba-toolkit upgrade --for cursor --dry-run
 
 ${bold('LEARN MORE')}
   https://github.com/TakhirKudusov/ba-toolkit
@@ -776,6 +912,10 @@ async function main() {
       break;
     case 'uninstall':
       await cmdUninstall(args);
+      break;
+    case 'upgrade':
+    case 'update':
+      await cmdUpgrade(args);
       break;
     case 'help':
       cmdHelp();
