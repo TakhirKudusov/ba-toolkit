@@ -16,6 +16,7 @@ const {
   parseArgs,
   resolveDomain,
   resolveAgent,
+  stringFlag,
   readSentinel,
   renderAgentsMd,
   DOMAINS,
@@ -261,6 +262,41 @@ test('resolveAgent: empty string → null', () => {
 
 test('resolveAgent: null → null', () => {
   assert.equal(resolveAgent(null), null);
+});
+
+// --------------------------------------------------------------------
+// stringFlag
+// --------------------------------------------------------------------
+
+test('stringFlag: returns string value when present', () => {
+  const args = parseArgs(['--name', 'foo']);
+  assert.equal(stringFlag(args, 'name'), 'foo');
+});
+
+test('stringFlag: returns string value with --key=value form', () => {
+  const args = parseArgs(['--name=foo']);
+  assert.equal(stringFlag(args, 'name'), 'foo');
+});
+
+test('stringFlag: returns null when flag absent', () => {
+  const args = parseArgs([]);
+  assert.equal(stringFlag(args, 'name'), null);
+});
+
+test('stringFlag: returns null when flag is bare boolean', () => {
+  // `--name` followed by another flag is parsed as boolean true.
+  const args = parseArgs(['--name', '--dry-run']);
+  assert.equal(stringFlag(args, 'name'), null);
+});
+
+test('stringFlag: returns null for empty string value (--key=)', () => {
+  const args = parseArgs(['--name=']);
+  assert.equal(stringFlag(args, 'name'), null);
+});
+
+test('stringFlag: returns null for boolean flag (--dry-run)', () => {
+  const args = parseArgs(['--dry-run']);
+  assert.equal(stringFlag(args, 'dry-run'), null);
 });
 
 // --------------------------------------------------------------------

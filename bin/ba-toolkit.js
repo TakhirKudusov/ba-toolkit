@@ -195,6 +195,17 @@ function resolveAgent(raw) {
   return AGENTS[trimmed] ? trimmed : null;
 }
 
+// Returns the string value of a flag, or null if it's absent, was passed
+// as a bare boolean (e.g. `--name` with no following value, which
+// parseArgs stores as `true`), or has an empty value (e.g. `--name=`).
+// Centralises the `flag && flag !== true` / `!flag || flag === true`
+// pattern that was repeated across cmdInit, cmdInstall, cmdUninstall,
+// cmdUpgrade.
+function stringFlag(args, key) {
+  const v = args.flags[key];
+  return (typeof v === 'string' && v.length > 0) ? v : null;
+}
+
 function today() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -294,8 +305,8 @@ async function cmdInit(args) {
   log('');
 
   // --- 1. Project name (slug derives from it) ---
-  const nameFromFlag = !!(args.flags.name && args.flags.name !== true);
-  let name = nameFromFlag ? args.flags.name : null;
+  const nameFlag = stringFlag(args, 'name');
+  let name = nameFlag;
   if (!name) name = await prompt('  Project name (e.g. My App): ');
   name = String(name || '').trim();
   if (!name) {
@@ -305,11 +316,11 @@ async function cmdInit(args) {
 
   // --- 2. Slug (auto-derived from name; confirmed interactively unless
   //     both --name and --slug were passed on the command line) ---
-  const slugFromFlag = !!(args.flags.slug && args.flags.slug !== true);
-  let slug = slugFromFlag ? args.flags.slug : null;
+  const slugFlag = stringFlag(args, 'slug');
+  let slug = slugFlag;
   if (!slug) {
     const derived = sanitiseSlug(name);
-    if (nameFromFlag) {
+    if (nameFlag) {
       // Non-interactive path. Either accept the derived slug, or fail
       // loudly with a hint when the name has no ASCII letters/digits to
       // derive from (e.g. `--name "Проект"` or `--name "🚀"`). Without
@@ -336,11 +347,12 @@ async function cmdInit(args) {
   }
 
   // --- 3. Domain (numbered menu) ---
-  let domain = args.flags.domain;
-  if (domain && domain !== true) {
-    domain = resolveDomain(String(domain));
+  const domainFlag = stringFlag(args, 'domain');
+  let domain;
+  if (domainFlag) {
+    domain = resolveDomain(domainFlag);
     if (!domain) {
-      logError(`Unknown domain: ${args.flags.domain}`);
+      logError(`Unknown domain: ${domainFlag}`);
       log('Valid ids: ' + DOMAINS.map((d) => d.id).join(', '));
       process.exit(1);
     }
@@ -362,12 +374,13 @@ async function cmdInit(args) {
 
   // --- 4. Agent (numbered menu), unless --no-install ---
   const skipInstall = !!args.flags['no-install'];
-  let agentId = args.flags.for;
+  const forFlag = stringFlag(args, 'for');
+  let agentId = null;
   if (!skipInstall) {
-    if (agentId && agentId !== true) {
-      agentId = resolveAgent(String(agentId));
+    if (forFlag) {
+      agentId = resolveAgent(forFlag);
       if (!agentId) {
-        logError(`Unknown agent: ${args.flags.for}`);
+        logError(`Unknown agent: ${forFlag}`);
         log('Supported: ' + Object.keys(AGENTS).join(', '));
         process.exit(1);
       }
@@ -557,8 +570,8 @@ async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = t
 }
 
 async function cmdInstall(args) {
-  const agentId = args.flags.for;
-  if (!agentId || agentId === true) {
+  const agentId = stringFlag(args, 'for');
+  if (!agentId) {
     logError('--for <agent> is required.');
     log('Supported agents: ' + Object.keys(AGENTS).join(', '));
     process.exit(1);
@@ -687,8 +700,8 @@ function cmdStatus() {
 }
 
 async function cmdUpgrade(args) {
-  const agentId = args.flags.for;
-  if (!agentId || agentId === true) {
+  const agentId = stringFlag(args, 'for');
+  if (!agentId) {
     logError('--for <agent> is required.');
     log('Supported agents: ' + Object.keys(AGENTS).join(', '));
     process.exit(1);
@@ -774,8 +787,8 @@ async function cmdUpgrade(args) {
 }
 
 async function cmdUninstall(args) {
-  const agentId = args.flags.for;
-  if (!agentId || agentId === true) {
+  const agentId = stringFlag(args, 'for');
+  if (!agentId) {
     logError('--for <agent> is required.');
     log('Supported agents: ' + Object.keys(AGENTS).join(', '));
     process.exit(1);
@@ -976,6 +989,7 @@ module.exports = {
   parseArgs,
   resolveDomain,
   resolveAgent,
+  stringFlag,
   readSentinel,
   renderAgentsMd,
   DOMAINS,
