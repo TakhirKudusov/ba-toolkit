@@ -257,6 +257,12 @@ function skillToMdc(srcPath, destPath) {
   return { destPath: newDestPath, content: mdcFrontmatter + body };
 }
 
+// MAINTENANCE: when adding a new skill, update BOTH tables below.
+// - Sequential pipeline stages (numbered 0-11 + 7a sub-step) go in
+//   "Pipeline Status" — they have a per-project status that progresses.
+// - Cross-cutting utilities (no fixed stage) go in "Cross-cutting Tools".
+// The README.md pipeline table is the canonical source of truth for the
+// 21-skill list and ordering; keep this template in sync with it.
 function renderAgentsMd({ name, slug, domain }) {
   return `# BA Toolkit — Project Context
 
@@ -287,6 +293,21 @@ function renderAgentsMd({ name, slug, domain }) {
 | 9 | /wireframes | ⬜ Not started | — |
 | 10 | /scenarios | ⬜ Not started | — |
 | 11 | /handoff | ⬜ Not started | — |
+
+## Cross-cutting Tools
+
+Utilities available throughout the pipeline. No fixed stage — invoke whenever they help. See README.md for the prerequisites of each.
+
+| Tool | Purpose |
+|------|---------|
+| /trace | Traceability Matrix + coverage gaps |
+| /clarify [focus] | Targeted ambiguity resolution for any artifact |
+| /analyze | Cross-artifact quality report with severity-rated findings |
+| /estimate | Effort estimation — Fibonacci SP, T-shirt sizes, or person-days |
+| /glossary | Unified project glossary with terminology drift detection |
+| /export [format] | Export User Stories to Jira / GitHub Issues / Linear / CSV |
+| /risk | Risk register — probability × impact matrix, mitigation per risk |
+| /sprint | Sprint plan — stories grouped by velocity and capacity with sprint goals |
 
 ## Key Constraints
 
