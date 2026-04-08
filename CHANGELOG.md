@@ -11,6 +11,27 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.4.0] — 2026-04-08
+
+### Added
+
+- **`ba-toolkit uninstall --for <agent>`** — remove BA Toolkit skills from an agent's directory. Symmetric to `install`: same `--for`, `--global`, `--project`, `--dry-run` flag set, same project-vs-global default. Counts files in the destination, asks `Remove {dest}? (y/N)` (defaults to N), and prints `Removed N files` after the rm completes. The pre-removal safety guard refuses to proceed unless `path.basename(destDir) === 'ba-toolkit'` — this is the only place in the CLI that calls `fs.rmSync({recursive: true})`, so it gets the strictest validation against future bugs that could turn it into `rm -rf $HOME`.
+- **`ba-toolkit upgrade --for <agent>`** (aliased as `update`) — refresh skills after a toolkit version bump. Reads the new version sentinel (see below), compares to `PKG.version`, and either prints `Already up to date` or wipes the destination wholesale and re-runs install with `force: true` (skipping the overwrite prompt). The wipe-and-reinstall approach guarantees that files removed from the toolkit between versions don't linger as ghost files in the destination — fixes the same class of bug that motivated `cmdUninstall`'s safety check. Pre-1.4 installs with no sentinel are treated as out-of-date and get a clean reinstall on first upgrade.
+- **`ba-toolkit status`** — pure read-only inspection: scans every (agent × scope) combination — 5 agents × project/global where supported, 8 real locations in total — and reports which versions of BA Toolkit are installed where. Output is grouped per installation, multi-line for readability, with colored version labels (`green: current` / `yellow: outdated` / `gray: pre-1.4 install with no sentinel`) and a summary footer pointing at `upgrade` for stale installs. Drives the natural follow-up to the version sentinel: now there's something to read it back with.
+- **Version sentinel `.ba-toolkit-version`** — `runInstall` now writes a hidden JSON marker file (`{"version": "1.4.0", "installedAt": "..."}`) into the install destination after a successful copy. The file has no `.md`/`.mdc` extension, so all five supported agents' skill loaders ignore it. Lets `upgrade` and `status` tell which package version is currently installed without diffing every file.
+- **`runInstall({..., force: true})` option** — skips the existing-destination overwrite prompt. Used by `cmdUpgrade` because it has already wiped the destination (or is in dry-run) and the prompt would just be noise. Not exposed as a CLI flag — `force` is an internal API surface only.
+
+### Fixed
+
+- **Five Tier 1 CLI fixes were already shipped in 1.3.2**, but they're worth restating in context here because 1.4.0 builds directly on the same `bin/ba-toolkit.js` improvements: `cmdInit` now honours `runInstall`'s return value (no false success message after a declined overwrite), `parseArgs` accepts `--key=value` form, the readline lifecycle and SIGINT handling are unified through a single shared interface with `INPUT_CLOSED` rejection, the slug-derivation path prints a clear error when the input has no ASCII letters, and `AGENTS.md` now lists all 21 skills (the previous template was missing the 8 cross-cutting utilities added in v1.1 and v1.2). See the 1.3.2 entry below for the per-fix detail.
+
+### Internal
+
+- **`resolveAgentDestination(...)` helper** — extracted scope-resolution logic from `runInstall`'s inline checks. `cmdUninstall` and `cmdUpgrade` reuse it. `runInstall` itself could be refactored to call the helper too in a follow-up — kept inline for now to keep this release's diff focused on the user-facing features.
+- **Documentation:** `CLAUDE.md` added at the repo root, with project conventions, the release flow (including the `.claude/settings.local.json` stash dance), the npm publish CI gotchas (curl tarball bypass for the broken bundled npm, `_authToken` strip for OIDC), and the do-not-touch list. Future Claude Code sessions get the institutional context without reading the full git log.
+
+---
+
 ## [1.3.2] — 2026-04-08
 
 ### Fixed
@@ -246,7 +267,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.2...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.2...v1.4.0
 [1.3.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.1...v1.3.2
 [1.3.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.0...v1.3.1
 [1.3.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.5...v1.3.0
