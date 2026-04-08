@@ -21,37 +21,6 @@ From project brief to development handoff — 21 skills, fully structured pipeli
 
 ---
 
-## Contents
-
-- [What is this?](#-what-is-this)
-  - [Who is this for?](#who-is-this-for)
-  - [Why not just prompt directly?](#why-not-just-prompt-chatgpt--claude-directly)
-- [Platform Compatibility](#-platform-compatibility)
-- [Pipeline](#-pipeline)
-- [Domain Support](#-domain-support)
-- [How Each Skill Works](#-how-each-skill-works)
-- [Installation](#-installation)
-  - [Option A: Claude Code](#option-a-claude-code-cli--recommended)
-  - [Option B: OpenAI Codex CLI](#option-b-openai-codex-cli)
-  - [Option C: Google Gemini CLI](#option-c-google-gemini-cli)
-  - [Option D: Cursor, Windsurf, Aider](#option-d-cursor-windsurf-aider)
-  - [Starting a new project](#starting-a-new-project)
-  - [Updating BA Toolkit](#updating-ba-toolkit)
-- [Repository Structure](#-repository-structure)
-- [Cross-Reference System](#-cross-reference-system)
-- [Minimum Viable Pipeline](#-minimum-viable-pipeline)
-- [Quick Start](#-quick-start)
-- [What the Output Looks Like](#️-what-the-output-looks-like)
-- [Usage Guide](docs/USAGE.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [FAQ](docs/FAQ.md)
-- [Contributing](CONTRIBUTING.md)
-- [Adding a New Domain](docs/DOMAINS.md)
-- [Changelog](CHANGELOG.md)
-- [License](#-license)
-
----
-
 ## 🎯 What is this?
 
 BA Toolkit is a set of **21 interconnected skills** that turn your AI coding agent into a business analyst. You walk through a structured pipeline — from a high-level project brief to a development handoff package — and get a complete requirements artifact set ready for engineering.
@@ -80,42 +49,130 @@ Each skill **reads the output of previous steps**, maintains cross-references be
 
 ---
 
-## 🤖 Platform Compatibility
+## 📦 Install
 
-BA Toolkit uses the open **Agent Skills specification** (SKILL.md format) published by Anthropic in December 2025 and adopted across multiple platforms.
+```bash
+# One-shot project setup — zero install, just run:
+npx @kudusov.takhir/ba-toolkit init
+npx @kudusov.takhir/ba-toolkit install --for claude-code
 
-| Platform | Support | Installation |
-|----------|:-------:|-------------|
-| **Claude Code** | ✅ Native | `cp -r skills/ .claude/skills/ba-toolkit/` |
-| **OpenAI Codex CLI** | ✅ Native | `cp -r skills/ ~/.codex/skills/ba-toolkit/` |
-| **Gemini CLI** | ✅ Native | Copy the entire `skills/` tree to `~/.gemini/skills/ba-toolkit/` (user) or `.gemini/skills/ba-toolkit/` (workspace) |
-| **Cursor** | 🔄 Convert | SKILL.md → `.mdc` rules in `.cursor/rules/` |
-| **Windsurf** | 🔄 Convert | SKILL.md → rules in `.windsurf/rules/` |
-| **Aider** | 🔄 Convert | SKILL.md → conventions file |
+# Or install globally and reuse across projects:
+npm install -g @kudusov.takhir/ba-toolkit
+ba-toolkit install --for claude-code --global
+```
 
-> 💡 Platforms marked **Native** read SKILL.md as-is. Platforms marked **Convert** require a one-time format conversion — the content is the same, only the file format differs. Tools like [convert.sh](https://github.com/alirezarezvani/claude-skills/blob/main/scripts/convert.sh) can automate this.
+Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. Cursor and Windsurf installs auto-convert `SKILL.md` into the `.mdc` rule format. Use `--dry-run` to preview without writing.
 
-### Environment detection
+`ba-toolkit --help` shows the full CLI reference. Zero runtime dependencies — only Node.js ≥ 18.
 
-Skills do not hardcode platform-specific paths. Instead, they reference `references/environment.md` which contains the output directory logic for each platform. By default, artifacts are saved to the current working directory.
+<details>
+<summary><strong>Manual install (clone + copy)</strong></summary>
 
-To customize for your setup, edit `skills/references/environment.md` — all skills will pick up the change automatically.
+Use these if you can't use npm or want to track a specific git commit.
+
+### Claude Code CLI
+
+```bash
+git clone https://github.com/TakhirKudusov/ba-toolkit.git
+cp -r ba-toolkit/skills/ /path/to/project/.claude/skills/ba-toolkit/
+
+# Or install globally:
+cp -r ba-toolkit/skills/ ~/.claude/skills/ba-toolkit/
+```
+
+Keep the full tree: skill folders (`brief/`, `srs/`, …) must stay together with `references/` in the same parent directory.
+
+### OpenAI Codex CLI
+
+Skills load from `$CODEX_HOME/skills` (default `~/.codex/skills`):
+
+```bash
+cp -r ba-toolkit/skills/ ~/.codex/skills/ba-toolkit/
+```
+
+If you use a custom Codex home, set `CODEX_HOME` and copy under `$CODEX_HOME/skills/ba-toolkit/`.
+
+### Google Gemini CLI
+
+```bash
+# User-wide (all projects)
+cp -r ba-toolkit/skills/ ~/.gemini/skills/ba-toolkit/
+
+# Or project-only
+cp -r ba-toolkit/skills/ /path/to/project/.gemini/skills/ba-toolkit/
+```
+
+Reload the CLI after copying.
+
+### Cursor, Windsurf, Aider
+
+These use their own rules format instead of `SKILL.md`. Convert first, then copy:
+
+```bash
+# Option 1: community converter
+# https://github.com/alirezarezvani/claude-skills/blob/main/scripts/convert.sh
+./convert.sh --tool cursor --target /path/to/project
+./convert.sh --tool windsurf --target /path/to/project
+
+# Option 2: ask your AI agent
+# "Convert all SKILL.md files in skills/ to Cursor .mdc rule format"
+```
+
+**Cursor rules live in [`.cursor/rules/`](https://cursor.com/docs/rules)** as `.mdc` files with YAML frontmatter (`description`, optional `globs`, `alwaysApply`). A plain rename of `SKILL.md` to `.mdc` is not enough — the metadata block is required. [Cursor CLI](https://cursor.com/docs/cli/using) reads the same `.cursor/rules` setup and may also pick up `AGENTS.md` / `CLAUDE.md` at repo root.
+
+### Starting a new project (shell scripts)
+
+```bash
+# macOS / Linux
+bash init.sh
+
+# Windows PowerShell
+.\init.ps1
+```
+
+The script asks for a project slug, name, and domain, then creates `output/{slug}/` and an `AGENTS.md` with the pipeline status table. Equivalent to `npx @kudusov.takhir/ba-toolkit init`.
+
+### Updating a manual install
+
+```bash
+cd ba-toolkit
+git pull
+cp -r skills/ /path/to/install/location/
+```
+
+Your generated artifacts (`01_brief_*.md`, `02_srs_*.md`, …) are untouched by updates.
+
+</details>
+
+---
+
+## 🗂️ What the output looks like
+
+A complete example project — **Dragon Fortune** (iGaming Telegram Mini App) — lives in [`example/dragon-fortune/`](example/dragon-fortune/). All 15 artifacts are realistic, cross-referenced, and generated by running the full BA Toolkit pipeline.
+
+| Artifact | File |
+|---------|------|
+| Project Principles | [`00_principles_dragon-fortune.md`](example/dragon-fortune/00_principles_dragon-fortune.md) |
+| Project Brief | [`01_brief_dragon-fortune.md`](example/dragon-fortune/01_brief_dragon-fortune.md) |
+| Requirements (SRS) | [`02_srs_dragon-fortune.md`](example/dragon-fortune/02_srs_dragon-fortune.md) |
+| User Stories | [`03_stories_dragon-fortune.md`](example/dragon-fortune/03_stories_dragon-fortune.md) |
+| Use Cases | [`04_usecases_dragon-fortune.md`](example/dragon-fortune/04_usecases_dragon-fortune.md) |
+| Acceptance Criteria | [`05_ac_dragon-fortune.md`](example/dragon-fortune/05_ac_dragon-fortune.md) |
+| Non-functional Requirements | [`06_nfr_dragon-fortune.md`](example/dragon-fortune/06_nfr_dragon-fortune.md) |
+| Data Dictionary | [`07_datadict_dragon-fortune.md`](example/dragon-fortune/07_datadict_dragon-fortune.md) |
+| Technology Research | [`07a_research_dragon-fortune.md`](example/dragon-fortune/07a_research_dragon-fortune.md) |
+| API Contract | [`08_apicontract_dragon-fortune.md`](example/dragon-fortune/08_apicontract_dragon-fortune.md) |
+| Wireframes | [`09_wireframes_dragon-fortune.md`](example/dragon-fortune/09_wireframes_dragon-fortune.md) |
+| Validation Scenarios | [`10_scenarios_dragon-fortune.md`](example/dragon-fortune/10_scenarios_dragon-fortune.md) |
+| Development Handoff | [`11_handoff_dragon-fortune.md`](example/dragon-fortune/11_handoff_dragon-fortune.md) |
+| Risk Register | [`00_risks_dragon-fortune.md`](example/dragon-fortune/00_risks_dragon-fortune.md) |
+| Sprint Plan | [`00_sprint_dragon-fortune.md`](example/dragon-fortune/00_sprint_dragon-fortune.md) |
+
+> The example demonstrates full traceability: FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario, plus risk register and sprint plan.
 
 ---
 
 ## 🔗 Pipeline
-
-```
-📐 /principles (optional)
-        │
-        ▼
-📄 /brief → 📑 /srs → 📝 /stories → 🔄 /usecases → ✅ /ac → ⚡ /nfr → 🗃️ /datadict → 🔬 /research → 🔌 /apicontract → 🖼️ /wireframes → 🧪 /scenarios → 📦 /handoff
-                           │
-                           └──→ 🔍 /trace    (available after /stories)
-
-🔎 /clarify [focus]  — available at any step, on any artifact
-📊 /analyze          — available at any step after /srs
-```
 
 | # | Command | What it generates | Output file |
 |:---:|---------|-------------------|-------------|
@@ -145,6 +202,27 @@ To customize for your setup, edit `skills/references/environment.md` — all ski
 
 ---
 
+## 🤖 Platform Compatibility
+
+BA Toolkit uses the open **Agent Skills specification** (SKILL.md format) published by Anthropic in December 2025 and adopted across multiple platforms.
+
+| Platform | Support | Installation |
+|----------|:-------:|-------------|
+| **Claude Code** | ✅ Native | `cp -r skills/ .claude/skills/ba-toolkit/` |
+| **OpenAI Codex CLI** | ✅ Native | `cp -r skills/ ~/.codex/skills/ba-toolkit/` |
+| **Gemini CLI** | ✅ Native | Copy the `skills/` tree to `~/.gemini/skills/ba-toolkit/` (user) or `.gemini/skills/ba-toolkit/` (workspace) |
+| **Cursor** | 🔄 Convert | `SKILL.md` → `.mdc` rules in `.cursor/rules/` |
+| **Windsurf** | 🔄 Convert | `SKILL.md` → rules in `.windsurf/rules/` |
+| **Aider** | 🔄 Convert | `SKILL.md` → conventions file |
+
+> 💡 Platforms marked **Native** read `SKILL.md` as-is. Platforms marked **Convert** require a one-time format conversion — the content is the same, only the file format differs. The `ba-toolkit install --for cursor|windsurf` CLI does this automatically.
+
+### Environment detection
+
+Skills do not hardcode platform-specific paths. Instead, they reference `skills/references/environment.md` which contains the output directory logic for each platform. By default, artifacts are saved to the current working directory. Edit that file to customize — all skills pick up the change automatically.
+
+---
+
 ## 🌍 Domain Support
 
 The pipeline is **domain-agnostic** by default. At the `/brief` stage, you pick a domain — and every subsequent skill loads domain-specific interview questions, mandatory entities, NFR categories, and glossary terms.
@@ -162,37 +240,15 @@ The pipeline is **domain-agnostic** by default. At the `/brief` stage, you pick 
 | 🏠 **Real Estate** | Property portals, agency CRM, rental management, property management, mortgage tools |
 | ✏️ **Custom** | Any other domain — works with general interview questions |
 
-> ➕ **Adding a new domain** = creating one Markdown file in `skills/references/domains/`. See [docs/DOMAINS.md](docs/DOMAINS.md).
+> ➕ Adding a new domain = creating one Markdown file in `skills/references/domains/`. See [docs/DOMAINS.md](docs/DOMAINS.md).
 
 ---
 
-## 🔄 How Each Skill Works
+## 🔄 How it works
 
-Most pipeline skills follow this cycle:
+Most pipeline skills follow the same cycle: **Command → Context → Interview → Generate → Refine**. Each skill loads all previous artifacts plus the domain reference and project principles, asks a few rounds of targeted questions, writes a Markdown artifact, and offers refinement subcommands before moving on. `/handoff`, `/trace`, and `/analyze` skip the interview — they extract everything from existing artifacts automatically.
 
-```
-┌─────────────┐      ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│  1. Command │────▶│  2. Context │────▶│3. Interview │────▶│ 4. Generate │
-│   /brief    │      │  Load prior │     │  3-7 Q's per│     │  Markdown   │
-│   /srs ...  │      │  artifacts  │     │  round, 2-4 │     │  artifact + │
-│             │      │  + domain + │     │  rounds     │     │  summary    │
-│             │      │  principles │     │             │     │             │
-└─────────────┘      └─────────────┘     └─────────────┘     └──────┬──────┘
-                                                                    │
-                                                                    ▼
-                                                             ┌─────────────┐
-                                                             │ 5. Refine   │
-                                                             │             │
-                                                             │ /clarify    │
-                                                             │ /revise     │
-                                                             │ /expand     │
-                                                             │ /split      │
-                                                             │ /validate   │
-                                                             │ /done ──────┼──▶ Next step
-                                                             └─────────────┘
-```
-
-> `/handoff`, `/trace`, and `/analyze` skip step 3 — they extract all information from existing artifacts automatically, with no interview.
+Every artifact links back to its predecessors, forming the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario`. Run `/trace` to verify coverage and `/analyze` for severity-rated findings (duplicates, ambiguous terms, terminology drift, invalid references).
 
 ### Subcommands
 
@@ -205,238 +261,6 @@ Most pipeline skills follow this cycle:
 | `/validate` | Check completeness, consistency, and alignment with prior artifacts |
 | `/analyze` | Cross-artifact quality report: duplicates, coverage gaps, terminology drift, invalid references |
 | `/done` | Finalize the current artifact and move to the next pipeline step |
-
----
-
-## 📦 Installation
-
-### 🚀 Easiest: via npm (no clone required)
-
-```bash
-# One-shot project setup — zero install, just run:
-npx @kudusov.takhir/ba-toolkit init
-npx @kudusov.takhir/ba-toolkit install --for claude-code
-
-# Or install globally and reuse across projects:
-npm install -g @kudusov.takhir/ba-toolkit
-ba-toolkit install --for claude-code --global
-```
-
-Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. Cursor and Windsurf installs automatically convert `SKILL.md` files into the `.mdc` rule format. Use `--dry-run` to preview without writing.
-
-Run `ba-toolkit --help` for the full CLI reference. The npm package has **zero runtime dependencies** — only Node.js ≥ 18.
-
----
-
-### Option A: Claude Code CLI ✨ Manual install
-
-```bash
-# Clone and copy the skills directory (includes domain references)
-git clone https://github.com/TakhirKudusov/ba-toolkit.git
-cp -r ba-toolkit/skills/ /path/to/project/.claude/skills/ba-toolkit/
-```
-
-Or install globally:
-
-```bash
-cp -r ba-toolkit/skills/ ~/.claude/skills/ba-toolkit/
-```
-
-Keep the full tree: skill folders (`brief/`, `srs/`, …) must stay together with `references/` in the same parent directory.
-
-### Option B: OpenAI Codex CLI
-
-Skills load from `$CODEX_HOME/skills` (default `~/.codex/skills`). Copy the **whole** `skills/` directory as one folder so shared `references/` stays next to each skill:
-
-```bash
-cp -r ba-toolkit/skills/ ~/.codex/skills/ba-toolkit/
-```
-
-If you use a custom Codex home, set `CODEX_HOME` and copy under `$CODEX_HOME/skills/ba-toolkit/` instead.
-
-### Option C: Google Gemini CLI
-
-Same layout as Codex: one directory that contains all skill subfolders **and** `references/`:
-
-```bash
-# User-wide (all projects)
-cp -r ba-toolkit/skills/ ~/.gemini/skills/ba-toolkit/
-
-# Or project-only (under your repo root)
-cp -r ba-toolkit/skills/ /path/to/project/.gemini/skills/ba-toolkit/
-```
-
-Reload the CLI after copying.
-
-### Option D: Cursor, Windsurf, Aider
-
-These platforms use their own rules format instead of SKILL.md. Convert first, then copy:
-
-```bash
-# Option 1: Use the community converter
-# https://github.com/alirezarezvani/claude-skills/blob/main/scripts/convert.sh
-./convert.sh --tool cursor --target /path/to/project
-./convert.sh --tool windsurf --target /path/to/project
-
-# Option 2: Ask your AI agent
-# "Convert all SKILL.md files in skills/ to Cursor .mdc rule format"
-```
-
-**Cursor (details):** Project rules live in [`.cursor/rules/`](https://cursor.com/docs/rules) as `.mdc` files. Each rule is Markdown with **YAML frontmatter** at the top (for example `description`, optional `globs` for file patterns, and `alwaysApply` when the rule should run in every Agent chat). A plain rename of `SKILL.md` to `.mdc` is not enough—you need that metadata block. [Cursor CLI](https://cursor.com/docs/cli/using) uses the same `.cursor/rules` setup as the editor, and may also read `AGENTS.md` / `CLAUDE.md` at the repo root alongside rules.
-
-### Starting a new project
-
-Run the initialiser script to create the output folder and a starter `AGENTS.md` in one step:
-
-```bash
-# macOS / Linux
-bash init.sh
-
-# Windows PowerShell
-.\init.ps1
-```
-
-The script will ask for a project slug, name, and domain, then create `output/{slug}/` and an `AGENTS.md` with the full pipeline status table. After that, open your AI assistant and run `/brief`.
-
----
-
-### Updating BA Toolkit
-
-When a new version is released, pull the latest changes and re-copy the `skills/` directory to your install location:
-
-```bash
-cd ba-toolkit
-git pull
-
-# Claude Code — project-level
-cp -r skills/ /path/to/project/.claude/skills/ba-toolkit/
-
-# Claude Code — global
-cp -r skills/ ~/.claude/skills/ba-toolkit/
-
-# Codex CLI
-cp -r skills/ ~/.codex/skills/ba-toolkit/
-
-# Gemini CLI (user-wide)
-cp -r skills/ ~/.gemini/skills/ba-toolkit/
-```
-
-
-Your previously generated artifact files (`01_brief_*.md`, `02_srs_*.md`, etc.) are not affected by updates — they stay exactly as you left them.
-
----
-
-## 📁 Repository Structure
-
-```
-ba-toolkit/
-│
-├── skills/                        # 🧠 Source SKILL.md files (install this directory)
-│   ├── ac/SKILL.md                #    Step 5: Acceptance Criteria
-│   ├── apicontract/SKILL.md       #    Step 8: API Contract
-│   ├── brief/SKILL.md             #    Step 1: Project Brief
-│   ├── datadict/SKILL.md          #    Step 7: Data Dictionary
-│   ├── nfr/SKILL.md               #    Step 6: Non-functional Requirements
-│   ├── srs/SKILL.md               #    Step 2: Requirements (SRS)
-│   ├── stories/SKILL.md           #    Step 3: User Stories
-│   ├── principles/SKILL.md        #    Step 0 (optional): Project Principles
-│   ├── trace/SKILL.md             #    Cross-cutting: Traceability Matrix
-│   ├── clarify/SKILL.md           #    Cross-cutting: Targeted Ambiguity Resolution
-│   ├── analyze/SKILL.md           #    Cross-cutting: Cross-Artifact Quality Report
-│   ├── usecases/SKILL.md          #    Step 4: Use Cases
-│   ├── wireframes/SKILL.md        #    Step 9: Wireframe Descriptions
-│   ├── research/SKILL.md          #    Step 7a (optional): Technology Research & ADRs
-│   ├── scenarios/SKILL.md         #    Step 10 (optional): End-to-end Validation Scenarios
-│   ├── handoff/SKILL.md           #    Step 11 (optional): Development Handoff Package
-│   ├── estimate/SKILL.md          #    Utility: Effort Estimation (SP / T-shirt / person-days)
-│   ├── glossary/SKILL.md          #    Utility: Unified Project Glossary
-│   ├── export/SKILL.md            #    Utility: Export to Jira / GitHub Issues / Linear / CSV
-│   ├── risk/SKILL.md              #    Utility: Risk Register (probability × impact matrix)
-│   ├── sprint/SKILL.md            #    Utility: Sprint Plan (velocity-based story grouping)
-│   └── references/
-│       ├── environment.md         #    🖥️ Platform-specific output paths
-│       ├── closing-message.md     #    📋 Closing message template (used by all skills)
-│       ├── prerequisites.md       #    ✅ Per-step prerequisite checklists
-│       ├── templates/             #    📄 Base artifact templates with [TOKEN] placeholders
-│       │   ├── README.md
-│       │   ├── principles-template.md
-│       │   ├── brief-template.md
-│       │   ├── srs-template.md
-│       │   ├── stories-template.md
-│       │   ├── usecases-template.md
-│       │   ├── ac-template.md
-│       │   ├── nfr-template.md
-│       │   ├── datadict-template.md
-│       │   ├── research-template.md
-│       │   ├── apicontract-template.md
-│       │   ├── wireframes-template.md
-│       │   ├── scenarios-template.md
-│       │   ├── trace-template.md
-│       │   ├── analyze-template.md
-│       │   └── handoff-template.md
-│       └── domains/
-│           ├── igaming.md         #    🎰 iGaming domain knowledge
-│           ├── fintech.md         #    🏦 Fintech domain knowledge
-│           ├── saas.md            #    ☁️ SaaS domain knowledge
-│           ├── ecommerce.md       #    🛒 E-commerce domain knowledge
-│           ├── healthcare.md      #    🏥 Healthcare / MedTech domain knowledge
-│           ├── logistics.md       #    🚚 Logistics / Delivery domain knowledge
-│           ├── on-demand.md       #    🔧 On-demand / Services domain knowledge
-│           ├── social-media.md    #    📱 Social / Media domain knowledge
-│           └── real-estate.md     #    🏠 Real Estate domain knowledge
-│
-├── bin/
-│   └── ba-toolkit.js              # 🧰 npm CLI entry point (zero runtime deps)
-├── package.json                   # 📦 npm package manifest (for `npx @kudusov.takhir/ba-toolkit`)
-├── init.ps1                       # 🚀 Project initialiser (Windows PowerShell)
-├── init.sh                        # 🚀 Project initialiser (macOS / Linux bash)
-├── CHANGELOG.md                   # 📋 Version history
-├── COMMANDS.md                    # 📜 Command cheat sheet
-├── CONTRIBUTING.md                # 🤝 Contribution workflow
-├── LICENSE                        # MIT license text
-├── README.md                      # Project documentation
-├── docs/
-│   ├── USAGE.md                   # 📖 Detailed usage guide
-│   ├── TROUBLESHOOTING.md         # 🔧 Common issues and fixes
-│   ├── FAQ.md                     # ❓ Frequently asked questions
-│   └── DOMAINS.md                 # 🌍 Adding a new domain reference
-├── .gitignore
-└── .github/
-    ├── workflows/
-    │   ├── validate.yml           # ✅ CI: validate artifacts and skill files on PR
-    │   └── release.yml            # 🚀 CD: create GitHub Release on version tag push
-    └── scripts/
-        └── validate_artifacts.py  # Python validator used by CI
-```
-
-> 💡 **`skills/`** is the directory you install — copy it as one unit so that `references/` stays alongside all skill folders.
-
----
-
-## 🔗 Cross-Reference System
-
-Every artifact links back to its predecessors. This chain ensures full traceability from business goals to screen specifications:
-
-```
-FR-001 (SRS)
-  └── US-001 (Stories)
-        └── UC-001 (Use Cases)
-              └── AC-001-01 (Acceptance Criteria)
-                    │
-                  NFR-003 (Non-functional Requirements)
-                    │
-                  User, Bet (Data Dictionary)
-                    │
-                  ADR-002 (Research — tech decision driven by this entity)
-                    │
-                  POST /bets (API Contract)
-                    │
-                  WF-005 (Wireframes)
-                    │
-                  SC-003 (Validation Scenario — end-to-end journey)
-```
-
-The `/trace` command builds the **complete matrix** of these links and highlights uncovered FRs, stories without AC, orphan entities and endpoints, and coverage percentage per artifact type. The `/analyze` command adds severity-rated findings: duplicates, ambiguous terms, terminology drift, and invalid references.
 
 ---
 
@@ -456,84 +280,7 @@ Not every project needs all 21 skills. Two common paths:
            → /trace → /analyze → /handoff
 ```
 
-Use `/clarify` at any step to resolve ambiguities before moving on.
-
-**Time estimates** (approximate, depends on project complexity and interview depth):
-
-| Step | Lean pipeline | Full pipeline |
-|------|:---:|:---:|
-| `/principles` | — | 5–10 min |
-| `/brief` | 15–25 min | 20–35 min |
-| `/srs` | 25–40 min | 30–50 min |
-| `/stories` | 20–30 min | 25–40 min |
-| `/usecases` | — | 20–35 min |
-| `/ac` | 20–35 min | 25–40 min |
-| `/nfr` | 15–20 min | 15–25 min |
-| `/datadict` | 15–25 min | 20–30 min |
-| `/research` | — | 15–25 min |
-| `/apicontract` | 20–35 min | 25–40 min |
-| `/wireframes` | 25–40 min | 30–50 min |
-| `/scenarios` | — | 15–25 min |
-| `/trace` + `/analyze` | — | 10–15 min |
-| `/handoff` | 5–10 min | 5–10 min |
-| **Total** | **~3–4 hours** | **~5–8 hours** |
-
----
-
-## 🚀 Quick Start
-
-```
-# Optional: define conventions before starting
-You:    /principles
-Agent:  What language should artifacts be in? What severity blocks /done?
-You:    English, block on CRITICAL only
-Agent:  [generates 00_principles_dragon-fortune.md — applied by all subsequent skills]
-
-You:    /brief
-Agent:  What domain is your project in? (iGaming, Fintech, SaaS, other?)
-You:    iGaming — it's an online slot as a Telegram Mini App
-Agent:  [asks 5-6 targeted questions about goals, audience, constraints...]
-You:    [answer]
-Agent:  [generates 01_brief_dragon-fortune.md]
-        Artifact saved: 01_brief_dragon-fortune.md
-        Covered: 4 business goals, 3 stakeholders, 6 risks identified.
-        Next step: /srs
-
-You:    /done
-Agent:  Brief finalized. Next step: /srs
-
-You:    /srs
-Agent:  [reads the brief, asks about roles, integrations, business rules...]
-...
-```
-
-Repeat for each step. At any point after `/srs`, run `/clarify [focus]` to resolve ambiguities in the current artifact or `/analyze` for a full cross-artifact quality report. After `/stories`, run `/trace` to check traceability coverage.
-
----
-
-## 🗂️ What the Output Looks Like
-
-A complete example project — **Dragon Fortune** (iGaming Telegram Mini App) — is included in [`example/dragon-fortune/`](example/dragon-fortune/). All 15 artifacts are realistic, cross-referenced, and generated by running the full BA Toolkit pipeline.
-
-| Artifact | File |
-|---------|------|
-| Project Principles | [`00_principles_dragon-fortune.md`](example/dragon-fortune/00_principles_dragon-fortune.md) |
-| Project Brief | [`01_brief_dragon-fortune.md`](example/dragon-fortune/01_brief_dragon-fortune.md) |
-| Requirements (SRS) | [`02_srs_dragon-fortune.md`](example/dragon-fortune/02_srs_dragon-fortune.md) |
-| User Stories | [`03_stories_dragon-fortune.md`](example/dragon-fortune/03_stories_dragon-fortune.md) |
-| Use Cases | [`04_usecases_dragon-fortune.md`](example/dragon-fortune/04_usecases_dragon-fortune.md) |
-| Acceptance Criteria | [`05_ac_dragon-fortune.md`](example/dragon-fortune/05_ac_dragon-fortune.md) |
-| Non-functional Requirements | [`06_nfr_dragon-fortune.md`](example/dragon-fortune/06_nfr_dragon-fortune.md) |
-| Data Dictionary | [`07_datadict_dragon-fortune.md`](example/dragon-fortune/07_datadict_dragon-fortune.md) |
-| Technology Research | [`07a_research_dragon-fortune.md`](example/dragon-fortune/07a_research_dragon-fortune.md) |
-| API Contract | [`08_apicontract_dragon-fortune.md`](example/dragon-fortune/08_apicontract_dragon-fortune.md) |
-| Wireframes | [`09_wireframes_dragon-fortune.md`](example/dragon-fortune/09_wireframes_dragon-fortune.md) |
-| Validation Scenarios | [`10_scenarios_dragon-fortune.md`](example/dragon-fortune/10_scenarios_dragon-fortune.md) |
-| Development Handoff | [`11_handoff_dragon-fortune.md`](example/dragon-fortune/11_handoff_dragon-fortune.md) |
-| Risk Register | [`00_risks_dragon-fortune.md`](example/dragon-fortune/00_risks_dragon-fortune.md) |
-| Sprint Plan | [`00_sprint_dragon-fortune.md`](example/dragon-fortune/00_sprint_dragon-fortune.md) |
-
-> The example demonstrates full traceability: FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario, plus risk register and sprint plan.
+Use `/clarify` at any step to resolve ambiguities before moving on. Approximate time per step is in [docs/USAGE.md#appendix-time-estimates](docs/USAGE.md#appendix-time-estimates).
 
 ---
 

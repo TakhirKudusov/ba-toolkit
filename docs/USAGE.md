@@ -192,3 +192,27 @@ Run /srs to generate the Requirements Specification.
 ```
 
 `AGENTS.md` is updated again after `/srs` with roles, integrations, and FR count. Any AI agent (Claude Code, Codex, Gemini CLI) that reads this file will understand the project context without re-reading all artifacts — useful when resuming work in a new session.
+
+---
+
+## Appendix: Time estimates
+
+Approximate, depends on project complexity and interview depth.
+
+| Step | Lean pipeline | Full pipeline |
+|------|:---:|:---:|
+| `/principles` | — | 5–10 min |
+| `/brief` | 15–25 min | 20–35 min |
+| `/srs` | 25–40 min | 30–50 min |
+| `/stories` | 20–30 min | 25–40 min |
+| `/usecases` | — | 20–35 min |
+| `/ac` | 20–35 min | 25–40 min |
+| `/nfr` | 15–20 min | 15–25 min |
+| `/datadict` | 15–25 min | 20–30 min |
+| `/research` | — | 15–25 min |
+| `/apicontract` | 20–35 min | 25–40 min |
+| `/wireframes` | 25–40 min | 30–50 min |
+| `/scenarios` | — | 15–25 min |
+| `/trace` + `/analyze` | — | 10–15 min |
+| `/handoff` | 5–10 min | 5–10 min |
+| **Total** | **~3–4 hours** | **~5–8 hours** |
