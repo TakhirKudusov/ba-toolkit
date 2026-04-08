@@ -11,6 +11,22 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [1.2.5] — 2026-04-08
+
+### Changed
+
+- **README refactor (3-step):** cut README from 843 to 288 lines (−66%) without losing any factual content.
+  - PR 1 — extracted Usage Guide, Troubleshooting, FAQ, Contributing, and "Adding a new domain" into `docs/USAGE.md`, `docs/TROUBLESHOOTING.md`, `docs/FAQ.md`, `CONTRIBUTING.md`, and `docs/DOMAINS.md`. README now links to each instead of duplicating the content.
+  - PR 2 — reordered sections to follow the reader funnel (what → install → see result → details → advanced). Collapsed manual install variants (Claude Code, Codex, Gemini, Cursor/Windsurf, init scripts, manual updates) under a single `<details>` block. Removed the `## Contents` TOC (GitHub auto-generates one), the ASCII Pipeline diagram (duplicated the table below it), the ASCII "How each skill works" block, the ~80-line `## Repository Structure` tree, and the `## Quick Start` section (duplicated `docs/USAGE.md` section 1). Moved `What the output looks like` up to sit right after Install. Moved the time-estimates table to `docs/USAGE.md` as an appendix.
+  - PR 3 — style pass: one-line hero, emoji removed from every H2 heading and from Pipeline/Platform/Domain table contents, "Who is this for?" bullets removed, the "Why not just prompt ChatGPT / Claude directly?" comparison table replaced with a single paragraph in the intro, callout blockquotes inlined, all headings switched to sentence case.
+- `docs/*` follow-up style pass: sentence-case H1s in `docs/USAGE.md` and `docs/DOMAINS.md`. Fixed a stale anchor in `docs/FAQ.md` (pointed to `../README.md#-installation` from before the emoji-stripped H2 rename; now points to `#install`).
+
+### Removed
+
+- `README.ru.md` and every remaining Russian-language reference across the repo (`README.md` language switcher, `package.json` files whitelist, the 1.2.0 CHANGELOG note about the Russian translation, and the planning item in `todo.md`). The toolkit is now single-language (English); localisation can be re-added later as a separate effort if needed.
+
+---
+
 ## [1.2.4] — 2026-04-08
 
 ### Fixed
@@ -164,7 +180,8 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.4...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.5...HEAD
+[1.2.5]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.4...v1.2.5
 [1.2.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.3...v1.2.4
 [1.2.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.2...v1.2.3
 [1.2.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.2.1...v1.2.2
