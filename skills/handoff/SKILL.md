@@ -22,13 +22,15 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 ## Generation
 
-No interview. All content is derived from the existing artifacts.
+No interview. All content is derived from the existing artifacts. The full template lives at `references/templates/handoff-template.md` and is the single source of truth — including the full inventory of pipeline-stage and cross-cutting artifacts (`/discovery`, `/principles`, `/implement-plan`, `/sprint`, `/risk`, `/glossary`, `/trace`, `/analyze`, `/estimate`), the Brief Goal → FR / FR → NFR / FR → API forward-traceability tables, the ADR summary, and the formal Sign-off section.
 
 **File:** `11_handoff_{slug}.md`
 
 ```markdown
 # Development Handoff: {Project Name}
 
+**Version:** 1.0
+**Status:** Draft | In Review | Approved
 **Date:** {date}
 **Domain:** {domain}
 **Pipeline completion:** {n}/{total} steps completed
@@ -37,19 +39,36 @@ No interview. All content is derived from the existing artifacts.
 
 ## 1. Artifact Inventory
 
-| Artifact | File | Status | Key numbers |
-|----------|------|--------|-------------|
-| Project Brief | `01_brief_{slug}.md` | ✓ Complete | {n} goals, {n} risks |
-| SRS | `02_srs_{slug}.md` | ✓ Complete | {n} FR ({must}/{should}/{could}/{wont}) |
-| User Stories | `03_stories_{slug}.md` | ✓ Complete | {n} stories across {n} epics |
-| Use Cases | `04_usecases_{slug}.md` | ✓ / ✗ Missing | {n} UC |
-| Acceptance Criteria | `05_ac_{slug}.md` | ✓ / ✗ Missing | {n} AC |
-| NFR | `06_nfr_{slug}.md` | ✓ / ✗ Missing | {n} NFR across {n} categories |
-| Research | `07a_research_{slug}.md` | ✓ / ✗ Missing / — Not run | {tech decisions} |
-| Data Dictionary | `07_datadict_{slug}.md` | ✓ / ✗ Missing | {n} entities, {n} attributes |
-| API Contract | `08_apicontract_{slug}.md` | ✓ / ✗ Missing | {n} endpoints |
-| Wireframes | `09_wireframes_{slug}.md` | ✓ / ✗ Missing | {n} screens |
-| Scenarios | `10_scenarios_{slug}.md` | ✓ / ✗ Missing / — Not run | {n} scenarios |
+### Pipeline-stage artifacts
+
+| Stage | Artifact | File | Status | Key numbers |
+|-------|----------|------|--------|-------------|
+| 0 | Discovery | `00_discovery_{slug}.md` | ✓ / ✗ Missing / — Not run | {recommended domain, MVP feature count} |
+| 0a | Principles | `00_principles_{slug}.md` | ✓ / ✗ Missing / — Not run | {testing strategy, ID conventions, NFR baseline characteristics} |
+| 1 | Project Brief | `01_brief_{slug}.md` | ✓ Complete | {n} goals, {n} stakeholders, {n} risks, {n} assumptions |
+| 2 | SRS | `02_srs_{slug}.md` | ✓ Complete | {n} FR ({must}/{should}/{could}/{wont}) |
+| 3 | User Stories | `03_stories_{slug}.md` | ✓ Complete | {n} stories across {n} epics |
+| 4 | Use Cases | `04_usecases_{slug}.md` | ✓ / ✗ Missing | {n} UC |
+| 5 | Acceptance Criteria | `05_ac_{slug}.md` | ✓ / ✗ Missing | {n} AC ({pos}/{neg}/{boundary}/{perf}) |
+| 6 | NFR | `06_nfr_{slug}.md` | ✓ / ✗ Missing | {n} NFR across {n} ISO 25010 characteristics |
+| 7 | Data Dictionary | `07_datadict_{slug}.md` | ✓ / ✗ Missing | {n} entities, {n} attributes |
+| 7a | Research | `07a_research_{slug}.md` | ✓ / ✗ Missing / — Not run | {n} ADRs, {n} integrations |
+| 8 | API Contract | `08_apicontract_{slug}.md` | ✓ / ✗ Missing | {n} endpoints |
+| 9 | Wireframes | `09_wireframes_{slug}.md` | ✓ / ✗ Missing | {n} screens |
+| 10 | Scenarios | `10_scenarios_{slug}.md` | ✓ / ✗ Missing / — Not run | {n} scenarios |
+| 11 | Handoff | `11_handoff_{slug}.md` | This document | — |
+| 12 | Implementation Plan | `12_implplan_{slug}.md` | ✓ / ✗ Missing / — Not run | {n} phases, {n} tasks |
+
+### Cross-cutting artifacts
+
+| Tool | File | Status | Key numbers |
+|------|------|--------|-------------|
+| Trace | `00_trace_{slug}.md` | ✓ / — Not run | Overall coverage {n}% |
+| Analyze | `00_analyze_{slug}.md` | ✓ / — Not run | {n} CRITICAL, {n} HIGH findings |
+| Risk | `00_risks_{slug}.md` | ✓ / — Not run | {n} risks ({n} Critical / {n} High) |
+| Sprint | `00_sprint_{slug}.md` | ✓ / — Not run | {n} sprints, {n} weeks |
+| Glossary | `00_glossary_{slug}.md` | ✓ / — Not run | {n} terms, {n} drift findings |
+| Estimate | inline in stories or `00_estimate_{slug}.md` | ✓ / — Not run | {n} SP total ± {confidence band} |
 
 ---
 
@@ -68,14 +87,18 @@ Must-priority items confirmed for the first release:
 ## 3. Traceability Coverage
 
 | Chain | Coverage |
-|-------|---------|
+|-------|----------|
+| Brief Goal → FR | {n}% ({uncovered} goals uncovered) |
 | FR → US | {n}% ({uncovered} uncovered) |
 | US → UC | {n}% |
-| US → AC | {n}% |
+| US → AC (Positive / Negative / Boundary) | {n}% / {n}% / {n}% |
 | FR → NFR | {n}% |
-| Entity → FR/US | {n}% |
-| Endpoint → FR/US | {n}% |
-| WF → US | {n}% |
+| FR → Entity | {n}% |
+| FR → API Endpoint | {n}% |
+| US → WF | {n}% |
+| US → Scenario | {n}% |
+| FR → Implementation Task (if `12_implplan` exists) | {n}% |
+| NFR → ADR | {n}% |
 
 {If coverage is below 100% for any CRITICAL chain, list uncovered items explicitly.}
 
@@ -114,13 +137,34 @@ Must-priority items confirmed for the first release:
 
 ---
 
-## 7. Artifact Files Reference
+## 7. Architecture Decision Summary
+
+Top architectural decisions from `07a_research_{slug}.md`. Dev team should read each linked ADR before starting the corresponding phase.
+
+| ADR | Decision | Drivers | Phase impact |
+|-----|----------|---------|--------------|
+| ADR-001 | {chosen tech for layer X} | NFR-{NNN}, FR-{NNN} | Phase {N} of `/implement-plan` |
+| ADR-002 | {decision} | {drivers} | {phase impact} |
+
+## 8. Artifact Files Reference
 
 All files are located in: `{output_directory}`
 
 ```
 {file tree of all generated artifacts}
 ```
+
+## 9. Sign-off
+
+Formal acceptance of the handoff package. Signing this section means the development team agrees the BA package is sufficient to begin implementation.
+
+| Role | Name | Sign-off Date | Notes |
+|------|------|---------------|-------|
+| Business Analyst | {name} | {date} | {notes} |
+| Product Manager | {name} | {date} | {notes} |
+| Tech Lead | {name} | {date} | {notes} |
+| QA Lead | {name} | {date} | {notes} |
+| Stakeholder | {name} | {date} | {notes} |
 ```
 
 ## Iterative refinement

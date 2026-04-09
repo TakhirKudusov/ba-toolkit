@@ -36,13 +36,19 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 ## Format interview
 
-If the format is not specified, ask:
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 options plus a free-text "Other" row last (5 rows max), mark exactly one row **Recommended**, render variants in the user's language (rule 11), and wait for an answer.
+>
+> **Inline context (protocol rule 9):** if the user wrote text after `/export` (e.g., `/export jira PROJ`, `/export github owner/repo`), parse it as a format + target hint and skip the matching questions.
 
-1. **Target tool:** Jira, GitHub Issues, Linear, CSV, or other?
-2. **Scope:** All stories, a specific epic, or specific story IDs?
-3. **Include AC?** Embed acceptance criteria in the issue body? (default: yes)
-4. **Jira-specific:** Project key (e.g., `PROJ`)? Epic link field name (default: `customfield_10014`)? Story Points field name (default: `story_points`)?
+If the format is not specified, ask the following (skip any question already answered by inline context):
+
+1. **Target tool:** Jira / GitHub Issues / Linear / CSV / Other? **Recommended:** Jira (most enterprise teams).
+2. **Scope:** All stories / a specific epic / specific story IDs?
+3. **Include AC?** Embed acceptance criteria in the issue body? **Recommended:** yes — without AC, the imported issue is just a story title.
+4. **Jira-specific:** Project key (e.g., `PROJ`)? Epic link field name (default: `customfield_10014`)? Story Points field name (default: `customfield_10016`)?
 5. **GitHub-specific:** Repository (e.g., `owner/repo`)? Label prefix for epics (e.g., `epic:`)? Milestone name (optional)?
+
+The exported issue body now includes **all v3.5.0+ stories template fields**: Persona (named, with context), Business Value Score, Size, Linked FR, Depends on (rendered as a "Blocked by" link in trackers that support it), Definition of Ready, INVEST self-check. Trackers that support custom fields (Jira, Linear) get them as separate fields; CSV gets extra columns; GitHub Issues embeds them in the issue body.
 
 ## Export formats
 
@@ -111,14 +117,14 @@ Or via CLI: jira import --file export_{slug}_jira.json
 
 Output file: `export_{slug}_github.json`
 
-Array of issue objects, one per story. Compatible with `gh` CLI batch import.
+Array of issue objects, one per story. Compatible with `gh` CLI batch import. The body embeds all v3.5.0+ stories template fields since GitHub Issues has no custom field support.
 
 ```json
 [
   {
     "title": "US-001: {Story title}",
-    "body": "## User Story\n\nAs a **{role}**, I want to **{action}**, so that **{benefit}**.\n\n---\n\n## Acceptance Criteria\n\n**Scenario 1 — {name}**\n- Given {precondition}\n- When {action}\n- Then {result}\n\n---\n\n**FR Reference:** FR-{NNN}\n**Priority:** {Must | Should | Could | Won't}\n**Estimate:** {N SP | —}",
-    "labels": ["{epic-label}", "user-story", "{priority-label}"],
+    "body": "## User Story\n\nAs **{persona — named persona with role and context}**, I want to **{action}**, so that **{benefit}**.\n\n---\n\n## Acceptance Criteria\n\n**Scenario 1 — {name}** *(AC-001-01)*\n- Given {precondition}\n- When {action}\n- Then {result}\n\n---\n\n## Traceability\n\n- **Linked FR:** FR-{NNN}\n- **Linked Use Case:** UC-{NNN}\n- **Linked Acceptance Criteria:** AC-001-01, AC-001-02, AC-001-03\n- **Linked NFR:** NFR-{NNN} (if applicable)\n- **Linked Wireframe:** WF-{NNN} (if applicable)\n\n---\n\n## Metadata\n\n- **Priority:** {Must | Should | Could | Won't}\n- **Business Value Score:** {1–5}\n- **Size:** {XS | S | M | L | XL}\n- **Estimate:** {N SP | —}\n- **Depends on:** US-{NNN}, US-{NNN}\n- **INVEST self-check:** Independent ✓ · Negotiable ✓ · Valuable ✓ · Estimable ✓ · Small ✓ · Testable ✓",
+    "labels": ["{epic-label}", "user-story", "{priority-label}", "value:{1-5}", "size:{xs-xl}"],
     "milestone": "{milestone-name-or-null}"
   }
 ]
@@ -181,11 +187,11 @@ Linear does not have a native bulk JSON import — use the Linear SDK or Zapier.
 Output file: `export_{slug}_stories.csv`
 
 ```
-ID,Title,Epic,Role,Action,Benefit,Priority,Estimate,FR Reference,AC Summary
-US-001,"{Story title}",E-01,"{role}","{action}","{benefit}",Must,3 SP,FR-001,"{first AC scenario summary}"
+ID,Title,Epic,Persona,Action,Benefit,Priority,Value,Size,Estimate,FR,UC,AC,NFR,WF,Depends on,AC Summary
+US-001,"{Story title}",E-01,"{persona name + role + context}","{action}","{benefit}",Must,5,M,3 SP,FR-001,UC-001,"AC-001-01;AC-001-02;AC-001-03",NFR-002,WF-005,—,"{first AC scenario summary}"
 ```
 
-Compatible with Jira CSV import, Trello, Asana, Monday.com, and Google Sheets.
+Compatible with Jira CSV import, Trello, Asana, Monday.com, and Google Sheets. Includes all v3.5.0+ stories template fields plus full cross-artifact traceability columns (FR / UC / AC / NFR / WF / Depends on) so a downstream tool can re-establish links without re-reading the source artifacts.
 
 ---
 

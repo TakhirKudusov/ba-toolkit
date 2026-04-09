@@ -10,6 +10,10 @@ Optional step between `/datadict` and `/apicontract`. Documents technology decis
 
 Running this step prevents "beautiful but impractical" API contracts by surfacing constraints early.
 
+**Standard alignment:** ADRs follow the **Michael Nygard format** (the de facto industry standard since 2011) extended with explicit Drivers, Alternatives Considered, and Decision Date fields.
+
+**Downstream consumers.** The output of `/research` is the **primary tech-stack source** for `/implement-plan` (added in v3.4.0). When `/research` is run, `/implement-plan` parses its ADRs and Integration Map to populate the Tech Stack header without asking the calibration interview. Make sure each tech-stack ADR (frontend, backend, database, hosting, auth, observability) has a clear winning decision so `/implement-plan` doesn't fall back to its own interview.
+
 ## Context loading
 
 0. If `00_principles_*.md` exists in the output directory, load it and apply its conventions.
@@ -31,11 +35,19 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 **Required topics:**
 1. Existing infrastructure — is there a current backend, database, or API the new system must integrate with or extend?
-2. API style preference — REST, GraphQL, gRPC, or a combination? Any existing API gateway or BFF?
-3. Real-time requirements — do any user stories require live updates (WebSocket, SSE, polling)?
-4. Third-party integrations — which external services are confirmed (payment gateway, auth provider, analytics, CDN)?
-5. Data storage constraints — any vendor lock-in restrictions, cloud provider preferences, on-premise requirements?
-6. Compliance constraints — any restrictions on where data can be stored (jurisdiction, residency)?
+2. **Frontend stack** — framework, language, build tool? *(consumed by `/implement-plan` Tech Stack header)*
+3. **Backend stack** — framework, language, runtime? *(consumed by `/implement-plan`)*
+4. **Database** — engine, version, hosting model? *(consumed by `/implement-plan`)*
+5. **Hosting / deployment target** — which cloud, which region, container vs serverless? *(consumed by `/implement-plan`)*
+6. **Auth / identity** — in-house vs SSO vs managed service (Auth0, Clerk, Cognito)? *(consumed by `/implement-plan`)*
+7. **Observability platform** — logging, metrics, traces (Datadog, New Relic, Grafana, OpenTelemetry self-hosted)? *(consumed by `/implement-plan` Phase 8)*
+8. API style preference — REST, GraphQL, gRPC, or a combination? Any existing API gateway or BFF?
+9. Real-time requirements — do any user stories require live updates (WebSocket, SSE, polling)?
+10. Third-party integrations — which external services are confirmed (payment gateway, auth provider, analytics, CDN)?
+11. Data storage constraints — any vendor lock-in restrictions, cloud provider preferences, on-premise requirements?
+12. Compliance constraints — any restrictions on where data can be stored (jurisdiction, residency)?
+13. **Build vs buy** — for each major capability, is custom code worth it or is a vendor / open-source library sufficient?
+14. **Open-source vs proprietary tolerance** — any blanket policy (e.g. "no AGPL", "preferred Apache 2.0 / MIT", "vendor SLAs required")?
 
 Supplement with domain-specific typical integrations from the reference.
 
@@ -110,9 +122,10 @@ _(Repeat ADR block for each key decision.)_
 
 **Rules:**
 - ADR numbering: ADR-001, ADR-002, ...
-- Every ADR must include at least two options compared.
-- Decisions must reference FR or NFR that drove the choice.
+- Every ADR must include **Drivers** (FR / NFR / regulatory / cost / time-to-market — what forced the decision), **Alternatives Considered** (at least two), **Decision** (chosen option + rationale), and **Consequences** (positive and negative). This is the Nygard format extended.
+- Decisions must reference FR or NFR that drove the choice in the Drivers field.
 - Open Questions section is mandatory — even if empty (write "None").
+- The artifact carries an **NFR → ADR** traceability matrix at the bottom so a senior reviewer can verify which NFRs drove which architectural decisions.
 
 ## Iterative refinement
 

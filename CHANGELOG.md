@@ -11,6 +11,54 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.8.0] — 2026-04-10
+
+### Highlights
+
+- **Group C skill audit pass on `/discovery`, `/principles`, `/research`, `/handoff`, `/implement-plan`, `/export`** — the bookend skills (entry, conventions, technology research, exit) brought to senior-BA rigour. ~26 Critical + High findings applied. Highlights: full Michael Nygard ADR format with Drivers / Alternatives / Decision Date for `/research`, expanded `/handoff` artifact inventory covering all 15 pipeline stages plus cross-cutting tools, formal Sign-off section for `/handoff`, principles Definition of Ready section synchronised with the v3.5.0+ template fields across every artifact type, new ISO/IEC 25010 alignment in the principles NFR baseline, new Testing Strategy section in `/principles` (the principled approach to TDD that resolves the batch 6 item 2 question), new Hypotheses → Brief Goals retrospective traceability in `/discovery`, observability + CI/CD + secret management slots in `/implement-plan`, and full v3.5.0+ stories template field support in `/export` (Persona / Business Value Score / Depends on / INVEST embedded in exported issues with full FR/UC/AC/NFR/WF traceability columns). After this pass, **22 of 24 shipped skills** carry the senior-BA improvements.
+
+### Changed
+
+- **`skills/principles/SKILL.md` and `skills/references/templates/principles-template.md`** — biggest debt of the audit because `/principles` is the source of truth that downstream skills read for Definition of Ready, ID conventions, and quality gates. The DoR section had drifted out of sync with the v3.5.0+ template fields across every artifact type:
+  - **Definition of Ready (§4) rewritten** to mirror the v3.7.0+ baseline per artifact type. Every DoR checklist now requires the same fields the artifact templates carry: FR adds Source / Verification / Rationale / area-grouping; US adds Persona / Business Value Score / Size / Depends on / INVEST self-check; UC adds Goal in Context / Scope / Stakeholders & Interests / Source / Success vs Minimal Guarantees split; AC adds Source / Verification / Linked NFR; NFR adds ISO 25010 characteristic / Acceptance threshold / Source / Rationale; Entity adds Source / Owner / Sensitivity / state machine for stateful entities; Endpoint adds Source / Idempotency / Required scope / SLO / Verification; Wireframe adds Source / Linked AC / Linked NFR / canonical 8-state list (was 4 states). New artifact types added: Risk DoR (Probability / Impact / Velocity / Treatment Strategy / Owner / Review cadence per ISO 31000) and Implementation Task DoR (references / dependsOn validity / definitionOfDone with linked AC).
+  - **ID Conventions table (§2) extended** with the post-v3.5.0 entity types that were previously missing: Risks (`RISK-NN`), Sprints (`SP-NN`), Implementation Tasks (`T-NN-NNN`), Analyse findings (`A-NN`), and Brief Goals (`G-N`).
+  - **NFR Baseline (§5) aligned with ISO/IEC 25010**. The three previously-listed categories (Security, Availability, Compliance) were ad-hoc; the new section explicitly maps every category to the parent ISO 25010 characteristic and lists the other 5 characteristics as candidate additions with one-line guidance on when each becomes mandatory.
+  - **New §8 Testing Strategy section** with five canonical strategies (TDD / Tests-after / Integration-only / Manual-only / None) and explicit guidance on which one drives `/implement-plan` to embed "Tests to write first" blocks per task. **This is the principled resolution of the batch 6 item 2 question** — TDD support lives in `/principles`, not as a separate `/tdd-tests` skill, exactly as the rationale recorded in `todo.md` "Removed from the backlog" predicted.
+  - **New §9 Code Review and Branching** section (trunk-based / GitHub flow / GitFlow / required reviewers / merge gate) and **new §10 Stakeholder Decision Authority** table (per-section decision authority by name and role).
+  - **3 new required-topics** in the SKILL.md interview: testing strategy, stakeholder decision authority, code review and branching policy.
+  - **Document-control metadata added**: `Status` field plus `Approvals` table at the bottom.
+- **`skills/discovery/SKILL.md` and `skills/references/templates/discovery-template.md`** — retrospective traceability and decision provenance:
+  - **New §9 Hypotheses → Brief Goals mapping table** filled in by `/brief` when it consumes the discovery artifact. Forward traceability from each discovery hypothesis to the Brief goal it became, with a Status column (Validated / Refined / Disproved / Pending) so a 3-month-post-launch retrospective can answer "did the chosen audience hypothesis hold?" and "did the predicted MVP features actually drive adoption?".
+  - **`Decision date`** and **`Decision owner`** fields in the header so the recommendation moment is timestamped and attributable.
+  - **`Status` field** (Concept (pre-brief) / In Review / Locked) and **`Approvals` table** for the cases where the discovery artifact is signed off as a decision document.
+- **`skills/research/SKILL.md` and `skills/references/templates/research-template.md`** — full Michael Nygard ADR format + downstream-consumer awareness:
+  - **Standard alignment with the Michael Nygard ADR format** (the de facto industry standard since 2011), extended with explicit **Drivers** field (what forced the decision — FRs, NFRs, regulatory, cost, time-to-market) and **Alternatives Considered** table with a `Disqualifying factor` column. Every ADR carries Status, Proposal date, Decision date, Decision owner, Drivers, Context, Alternatives Considered, Decision, Consequences (positive / negative / neutral) — the field set a senior architect would expect on a serious project.
+  - **`/implement-plan` integration** documented explicitly. The output of `/research` is the primary tech-stack source for `/implement-plan` (added in v3.4.0); the new Tech Stack Summary table at the bottom of the research artifact is read directly by `/implement-plan` to populate its header without re-asking the calibration interview.
+  - **Required-topics list extended from 6 to 14**. Added the explicit tech-stack slots `/implement-plan` consumes: Frontend stack, Backend stack, Database, Hosting / deployment target, Auth / identity, Observability platform. Added Build vs Buy and Open-source vs Proprietary tolerance as common BA inquiries.
+  - **New NFR → ADR traceability matrix** at the bottom flags Must NFRs without an architectural decision.
+  - **Document-control metadata added** (Version / Status).
+- **`skills/handoff/SKILL.md` and `skills/references/templates/handoff-template.md`** — full pipeline coverage and formal sign-off:
+  - **Artifact Inventory expanded from 11 rows to 21 rows** (15 pipeline-stage rows + 6 cross-cutting tool rows). Was missing /discovery (stage 0), /principles (stage 0a), /implement-plan (stage 12), and every cross-cutting artifact (sprint, risk, glossary, trace, analyze, estimate). The inventory is now the canonical "what's in the package" reference for the dev team.
+  - **Traceability Coverage expanded from 7 chains to 11 chains** to reflect the new traceability matrices added in pilot / Group A / Group B: Brief Goal → FR (added in v3.5.0 SRS template), US → AC broken down by Positive / Negative / Boundary type, FR → NFR, FR → Entity, FR → Endpoint, US → WF, US → Scenario, FR → Implementation Task, NFR → ADR.
+  - **New §7 Architecture Decision Summary** lists the top ADRs from `/research` with their drivers and which `/implement-plan` phase they affect — so the dev team learns the architectural decisions without having to read `/research` separately.
+  - **New §9 Sign-off section** with a formal acceptance table (Business Analyst / Product Manager / Tech Lead / QA Lead / Stakeholder). Senior BA expectation: handoff is the formal acceptance step and needs an explicit sign-off flow with named approvers.
+  - **Document-control metadata added** (Version / Status). Same P1 pattern as the rest of the audit.
+- **`skills/implement-plan/SKILL.md`** — extended Tech Stack with operational slots, risk-aware sequencing within phases:
+  - **Tech Stack table extended from 6 rows to 9 rows.** Added: **Observability** (logging / metrics / tracing platform — Datadog / New Relic / Grafana / OTel), **CI / CD** (GitHub Actions / GitLab CI / CircleCI / Jenkins), **Secret management** (env vars / Vault / Secrets Manager / Doppler / 1Password CLI). Without these slots, the AI coding agent has to invent operational choices on the fly.
+  - **Calibration interview extended from 6 to 9 questions** to cover the same three new slots when `/research` is missing.
+  - **Risk-aware sequencing within phases** is now explicit. Tasks whose `references` link to FRs / US / NFRs tied to a 🔴 Critical or 🟡 High risk in `00_risks_*.md` are pulled to the front of their phase, ahead of equally-prioritised tasks. Tagged with `**Risk:** RISK-NN ↑` next to the task title. Rationale: validate risky bets early when there's still time to pivot. Was generic "ordered by dependencies, then priority"; now also "then by risk elevation".
+- **`skills/export/SKILL.md`** — interview-protocol compliance, v3.5.0+ stories template field support, full traceability in exports:
+  - **Format interview now follows the standard interview protocol** — table-based options, Recommended marker, inline-context support per protocol rule 9. Was a flat numbered question list that bypassed the protocol.
+  - **Exported issues now carry every v3.5.0+ stories template field**: Persona (named persona with role + context, not bare job title), Business Value Score, Size, Depends on (rendered as "Blocked by" link in trackers that support it), INVEST self-check. Trackers with custom field support (Jira, Linear) get them as separate fields; CSV gets extra columns; GitHub Issues embeds them in the issue body since GitHub has no custom-field surface.
+  - **Full cross-artifact traceability in exported issues**: Linked FR, Linked UC, Linked AC (per scenario, with their `AC-NNN-NN` IDs), Linked NFR (for performance- and security-relevant stories), Linked Wireframe. Was previously only `FR Reference`. Modern issue trackers can re-establish the traceability graph without re-reading the source artifacts.
+  - **CSV format expanded from 10 columns to 17** to carry the new fields (Persona, Value, Size, FR, UC, AC list, NFR, WF, Depends on, AC Summary).
+
+### Cross-pattern impact
+
+After the pilot, Group A, Group B, and Group C audits, **22 of 24 shipped skills** carry the senior-BA improvements: standards conformance to canonical frameworks (BABOK v3, IEEE 830, ISO 25010, ISO 31000, ISO 1087-1, OpenAPI 3.x, Cockburn use cases, INVEST, MoSCoW, PMBOK 7, Cone of Uncertainty, Michael Nygard ADRs), explicit "why" / provenance / ownership fields on every artifact element, cross-artifact bidirectional traceability with severity-aware coverage gaps, document control with versions and approvers, single-source-of-truth templates with no inline drift, and BA-grade required-topics coverage. The two skills not yet audited are `/publish` (a thin CLI wrapper with nothing structural to audit) and `/clarify` (already audited in Group B). The skill audit rollout is functionally complete.
+
+---
+
 ## [3.7.0] — 2026-04-10
 
 ### Highlights
@@ -650,7 +698,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.7.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.0...HEAD
+[3.8.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.1...v3.5.0

@@ -1,8 +1,11 @@
 # Discovery: [PROJECT_NAME]
 
+**Version:** 0.1
+**Status:** Concept (pre-brief) | In Review | Locked
 **Slug:** [SLUG]
 **Date:** [DATE]
-**Status:** Concept (pre-brief)
+**Decision date:** [DATE — when the recommended domain was locked in]
+**Decision owner:** [Name + role]
 
 ## 1. Problem Space
 
@@ -61,3 +64,23 @@ Things we do not yet know and need to learn before committing real resources.
 - **Domain:** [chosen domain]
 - **Scope hint for `/brief`:** [one-sentence summary the user can paste as inline context: `/brief [scope hint]`]
 - **Suggested first interview focus in `/brief`:** [1–2 topics from this discovery doc that are now firm enough to anchor the brief]
+
+---
+
+## 9. Hypotheses → Brief Goals (filled in after `/brief`)
+
+Forward traceability from the discovery hypotheses to the brief business goals they became. Filled in by `/brief` when it consumes this discovery artifact, then preserved here for retrospective validation: 3 months after launch, did the chosen audience hypothesis hold? Did the MVP features that the differentiation angle predicted would matter actually drive adoption?
+
+| Discovery section | Hypothesis | Brief Goal G-N | Status |
+|-------------------|------------|----------------|--------|
+| §1 Problem space | [problem statement] | G-1 | Validated / Refined / Disproved / Pending |
+| §2 Audience (Primary) | [primary segment] | G-2 | Validated / Refined / Disproved / Pending |
+| §5 MVP feature 1 | [feature] | G-3 | Validated / Refined / Disproved / Pending |
+
+---
+
+## Approvals
+
+| Name | Role | Approval Date | Notes |
+|------|------|---------------|-------|
+| [name] | [role] | [YYYY-MM-DD] | [optional notes] |

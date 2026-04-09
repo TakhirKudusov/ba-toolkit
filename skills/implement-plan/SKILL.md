@@ -69,7 +69,10 @@ Required topics for the calibration interview (skip any topic already answered b
 3. Database (engine, version, hosting model).
 4. Hosting / deployment target.
 5. Auth / identity approach (in-house vs. SSO vs. managed service).
-6. Mandatory integrations from `02_srs` (carry over verbatim — do not re-decide them).
+6. **Observability platform** — logging, metrics, traces stack (Datadog / New Relic / Grafana / OpenTelemetry self-hosted). Drives Phase 8 (Quality & NFRs) tasks.
+7. **CI/CD platform** — GitHub Actions / GitLab CI / CircleCI / Jenkins / other. Drives Phase 1 (Foundation) tasks.
+8. **Secret management** — environment variables / Vault / AWS Secrets Manager / Doppler / 1Password CLI. Drives Phase 1 (Foundation) tasks.
+9. Mandatory integrations from `02_srs` (carry over verbatim — do not re-decide them).
 
 **Step 3 — TBD slots.** If neither `/research` nor the interview yields a value for a slot (e.g. user picked "Other" without a concrete answer), record `[TBD: <slot>]` in the output's "Tech stack" header AND add a row to the "Open Assumptions" section so the AI coding agent knows it must ask before starting any task that touches that slot.
 
@@ -107,7 +110,7 @@ Each task is one atomic, AI-actionable unit of work. Rules:
 - **files:** list of file paths the AI agent should create or modify (best-effort; framework-dependent). Optional. Examples: `src/db/schema.sql`, `apps/api/src/auth/login.controller.ts`. **If unknown, omit rather than guess.**
 - **definitionOfDone:** bullet list of acceptance hooks. Pull from the linked AC where possible ("AC-001-03 passes", "endpoint returns 401 on invalid credentials"). Always include a type-check / lint hook on backend tasks and a render-state hook on UI tasks.
 
-Within a phase, order tasks so each task's `dependsOn` list points only at tasks already listed. Risk-elevated tasks (mitigating Critical / High risks from `00_risks_*.md`) come earliest within their priority tier.
+Within a phase, order tasks so each task's `dependsOn` list points only at tasks already listed. **Risk-elevated tasks come earliest within their phase**: any task whose `references` include an FR / US / NFR linked to a 🔴 Critical or 🟡 High risk in `00_risks_*.md` is pulled to the front of its phase, ahead of equally-prioritised tasks. Rationale: validate risky bets early, when there's still time to pivot. Tag risk-elevated tasks with `**Risk:** RISK-NN ↑` next to their title so the AI agent and the human reviewer both see the elevation reason.
 
 ### 7. Generation
 
@@ -132,6 +135,9 @@ Within a phase, order tasks so each task's `dependsOn` list points only at tasks
 | Database | {…} | … |
 | Hosting | {…} | … |
 | Auth | {…} | … |
+| Observability (logs / metrics / traces) | {…} | … |
+| CI / CD | {…} | … |
+| Secret management | {…} | … |
 | Mandatory integrations | {…} | … |
 
 ---
