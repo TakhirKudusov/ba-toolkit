@@ -82,21 +82,16 @@ $EDITOR CHANGELOG.md
 git add CHANGELOG.md $OTHER_FILES
 git commit -m "..."
 
-# 3. npm version will create its own commit + tag. But .claude/settings.local.json
-#    is always dirty — stash it first or the command fails with
-#    "Git working directory not clean."
-git stash push -m "settings.local.json" .claude/settings.local.json
-
-# 4. Bump version (creates commit and tag vX.Y.Z).
+# 3. Bump version (creates commit and tag vX.Y.Z).
+#    .claude/settings.local.json is gitignored now, so no stash dance.
 npm version patch -m "chore(release): %s"    # bug fix / docs
 npm version minor -m "chore(release): %s"    # new feature
 npm version major -m "chore(release): %s"    # breaking change
 
-# 5. Restore the stash and push.
-git stash pop
+# 4. Push.
 git push origin main --follow-tags
 
-# 6. Verify after ~1-2 minutes.
+# 5. Verify after ~1-2 minutes.
 npm view @kudusov.takhir/ba-toolkit version
 ```
 
@@ -146,7 +141,7 @@ If CI fails with `ENEEDAUTH` on a new package, check this first.
 - `skills/references/domains/igaming.md` — the legitimate iGaming domain reference. iGaming is a supported domain.
 - `CHANGELOG.md` historical sections — only add new `[X.Y.Z]` blocks above existing ones. Never edit released versions retroactively (except for stale-anchor fixes that are cosmetic).
 - The two CI hacks in `.github/workflows/release.yml` (see section 7).
-- `.claude/settings.local.json` — ignore its perpetual dirty state; stash it around `npm version` calls.
+- `.claude/settings.local.json` and `.claude/skills/` — gitignored. Local Claude Code state, not part of the package. Don't try to stage or commit them.
 
 ## 9. Quirks to remember
 

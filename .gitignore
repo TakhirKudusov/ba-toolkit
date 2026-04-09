@@ -1,1 +1,17 @@
 ./.idea
+
+# Claude Code local state — per-developer settings and any user-installed
+# third-party skills under .claude/skills/. The toolkit's own skills live
+# under skills/ at the repo root, not here. .claude/ holds local agent
+# state that must never be committed.
+.claude/settings.local.json
+.claude/skills/
+
+# Node / npm
+node_modules/
+npm-debug.log*
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.swp
