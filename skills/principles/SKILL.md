@@ -27,7 +27,11 @@ If `01_brief_*.md` already exists, extract the slug and domain from it. Otherwis
 
 ### 3. Interview
 
-> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, offer 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of 3–5 domain-appropriate options, always include a free-text "Other" row as the last option, and wait for an answer before asking the next question.
+>
+> **Inline context (protocol rule 9):** if the user wrote text after `/principles`, parse it as the lead-in answer and skip directly to the first structured question it doesn't already cover.
+>
+> **Open-ended lead-in (protocol rule 8):** if there is NO inline text and no prior `01_brief_*.md` exists, your very first interview question is open-ended free-text — `What kind of project is this and what conventions matter most to you?`. Otherwise jump straight to the structured questions.
 
 1–2 rounds, 3–5 topics each. Do not ask about topics the user can accept as defaults.
 

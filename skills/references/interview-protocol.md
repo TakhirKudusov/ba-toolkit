@@ -23,6 +23,10 @@ Every BA Toolkit skill that gathers information from the user MUST follow this p
 
 7. **Stop when you have enough.** Each skill specifies a required set of topics. Once every required topic has a recorded answer, stop asking and move to the Generation phase. Do not pad the interview with "nice-to-have" questions.
 
+8. **Lead-in question for entry-point skills.** For the first skill in a fresh project (typically `/brief`), the very first interview question is **open-ended free-text**, not a structured options table — `Tell me about the project in your own words: one or two sentences are enough. What are you building, who is it for, and what problem does it solve?`. The user replies in free form. From that reply, extract whatever you can (product type, target audience, business goal, domain hints) and use it to pre-fill the structured questions that follow rule 2. Only ask the structured questions for topics the lead-in answer didn't cover. Non-entry-point skills (`/srs`, `/stories`, …) skip the lead-in and go straight to structured questions, because the prior artifacts already supply the project context.
+
+9. **Inline command context.** If the user invokes the skill with text after the slash command — for example `/brief I want to build an online store for construction materials targeting B2B buyers in LATAM` or `/srs the SRS should focus on the payments module first` — parse that text as if it were the answer to the lead-in question (rule 8). Skip the open-ended lead-in and use the inline text to pre-fill any structured questions you can. Only ask the user for what's still missing. Acknowledge the inline context once at the start (`Got it — online store for construction materials, B2B buyers, LATAM market.`) so the user knows their context was understood, then jump straight into the first structured question that the inline text didn't already answer. This rule applies to **every** skill that has an Interview phase, not just entry-point skills.
+
 ## Example
 
 Bad (old style — questionnaire dump):
@@ -61,4 +65,4 @@ Good (protocol style — one question, table of variants):
 
 ## When this protocol applies
 
-This protocol applies to every skill that has an `### Interview` (or `## Interview`) section in its SKILL.md — currently: `brief`, `srs`, `stories`, `usecases`, `ac`, `nfr`, `datadict`, `apicontract`, `wireframes`, `scenarios`, `research`, `principles`. Each of those skills MUST link to this file from its Interview section and follow the rules above.
+This protocol applies to every skill that has an `### Interview` (or `## Interview`) section in its SKILL.md — currently: `brief`, `srs`, `stories`, `usecases`, `ac`, `nfr`, `datadict`, `apicontract`, `wireframes`, `scenarios`, `research`, `principles`. Each of those skills MUST link to this file from its Interview section and follow rules 1–7 + rule 9. Rule 8 (open-ended lead-in question) applies only to entry-point skills — currently `/brief` and `/principles` when no `01_brief_*.md` or `00_principles_*.md` is present in the output directory yet.

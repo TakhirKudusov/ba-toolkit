@@ -23,7 +23,9 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 ## Interview
 
-> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, offer 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of 3–5 domain-appropriate options, always include a free-text "Other" row as the last option, and wait for an answer before asking the next question.
+>
+> **Inline context (protocol rule 9):** if the user wrote text after `/research` (e.g., `/research compare PostgreSQL vs DynamoDB for our event store`), use it as the focus question to research instead of asking for one.
 
 1–2 rounds, 4–6 topics.
 

@@ -21,7 +21,9 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 ## Interview
 
-> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, offer 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of 3–5 domain-appropriate options, always include a free-text "Other" row as the last option, and wait for an answer before asking the next question.
+>
+> **Inline context (protocol rule 9):** if the user wrote text after `/apicontract` (e.g., `/apicontract REST with JWT auth, OpenAPI 3.1`), use it as a style and protocol hint for the API design.
 
 3–7 topics per round, 2–4 rounds.
 

@@ -34,7 +34,11 @@ The domain is written into the brief metadata and passed to all subsequent pipel
 
 ### 4. Interview
 
-> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, offer 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" row as the last option, and wait for an answer before asking the next question.
+>
+> **Inline context (protocol rule 9):** if the user wrote text after `/brief` (e.g., `/brief I want to build an online store for construction materials`), parse that as the lead-in answer, acknowledge it in one line, and skip directly to the first structured question that the inline text doesn't already cover.
+>
+> **Open-ended lead-in (protocol rule 8):** if there is NO inline text after `/brief`, your very first interview question is open-ended and free-text, not a table — `Tell me about the project in your own words: one or two sentences are enough. What are you building, who is it for, and what problem does it solve?`. After the user answers, switch to the structured table protocol for all subsequent questions and use the lead-in answer to pre-fill what you can.
 
 Cover 3–7 topics per round, 2–4 rounds. Do not generate the artifact until sufficient information is collected.
 

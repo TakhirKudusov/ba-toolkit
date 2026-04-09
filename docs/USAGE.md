@@ -19,39 +19,38 @@ npx @kudusov.takhir/ba-toolkit init --name "Neobank App" --domain fintech --for 
 
 After `init`, the slug, domain, and agent are fixed for the rest of the pipeline. Slug is derived from the project name and used as a suffix for every artifact: `01_brief_neobank-app.md`, `02_srs_neobank-app.md`, `03_stories_neobank-app.md`, …
 
-Now start the pipeline inside the AI agent:
+Now start the pipeline inside the AI agent. There are two ways to call any interview-phase skill:
+
+**(a) Plain slash command** — the agent asks an open-ended lead-in question first, then drills down with structured-option tables:
 
 ```
 You:    /brief
 Agent:  Reading AGENTS.md — project is Neobank App, domain fintech.
         Loading skills/references/domains/fintech.md.
 
-        Let's start with the product itself. What kind of fintech
-        product is this?
+        Tell me about the project in your own words: one or two
+        sentences are enough. What are you building, who is it for,
+        and what problem does it solve?
 
-          1. Neobank — current accounts, cards, transfers, savings
-          2. Payments / wallet — money movement, peer-to-peer, top-ups
-          3. Investment — brokerage, robo-advisor, savings goals
-          4. Crypto exchange — trading, custody, on/off ramps
-          5. Other — type your own answer
+You:    A neobank with current accounts and cards for mass-market
+        consumers in two LATAM countries.
 
-You:    1
-Agent:  Got it — neobank with current accounts and cards. Who's the
-        primary target user?
+Agent:  Got it — neobank with current accounts and cards, mass-market
+        B2C, two-country LATAM launch. Next: what's the primary
+        business goal for the first 12 months?
 
-          1. Mass-market consumers in a single country (B2C)
-          2. Underbanked / migrant communities (B2C, regulated niche)
-          3. SMBs / freelancers needing business accounts (B2B)
-          4. Teen / family banking (parental controls)
-          5. Other
+        | ID | Variant                                                |
+        |----|--------------------------------------------------------|
+        | a  | Acquire 100k users, prove product–market fit           |
+        | b  | Reach $5M revenue from interchange + subscriptions     |
+        | c  | Get a Tier-2 banking licence in country B              |
+        | d  | Other — type your own answer                           |
 
-You:    Mass-market consumers in two LATAM countries
-Agent:  Got it — mass-market B2C, two-country LATAM launch. Next:
-        what's the business goal for the first 12 months?
+You:    a
+Agent:  Got it — 100k users, PMF focus. Next: what's the regulatory
+        situation right now?
 
-          [3–5 fintech-specific options follow]
-
-        ... (more one-question rounds, ~6–8 questions total) ...
+          [more questions, one at a time, ~6–8 total] ...
 
 Agent:  [generates 01_brief_neobank-app.md]
 
@@ -62,7 +61,30 @@ Agent:  [generates 01_brief_neobank-app.md]
         Next step: /srs
 ```
 
-Every interview-phase skill follows this protocol — one question at a time, 3–5 domain-appropriate answer options sourced from `references/domains/{domain}.md`, plus a free-text "Other" choice you can always type into. See [`skills/references/interview-protocol.md`](../skills/references/interview-protocol.md) for the full rule. You never have to remember the format — every shipped skill enforces it.
+**(b) Inline context after the slash command** — the agent skips the open-ended lead-in and uses your text to pre-fill what it can:
+
+```
+You:    /brief I want to build a neobank with current accounts and
+        cards for mass-market consumers in two LATAM countries.
+
+Agent:  Got it — neobank with current accounts and cards, mass-market
+        B2C, two-country LATAM launch. Jumping straight to the next
+        topic: what's the primary business goal for the first 12 months?
+
+        | ID | Variant                                                |
+        |----|--------------------------------------------------------|
+        | a  | Acquire 100k users, prove product–market fit           |
+        | b  | Reach $5M revenue from interchange + subscriptions     |
+        | c  | Get a Tier-2 banking licence in country B              |
+        | d  | Other — type your own answer                           |
+
+You:    a
+        ... (interview continues normally) ...
+```
+
+Both styles are supported by **every** interview-phase skill (`/brief`, `/srs`, `/stories`, `/usecases`, `/ac`, `/nfr`, `/datadict`, `/research`, `/apicontract`, `/wireframes`, `/scenarios`, `/principles`). Inline context works for any of them — `/srs focus on the payments module first`, `/stories I want to plan the onboarding epic`, `/nfr emphasise security and compliance`, etc. The agent uses it as a scope or focus hint, then runs the rest of the interview normally.
+
+Every interview follows the same protocol — one question at a time, 3–5 domain-appropriate variants in a 2-column markdown table with letter IDs (`a`, `b`, `c`, …), plus a free-text "Other" row you can always type into. See [`skills/references/interview-protocol.md`](../skills/references/interview-protocol.md) for the full rule. You never have to remember the format — every shipped skill enforces it.
 
 The **slug** (`neobank-app`) is set at `ba-toolkit init`, not at `/brief`. `/brief` reads it from `AGENTS.md` and reuses it across the pipeline.
 
