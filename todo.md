@@ -47,7 +47,7 @@ Improvements batch 6 — closed:
 
 Improvements batch 7:
 1. ✅ Build a roadmap for further development / improvements and bug fixes. (priority 1) Done in Unreleased — `ROADMAP.md` published with Mission / Now / Next / Known limitations / Removed-from-backlog / Recently shipped / Versioning policy / Contributing sections. Commitment-only (no Wishlist or Later-aspirational). README gains a "Roadmap" section linking to it.
-2. Build a GitHub-hosted website for the project. The site must surface the documentation, the roadmap, and links (npm, GitHub, my LinkedIn). It must be responsive and look good on both desktop and mobile. (priority 2)
+2. ✅ Build a GitHub-hosted website for the project. The site must surface the documentation, the roadmap, and links (npm, GitHub, my LinkedIn). It must be responsive and look good on both desktop and mobile. (priority 2) Done in v3.10.0 — Astro Starlight website at https://takhirkudusov.github.io/ba-toolkit/. Content sync'd from repo root via build-time script. GitHub Action auto-deploys on push. Social links to GitHub + npm + LinkedIn. `.npmignore` added to exclude website/ from npm tarball.
 3. Review and rework the README and the documentation once more if the website work surfaces inconsistencies. (priority 3)
 
 Найденные баги:

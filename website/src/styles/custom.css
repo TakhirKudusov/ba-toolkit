@@ -1,0 +1,27 @@
+/* BA Toolkit website — custom Starlight overrides.
+ *
+ * Keep this file small. Starlight already ships a polished default theme;
+ * we only override what is needed for branding consistency with the GitHub
+ * README. The repo is the source of truth for content.
+ */
+
+:root {
+  --sl-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Slightly tighten the heading rhythm so dense BA documentation reads
+ * like a spec, not like a marketing landing page. */
+:root {
+  --sl-text-h1: 2.25rem;
+  --sl-text-h2: 1.625rem;
+  --sl-text-h3: 1.25rem;
+}
+
+/* The BA Toolkit README uses tables heavily. Make sure they wrap on mobile
+ * instead of forcing horizontal scroll. */
+.sl-markdown-content table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}

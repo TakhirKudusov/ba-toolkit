@@ -1,0 +1,13 @@
+# Exclude from the published npm tarball — these are either build/dev
+# artifacts or the companion website source that should not ship to
+# downstream users of the package.
+
+website/
+.github/
+.claude/
+.idea/
+test/
+example/
+.gitignore
+.npmignore
+todo.md

@@ -1,0 +1,69 @@
+name: Build and deploy website
+
+on:
+  # Build on every push to main that touches anything the website depends on.
+  # The sync script reads README.md, COMMANDS.md, CHANGELOG.md, ROADMAP.md,
+  # docs/*.md, and the website/ folder itself, so any change to those should
+  # trigger a rebuild.
+  push:
+    branches: [main]
+    paths:
+      - 'README.md'
+      - 'COMMANDS.md'
+      - 'CHANGELOG.md'
+      - 'ROADMAP.md'
+      - 'docs/**'
+      - 'website/**'
+      - '.github/workflows/website.yml'
+  # Allow manual runs for re-deploys without a content change.
+  workflow_dispatch:
+
+# Single concurrency group — newer pushes cancel an in-flight build.
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+# GitHub Pages deployment requires write access to pages and id-token.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: website
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: website/package-lock.json
+
+      - name: Install website dependencies
+        run: npm ci
+
+      - name: Sync content from repo root and build
+        run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: website/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

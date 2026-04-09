@@ -11,6 +11,20 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.10.0] — 2026-04-10
+
+### Added
+
+- **Documentation website powered by Astro Starlight** at [`https://takhirkudusov.github.io/ba-toolkit/`](https://takhirkudusov.github.io/ba-toolkit/). Responsive, dark mode, client-side search — all out of the box. Content is sync'd from the repo root (`README.md`, `COMMANDS.md`, `CHANGELOG.md`, `ROADMAP.md`, `docs/*.md`) at build time via `website/scripts/sync-content.mjs` — the repo root stays the single source of truth and the website is a zero-drift derived view. One hand-written page (`getting-started.md`) provides a 5-step quickstart optimised for the website landing experience. The build deploys automatically via `.github/workflows/website.yml` (GitHub Actions → GitHub Pages) on every push to `main` that touches any of the synced content files. Social links in the header point to GitHub, npm, and LinkedIn. Search index built by Pagefind (10 pages indexed). Sitemap auto-generated.
+- **`.npmignore` created.** Excludes `website/`, `.github/`, `.claude/`, `.idea/`, `test/`, `example/`, and several meta-files from the published npm tarball so that Astro and its transitive dependencies never bloat the downstream package. Verified with `npm pack --dry-run`.
+- **`.github/workflows/website.yml`** — GitHub Actions workflow that: installs website deps (`npm ci`), runs the content sync script, builds with Astro, and deploys to GitHub Pages via `actions/deploy-pages@v4`. Triggers on push to `main` that touches `README.md`, `COMMANDS.md`, `CHANGELOG.md`, `ROADMAP.md`, `docs/**`, `website/**`, or the workflow file itself. Single concurrency group; newer pushes cancel in-flight builds. Manual dispatch supported for ad-hoc re-deploys.
+
+### Note for deployers
+
+The first push that includes this workflow will **not** auto-deploy unless GitHub Pages is enabled in the repo's Settings → Pages → Build and deployment → Source → **GitHub Actions**. This is a one-time manual step — after it is set, all future deployments happen automatically.
+
+---
+
 ## [3.9.0] — 2026-04-10
 
 ### Added
@@ -715,7 +729,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.9.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.0...HEAD
+[3.10.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.9.0...v3.10.0
 [3.9.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.1...v3.9.0
 [3.8.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.0...v3.8.1
 [3.8.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.7.0...v3.8.0
