@@ -9,8 +9,15 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [3.1.1] — 2026-04-09
+
 ### Changed
 
+- **Interview options table is now capped at 5 rows total** (`skills/references/interview-protocol.md` rule 3). Previously rule 3 allowed "3–5 variants per question" with the free-text "Other" row on top, so a single question could surface up to 6 options and overwhelm the user. The new cap is **up to 4 predefined variants + exactly 1 free-text "Other" row = 5 rows max**, no exceptions. Fewer than 4 predefined rows is still fine when the topic only has 2–3 sensible options. The one-line protocol summary in all 12 interview-phase skills (`brief`, `srs`, `stories`, `usecases`, `ac`, `nfr`, `datadict`, `apicontract`, `wireframes`, `scenarios`, `research`, `principles`) was updated to match. New regression test in `test/cli.test.js` walks every shipped SKILL.md with an Interview heading and fails if any of them carry the legacy `3–5 domain-appropriate options` wording or omit the new `5 rows max` reminder.
+- **Exactly one variant per question is now marked `**Recommended**`** (`skills/references/interview-protocol.md` new rule 10). The AI picks the row using, in priority order, (a) the loaded `references/domains/{domain}.md` for the current skill, (b) the user's prior interview answers, (c) the inline context from rule 9, (d) widely-accepted industry default. The free-text "Other" row is never recommended. If none of (a)–(d) gives a defensible choice the AI omits the marker entirely rather than guessing — a missing recommendation is better than a misleading one. Rendered as `**Recommended**` appended to the end of the `Variant` cell so it stays visible even when the table wraps. Translated together with the variant text per rule 11 (e.g. `**Рекомендуется**`, `**Recomendado**`). All 12 interview-phase SKILL.md summaries point at rule 10. New regression test in `test/cli.test.js` enforces that every Interview-section SKILL.md mentions the marker.
+- **Variant text and the `Variant` column header are now rendered in the user's language** (`skills/references/interview-protocol.md` new rule 11), matching the rule the generated artifacts already follow (`skills/brief/SKILL.md:107`). The `ID` column header and the letter IDs (`a`, `b`, …) stay ASCII. Domain reference files in `skills/references/domains/` remain English-only by design (per the project's English-only convention) — the AI translates the variants on the fly when rendering the table for a non-English-speaking user, instead of pasting the English source verbatim or asking the user which language to use. Updated example block in the protocol now shows both an English question with `**Recommended**` and a Russian rendering of the same question to make the rule concrete.
 - **Replaced `example/dragon-fortune/` with `example/lumen-goods/`**, a sustainable home-goods D2C e-commerce walkthrough. The new example is more universally relatable than the iGaming-themed predecessor: 15 cross-referenced artifacts (Brief, Principles, SRS, Stories, Use Cases, AC, NFRs, Data Dictionary, Tech Research, API Contract, Wireframes, Scenarios, Risk Register, Sprint Plan, Handoff) for a fictional D2C online store selling lighting, kitchenware, and textiles to eco-conscious EU/UK buyers. Stack covers Next.js storefront, Stripe (cards / Apple Pay / Klarna / SEPA), Stripe Tax for destination-based VAT, hybrid stock sync between an NL warehouse and a UK 3PL, GDPR/DSAR/cookie consent flows, and a paid Lumen Circle loyalty tier. CLAUDE.md "Do NOT touch" entry, the placeholder warning, the repo-layout block, and the README example table all updated to reference `lumen-goods`. The old `example/dragon-fortune/` folder has been removed.
 
 ---
@@ -444,7 +451,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.1...HEAD
+[3.1.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.5.0...v2.0.0

@@ -34,7 +34,7 @@ The domain is written into the brief metadata and passed to all subsequent pipel
 
 ### 4. Interview
 
-> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" row as the last option, and wait for an answer before asking the next question.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit) plus a free-text "Other" row last (5 rows max), mark exactly one row **Recommended** based on the loaded domain reference and prior answers, render variants in the user's language (rule 11), and wait for an answer before asking the next question.
 >
 > **Inline context (protocol rule 9):** if the user wrote text after `/brief` (e.g., `/brief I want to build an online store for construction materials`), parse that as the lead-in answer, acknowledge it in one line, and skip directly to the first structured question that the inline text doesn't already cover.
 >

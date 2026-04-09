@@ -13,7 +13,7 @@ Every BA Toolkit skill that gathers information from the user MUST follow this p
 
    Variants should be **concrete**, not abstract — e.g. for "Who is your primary user?" in a SaaS project, offer "Product Manager at a 50–500-person SaaS startup", "Engineering Lead", "Ops/Support team", not "End user", "Customer", "User".
 
-3. **3–5 variants per question, last row is always free-text.** Keep the table to 3–5 rows total. The last row is always something like `e | Other — type your own answer` (or whatever letter follows the last predefined variant). If the user picks the free-text row, accept arbitrary text. Never force the user into one of the predefined variants.
+3. **At most 5 rows per question, last row is always free-text.** Hard cap: **5 rows total = up to 4 predefined variants + exactly 1 free-text "Other" row**. Never render a 6th row. The last row is always something like `e | Other — type your own answer` (or whatever letter follows the last predefined variant). If the user picks the free-text row, accept arbitrary text. Never force the user into one of the predefined variants. Fewer than 4 predefined rows is fine when the topic genuinely has only 2–3 sensible options — pad with "Other" rather than inventing filler.
 
 4. **Wait for the answer.** Do not generate the next question or any part of the artifact until the user has replied. A non-answer (e.g. "I don't know", "skip") is a valid answer — record it as "unknown" and move on. The user can respond with the letter ID (`a`, `b`, …), the verbatim variant text, or — for the free-text row — any text of their own.
 
@@ -27,6 +27,10 @@ Every BA Toolkit skill that gathers information from the user MUST follow this p
 
 9. **Inline command context.** If the user invokes the skill with text after the slash command — for example `/brief I want to build an online store for construction materials targeting B2B buyers in LATAM` or `/srs the SRS should focus on the payments module first` — parse that text as if it were the answer to the lead-in question (rule 8). Skip the open-ended lead-in and use the inline text to pre-fill any structured questions you can. Only ask the user for what's still missing. Acknowledge the inline context once at the start (`Got it — online store for construction materials, B2B buyers, LATAM market.`) so the user knows their context was understood, then jump straight into the first structured question that the inline text didn't already answer. This rule applies to **every** skill that has an Interview phase, not just entry-point skills.
 
+10. **Mark exactly one row as Recommended.** In every options table, append `**Recommended**` to the end of the `Variant` cell of the single row that best fits the project context. Pick the row using, in order: (a) the loaded `references/domains/{domain}.md` for the current skill — what the reference treats as the typical default; (b) what the user has already said earlier in this interview; (c) the inline context from rule 9; (d) widely-accepted industry default. Never recommend the free-text "Other" row. Never recommend more than one row. If none of (a)–(d) gives you a defensible choice, omit the marker entirely for that question rather than guessing — a missing recommendation is better than a misleading one. Translate the marker together with the variant text per rule 11 (e.g. `**Рекомендуется**`, `**Recomendado**`).
+
+11. **Variant text in the user's language.** The `Variant` column header and every variant string must be written in the same language as the user's first message in this conversation — the same rule the generated artifact already follows. The `ID` column header and the letter IDs (`a`, `b`, …) stay ASCII, unchanged. The `**Recommended**` marker is also translated. Domain reference files in `references/domains/` are English-only by design; when the interview language is not English, translate the variants on the fly as you render the table — do not paste the English source verbatim and do not ask the user which language to use.
+
 ## Example
 
 Bad (old style — questionnaire dump):
@@ -38,31 +42,45 @@ Bad (old style — questionnaire dump):
 > 4. What are the success metrics?
 > 5. What are the key constraints?
 
-Good (protocol style — one question, table of variants):
+Good (protocol style — one question, table of variants, 5 rows max, one Recommended):
 
 > Let's start with the product itself. What are you building?
 >
-> | ID | Variant                                                       |
-> |----|---------------------------------------------------------------|
-> | a  | A B2B SaaS tool for internal teams (dashboards, automation)   |
-> | b  | A customer-facing web application (marketplace, portal)       |
-> | c  | A mobile app (consumer or B2B)                                |
-> | d  | An API / developer platform                                   |
-> | e  | Other — type your own answer                                  |
+> | ID | Variant                                                                       |
+> |----|-------------------------------------------------------------------------------|
+> | a  | A B2B SaaS tool for internal teams (dashboards, automation) **Recommended**   |
+> | b  | A customer-facing web application (marketplace, portal)                       |
+> | c  | A mobile app (consumer or B2B)                                                |
+> | d  | An API / developer platform                                                   |
+> | e  | Other — type your own answer                                                  |
 
-*User replies with `a`, types the verbatim variant text, or picks `e` and types their own description.*
+*User replies with `a`, types the verbatim variant text, or picks `e` and types their own description. The `**Recommended**` marker on row `a` reflects the loaded SaaS domain reference + the inline context the user gave with `/brief`.*
 
 > Got it — internal B2B SaaS tool. Who is the primary user?
 >
-> | ID | Variant                                                       |
-> |----|---------------------------------------------------------------|
-> | a  | Product Manager at a 50–500-person SaaS startup               |
-> | b  | Engineering Lead at a B2B company                             |
-> | c  | Operations / Support team at a mid-size SaaS                  |
-> | d  | Other — type your own answer                                  |
+> | ID | Variant                                                                  |
+> |----|--------------------------------------------------------------------------|
+> | a  | Product Manager at a 50–500-person SaaS startup **Recommended**          |
+> | b  | Engineering Lead at a B2B company                                        |
+> | c  | Operations / Support team at a mid-size SaaS                             |
+> | d  | Other — type your own answer                                             |
 
-*…and so on, one question at a time, until every required topic for the current skill has an answer.*
+*…and so on, one question at a time, until every required topic for the current skill has an answer. Tables stay at 5 rows or fewer; exactly one predefined row is marked Recommended, never the "Other" row.*
+
+### Variant translation example (rule 11)
+
+If the user's first message was in Russian, the same question is rendered with Russian variants and a translated `Variant` header / `Recommended` marker — `ID` column and letter IDs stay ASCII:
+
+> Давайте начнём с самого продукта. Что вы создаёте?
+>
+> | ID | Вариант                                                                          |
+> |----|----------------------------------------------------------------------------------|
+> | a  | B2B SaaS-инструмент для внутренних команд (дашборды, автоматизация) **Рекомендуется** |
+> | b  | Клиентское веб-приложение (маркетплейс, портал)                                  |
+> | c  | Мобильное приложение (для потребителей или B2B)                                  |
+> | d  | API / платформа для разработчиков                                                |
+> | e  | Другое — введите свой вариант                                                    |
 
 ## When this protocol applies
 
-This protocol applies to every skill that has an `### Interview` (or `## Interview`) section in its SKILL.md — currently: `brief`, `srs`, `stories`, `usecases`, `ac`, `nfr`, `datadict`, `apicontract`, `wireframes`, `scenarios`, `research`, `principles`. Each of those skills MUST link to this file from its Interview section and follow rules 1–7 + rule 9. Rule 8 (open-ended lead-in question) applies only to entry-point skills — currently `/brief` and `/principles` when no `01_brief_*.md` or `00_principles_*.md` is present in the output directory yet.
+This protocol applies to every skill that has an `### Interview` (or `## Interview`) section in its SKILL.md — currently: `brief`, `srs`, `stories`, `usecases`, `ac`, `nfr`, `datadict`, `apicontract`, `wireframes`, `scenarios`, `research`, `principles`. Each of those skills MUST link to this file from its Interview section and follow rules 1–7 + rules 9–11. Rule 8 (open-ended lead-in question) applies only to entry-point skills — currently `/brief` and `/principles` when no `01_brief_*.md` or `00_principles_*.md` is present in the output directory yet.

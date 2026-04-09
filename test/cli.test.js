@@ -601,6 +601,63 @@ test('interview protocol: every SKILL.md with an Interview section references th
   assert.deepEqual(offenders, [], `skills with an Interview section but no protocol link: ${offenders.join(', ')}`);
 });
 
+test('interview protocol: every Interview-section SKILL.md enforces the 5-rows-max cap', () => {
+  // Regression guard for batch 3 item 2 — the hard cap of 5 rows total
+  // (4 predefined + 1 free-text "Other"). Catches a future skill that
+  // copies the old "3–5 domain-appropriate options" wording back in.
+  const skillsDir = path.join(__dirname, '..', 'skills');
+  const skillFolders = fs.readdirSync(skillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && e.name !== 'references')
+    .map((e) => e.name);
+  const interviewHeadingRe = /^(## |### \d+\. )Interview$/m;
+  const legacyRe = /3[–-]5 domain-appropriate options/;
+  const offenders = [];
+  for (const folder of skillFolders) {
+    const skillPath = path.join(skillsDir, folder, 'SKILL.md');
+    if (!fs.existsSync(skillPath)) continue;
+    const content = fs.readFileSync(skillPath, 'utf8');
+    if (!interviewHeadingRe.test(content)) continue;
+    if (legacyRe.test(content) || !content.includes('5 rows max')) {
+      offenders.push(folder);
+    }
+  }
+  assert.deepEqual(offenders, [], `skills missing "5 rows max" or carrying legacy "3–5 options" wording: ${offenders.join(', ')}`);
+});
+
+test('interview protocol: every Interview-section SKILL.md mentions the Recommended marker', () => {
+  // Regression guard for batch 3 item 1 — exactly one row per question
+  // is marked **Recommended**. Catches a future skill that drops the
+  // marker reminder from its protocol summary.
+  const skillsDir = path.join(__dirname, '..', 'skills');
+  const skillFolders = fs.readdirSync(skillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && e.name !== 'references')
+    .map((e) => e.name);
+  const interviewHeadingRe = /^(## |### \d+\. )Interview$/m;
+  const offenders = [];
+  for (const folder of skillFolders) {
+    const skillPath = path.join(skillsDir, folder, 'SKILL.md');
+    if (!fs.existsSync(skillPath)) continue;
+    const content = fs.readFileSync(skillPath, 'utf8');
+    if (!interviewHeadingRe.test(content)) continue;
+    if (!content.includes('**Recommended**')) {
+      offenders.push(folder);
+    }
+  }
+  assert.deepEqual(offenders, [], `skills missing the **Recommended** marker reminder: ${offenders.join(', ')}`);
+});
+
+test('interview-protocol.md: defines rules 10 (Recommended) and 11 (variant language) plus the 5-rows cap', () => {
+  // Structural sanity check on the single source of truth. If any of
+  // these markers go missing, the per-skill summaries will drift away
+  // from the protocol they reference.
+  const protocolPath = path.join(__dirname, '..', 'skills', 'references', 'interview-protocol.md');
+  const content = fs.readFileSync(protocolPath, 'utf8');
+  assert.ok(content.includes('5 rows total'), 'protocol must state the "5 rows total" cap');
+  assert.ok(/^10\. \*\*Mark exactly one row as Recommended/m.test(content), 'protocol must define rule 10 (Recommended marker)');
+  assert.ok(/^11\. \*\*Variant text in the user's language/m.test(content), 'protocol must define rule 11 (variant language)');
+  assert.ok(!/3[–-]5 variants per question/.test(content), 'protocol must not carry the legacy "3–5 variants per question" wording');
+});
+
 test('parseSkillFrontmatter: parses every shipped SKILL.md without losing the description', () => {
   // Integration check: every skill in the package's skills/ directory
   // must produce a non-empty name and description through the parser.

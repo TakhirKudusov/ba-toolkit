@@ -19,9 +19,9 @@ Improvements batch 2:
 - ✅ Make `/brief` clarify what kind of project it is and the necessary details first when no inline text was provided, then start the structured interview. Done in v3.1.0 — interview-protocol rule 8 (open-ended lead-in question). Applied to `/brief` and `/principles` (entry-point skills). If inline text is present, the lead-in is skipped and the skill jumps straight to the structured questions.
 
 Improvements batch 3:
-1. Highlight one of the answer options as `Recommended` — the option the AI judges most likely to fit the user's project context, based on the domain reference and prior interview answers.
-2. Cap the number of options at 5 total, including the free-text custom answer (so: 4 predefined variants + 1 free-text "Other" row).
-3. Variant text in `/brief` is always written in the language of the user's first request — domain references should be translated on the fly when the interview language is not English.
+1. ✅ Highlight one of the answer options as `Recommended` — the option the AI judges most likely to fit the user's project context, based on the domain reference and prior interview answers. Done in Unreleased — `interview-protocol.md` new rule 10, all 12 interview-phase SKILL.md summaries updated, regression test in `test/cli.test.js`.
+2. ✅ Cap the number of options at 5 total, including the free-text custom answer (so: 4 predefined variants + 1 free-text "Other" row). Done in Unreleased — `interview-protocol.md` rule 3 rewritten as a hard cap, all 12 SKILL.md summaries updated, regression test rejects the legacy `3–5 domain-appropriate options` wording.
+3. ✅ Variant text in `/brief` is always written in the language of the user's first request — domain references should be translated on the fly when the interview language is not English. Done in Unreleased — `interview-protocol.md` new rule 11, applies to every interview-phase skill (not just `/brief`); domain reference files stay English-only per the project convention, translation happens at runtime; example block now includes a Russian rendering.
 4. ✅ Replaced `example/dragon-fortune/` with `example/lumen-goods/` — a sustainable home-goods D2C e-commerce walkthrough. All 15 artifacts rewritten end-to-end; CLAUDE.md and README updated. Done in Unreleased.
 
 Улучшения 4:
@@ -47,5 +47,5 @@ Improvements batch 3:
 6. Синхронизировать с проектом документацию и ридми
 
 Улучшения 7:
-1. Создать гиф с примером работы с тулкитом.
-2. Создать дальнейший план развития/улучшения проекта и исправления проблем. Возможно, будут полезные еще какие-либо скиллы, например.
+1. Создать дальнейший план развития/улучшения проекта и исправления проблем. Возможно, будут полезные еще какие-либо скиллы, например.
+2. Создать сайт на базе github для проекта. Отразить на сайте документацию + дальнейшие планы + предоставить ссылки (npm, github, мой linkedin).
