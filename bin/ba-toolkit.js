@@ -960,11 +960,14 @@ async function cmdInit(args) {
     log(`    exists   ${outputDir}`);
   }
 
-  // AGENTS.md: merge-on-reinit instead of overwrite. Everything outside
-  // the managed block (Pipeline Status, Key Constraints, user notes) is
-  // preserved. See mergeAgentsMd for the three branches (created,
-  // merged, preserved).
-  const agentsPath = 'AGENTS.md';
+  // AGENTS.md: per-project, lives inside output/<slug>/. Two agent
+  // windows can now work on two different projects in the same repo
+  // without colliding — each cd-s into its own output/<slug>/ folder
+  // and finds its own AGENTS.md there. The merge-on-reinit behaviour
+  // (managed-block anchors) still applies, just at per-project scope.
+  // See mergeAgentsMd for the three branches (created, merged,
+  // preserved).
+  const agentsPath = path.join(outputDir, 'AGENTS.md');
   const existingAgents = fs.existsSync(agentsPath)
     ? fs.readFileSync(agentsPath, 'utf8')
     : null;
@@ -973,10 +976,10 @@ async function cmdInit(args) {
     { name, slug, domain },
   );
   if (agentsAction === 'preserved') {
-    log('    ' + gray('preserved AGENTS.md (no ba-toolkit managed block — left untouched)'));
+    log('    ' + gray(`preserved ${agentsPath} (no ba-toolkit managed block — left untouched)`));
   } else {
     fs.writeFileSync(agentsPath, agentsContent);
-    log(`    ${agentsAction === 'merged' ? 'updated ' : 'created '} AGENTS.md`);
+    log(`    ${agentsAction === 'merged' ? 'updated ' : 'created '} ${agentsPath}`);
   }
 
   // --- 6. Install skills for the selected agent ---
@@ -997,28 +1000,31 @@ async function cmdInit(args) {
 
   // --- 7. Final message ---
   log('');
-  log('  ' + cyan(`Project '${name}' (${slug}) is ready.`));
+  log('  ' + cyan(`Project '${name}' (${slug}) is ready in ${outputDir}/.`));
   log('');
   log('  ' + yellow('Next steps:'));
   if (installed === true) {
     log('    1. ' + AGENTS[agentId].restartHint);
-    log('    2. Optional: run /principles to define project-wide conventions');
-    log('    3. Run /brief to start the BA pipeline');
+    log('    2. ' + bold(`cd ${outputDir}`) + ' — open your AI agent in this folder.');
+    log('       Each project has its own AGENTS.md, so two agent windows');
+    log('       can work on two different projects in the same repo.');
+    log('    3. Optional: run /principles to define project-wide conventions');
+    log('    4. Run /brief to start the BA pipeline');
   } else if (installed === false) {
     log('    1. Skill install was cancelled. To install later, run:');
     log('         ' + gray(`ba-toolkit install --for ${agentId}`));
-    log('    2. Open your AI assistant (Claude, Cursor, etc.)');
+    log('    2. ' + bold(`cd ${outputDir}`) + ' and open your AI agent there.');
     log('    3. Optional: run /principles to define project-wide conventions');
     log('    4. Run /brief to start the BA pipeline');
   } else {
     log('    1. Install skills for your agent:');
     log('         ' + gray('ba-toolkit install --for claude-code'));
-    log('    2. Open your AI assistant (Claude, Cursor, etc.)');
+    log('    2. ' + bold(`cd ${outputDir}`) + ' and open your AI agent there.');
     log('    3. Optional: run /principles to define project-wide conventions');
     log('    4. Run /brief to start the BA pipeline');
   }
   log('');
-  log('  ' + gray(`Artifacts will be saved to: ${outputDir}/`));
+  log('  ' + gray(`Artifacts and AGENTS.md live in: ${outputDir}/`));
   log('');
 }
 

@@ -147,7 +147,7 @@ Bugs and improvements:
 2. Улучшить пользовательский опыт при работе с командами:
 - Сделать более user-friendly
 - ✅ Вместо чисел - буквы вариантов. Done in Unreleased — буквенные ID `a-z` в interview-protocol и в CLI menu (TTY arrow-key и non-TTY fallback). Цифры остаются как backward-compat fallback.
-- Сделать инструмент приспособленным к работе одновременно над артефактами для нескольких проектов. Например, когда открыты 2 окна агентов. Сейчас попытка начать новый проект просто перезаписывает AGENTS.md.
+- ✅ Сделать инструмент приспособленным к работе одновременно над артефактами для нескольких проектов. Done in Unreleased — `init` теперь пишет `output/<slug>/AGENTS.md`, не корневой. Два окна агентов делают `cd output/<slug-A> && claude` и `cd output/<slug-B> && claude` — полная изоляция. Скиллы ищут AGENTS.md в cwd, fallback на walking up для legacy v3.0 layouts.
 - Сделать более подробное описание того, как продолжить работу после завершения работы с очередной командой.
 - ✅ Добавить возможность того, чтобы можно было вводить текст после `/команды`. Done in Unreleased — interview-protocol rule 9 (inline context). Применено ко всем 12 интервью-скиллам. `/brief I want to build...`, `/srs focus on payments`, `/nfr emphasise security` — все понимают inline-текст как scope hint и пропускают повторные вопросы про то, что уже сказано.
 - ✅ Сделай так, чтобы /brief уточнял в первую очередь, что именно за проект будет, если текст не введен. Done in Unreleased — interview-protocol rule 8 (open-ended lead-in). Применено к /brief и /principles (entry-point скиллы). Если inline-text есть — лид-ин пропускается, скилл уходит сразу к структурным вопросам.

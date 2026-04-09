@@ -82,24 +82,9 @@ FR numbering: sequential, three-digit (FR-001, FR-002, ...).
 
 ## AGENTS.md update
 
-After `/done`, update `AGENTS.md` in the project root with SRS-level context:
+After `/done`, find the project's `AGENTS.md` (look in cwd first; fall back to walking up the directory tree for legacy v3.0 single-project layouts). **Update only the `## Pipeline Status` row for `/srs`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename (`02_srs_{slug}.md`) in the `File` column. **Do not touch the managed block** (`<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->`) — that's owned by `ba-toolkit init`. **Do not add `## Artifacts` / `## Key context` sections** — those are not part of the v3.1+ template.
 
-```markdown
-## Artifacts
-...
-- `{output_dir}/02_srs_{slug}.md` — SRS ({n} FR, MoSCoW breakdown)
-
-## Key context
-...
-- **User roles:** {comma-separated list}
-- **External integrations:** {comma-separated list}
-- **Must-priority FR count:** {n}
-
-## Next step
-Run `/stories` to generate User Stories.
-```
-
-Only update the "Pipeline stage", "Artifacts", and "Key context" sections. Preserve any custom content.
+If you find no `AGENTS.md` at all, warn the user that the project was likely set up before v3.1 and tell them to run `ba-toolkit init --name "..." --slug {slug}` to scaffold the per-project file. Do not create one yourself with arbitrary structure.
 
 ## Iterative refinement
 

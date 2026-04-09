@@ -142,15 +142,18 @@ test('init: full flags, dry-run, fresh tmp cwd succeeds', () => {
       { cwd },
     );
     assert.equal(r.status, 0, `stderr: ${r.stderr}\nstdout: ${r.stdout}`);
-    // The project scaffold (output/<slug>/, AGENTS.md) is always
-    // created, even in dry-run — dry-run only gates the skill install.
-    assert.ok(fs.existsSync(path.join(cwd, 'output', 'nova-analytics')));
-    assert.ok(fs.existsSync(path.join(cwd, 'AGENTS.md')));
-    // Skills install was dry-run, so the agent's skill root must NOT
-    // exist.
+    // The project scaffold lives under output/<slug>/. AGENTS.md is
+    // per-project (inside that folder), not at repo root.
+    const projectDir = path.join(cwd, 'output', 'nova-analytics');
+    assert.ok(fs.existsSync(projectDir));
+    assert.ok(fs.existsSync(path.join(projectDir, 'AGENTS.md')));
+    // The repo root AGENTS.md is NOT created — that path is reserved
+    // for the user's existing repo-level instructions, if any.
+    assert.equal(fs.existsSync(path.join(cwd, 'AGENTS.md')), false);
+    // Skills install was dry-run, so the agent's skill root must NOT exist.
     assert.equal(fs.existsSync(path.join(cwd, '.claude', 'skills')), false);
     // AGENTS.md content is substituted correctly.
-    const agentsMd = fs.readFileSync(path.join(cwd, 'AGENTS.md'), 'utf8');
+    const agentsMd = fs.readFileSync(path.join(projectDir, 'AGENTS.md'), 'utf8');
     assert.match(agentsMd, /Nova Analytics/);
     assert.match(agentsMd, /nova-analytics/);
     assert.match(agentsMd, /saas/);
@@ -221,8 +224,8 @@ test('init: non-TTY menu fallback accepts a letter ID (b → second item)', () =
     // Domain menu fallback should print letter IDs, not 1-9 digits.
     assert.match(r.stdout, /^\s+a\) SaaS/m);
     assert.match(r.stdout, /^\s+b\) Fintech/m);
-    // The chosen domain ended up in AGENTS.md.
-    const agents = fs.readFileSync(path.join(cwd, 'AGENTS.md'), 'utf8');
+    // The chosen domain ended up in the per-project AGENTS.md.
+    const agents = fs.readFileSync(path.join(cwd, 'output', 'letter-test', 'AGENTS.md'), 'utf8');
     assert.match(agents, /\*\*Domain:\*\* fintech/);
   });
 });
@@ -234,7 +237,7 @@ test('init: non-TTY menu fallback still accepts a digit (backward compat)', () =
       { cwd, input: '2\n1\n' },
     );
     assert.equal(r.status, 0, `stderr: ${r.stderr}\nstdout: ${r.stdout}`);
-    const agents = fs.readFileSync(path.join(cwd, 'AGENTS.md'), 'utf8');
+    const agents = fs.readFileSync(path.join(cwd, 'output', 'digit-compat', 'AGENTS.md'), 'utf8');
     assert.match(agents, /\*\*Domain:\*\* fintech/);
   });
 });
@@ -252,9 +255,10 @@ test('init: invalid interactive domain input re-prompts, then accepts valid answ
     // Retry message appeared.
     assert.match(r.stdout, /Invalid selection/);
     assert.match(r.stdout, /attempts? left/);
-    // Final state correct.
-    assert.ok(fs.existsSync(path.join(cwd, 'AGENTS.md')));
-    const agents = fs.readFileSync(path.join(cwd, 'AGENTS.md'), 'utf8');
+    // Final state correct — per-project AGENTS.md.
+    const agentsPath = path.join(cwd, 'output', 'retry-test', 'AGENTS.md');
+    assert.ok(fs.existsSync(agentsPath));
+    const agents = fs.readFileSync(agentsPath, 'utf8');
     assert.match(agents, /\*\*Domain:\*\* saas/);
   });
 });
@@ -270,15 +274,17 @@ test('init: three invalid domain inputs in a row abort with non-zero', () => {
   });
 });
 
-test('init twice: second run updates managed block, preserves user edits outside it', () => {
+test('init twice with the same slug: second run updates managed block, preserves user edits outside it', () => {
+  // Same slug (--slug locked) on both runs — the second init merges
+  // into the same per-project AGENTS.md and refreshes the managed block.
   withTempDir((cwd) => {
     // First init.
     const r1 = runCli(
-      ['init', '--name', 'First Name', '--domain', 'saas', '--no-install'],
+      ['init', '--name', 'First Name', '--slug', 'shared', '--domain', 'saas', '--no-install'],
       { cwd },
     );
     assert.equal(r1.status, 0, `first init stderr: ${r1.stderr}`);
-    const agentsPath = path.join(cwd, 'AGENTS.md');
+    const agentsPath = path.join(cwd, 'output', 'shared', 'AGENTS.md');
     assert.ok(fs.existsSync(agentsPath));
 
     // User edits a row in Pipeline Status AND adds a section below.
@@ -286,14 +292,14 @@ test('init twice: second run updates managed block, preserves user edits outside
     const edited = original
       .replace(
         '| 1 | /brief | ⬜ Not started | — |',
-        '| 1 | /brief | ✅ Done | 01_brief_first-name.md |',
+        '| 1 | /brief | ✅ Done | 01_brief_shared.md |',
       )
       + '\n## My handwritten notes\n\nCall CEO on Monday.\n';
     fs.writeFileSync(agentsPath, edited);
 
-    // Second init with different name and domain.
+    // Second init with different name and domain but same slug.
     const r2 = runCli(
-      ['init', '--name', 'Second Name', '--domain', 'fintech', '--no-install'],
+      ['init', '--name', 'Second Name', '--slug', 'shared', '--domain', 'fintech', '--no-install'],
       { cwd },
     );
     assert.equal(r2.status, 0, `second init stderr: ${r2.stderr}`);
@@ -304,7 +310,7 @@ test('init twice: second run updates managed block, preserves user edits outside
     assert.match(merged, /\*\*Domain:\*\* fintech/);
     assert.doesNotMatch(merged, /\*\*Project:\*\* First Name/);
     // User edits OUTSIDE the managed block survived.
-    assert.match(merged, /\/brief \| ✅ Done \| 01_brief_first-name\.md/);
+    assert.match(merged, /\/brief \| ✅ Done \| 01_brief_shared\.md/);
     assert.match(merged, /## My handwritten notes/);
     assert.match(merged, /Call CEO on Monday/);
     // stdout mentions the merge (not "created").
@@ -312,21 +318,69 @@ test('init twice: second run updates managed block, preserves user edits outside
   });
 });
 
-test('init with existing unmanaged AGENTS.md: file is preserved untouched', () => {
+test('multi-project: two init runs with different slugs in the same cwd produce two isolated AGENTS.md files', () => {
+  // Core multi-project guarantee: two agent windows in the same repo,
+  // each running their own ba-toolkit init, must end up with
+  // independent project state. v3.0 collided here because everything
+  // wrote to repo-root AGENTS.md.
   withTempDir((cwd) => {
-    const agentsPath = path.join(cwd, 'AGENTS.md');
-    const userContent = '# Hand-written AGENTS.md\n\nNo anchors here. Leave me alone.\n';
-    fs.writeFileSync(agentsPath, userContent);
+    const r1 = runCli(
+      ['init', '--name', 'Alpha', '--slug', 'alpha', '--domain', 'saas', '--no-install'],
+      { cwd },
+    );
+    assert.equal(r1.status, 0, `alpha stderr: ${r1.stderr}`);
+
+    const r2 = runCli(
+      ['init', '--name', 'Beta', '--slug', 'beta', '--domain', 'fintech', '--no-install'],
+      { cwd },
+    );
+    assert.equal(r2.status, 0, `beta stderr: ${r2.stderr}`);
+
+    const alphaAgents = path.join(cwd, 'output', 'alpha', 'AGENTS.md');
+    const betaAgents = path.join(cwd, 'output', 'beta', 'AGENTS.md');
+    assert.ok(fs.existsSync(alphaAgents), 'alpha AGENTS.md should exist');
+    assert.ok(fs.existsSync(betaAgents), 'beta AGENTS.md should exist');
+
+    const alpha = fs.readFileSync(alphaAgents, 'utf8');
+    const beta = fs.readFileSync(betaAgents, 'utf8');
+
+    assert.match(alpha, /\*\*Project:\*\* Alpha/);
+    assert.match(alpha, /\*\*Slug:\*\* alpha/);
+    assert.match(alpha, /\*\*Domain:\*\* saas/);
+    assert.doesNotMatch(alpha, /Beta/);
+    assert.doesNotMatch(alpha, /fintech/);
+
+    assert.match(beta, /\*\*Project:\*\* Beta/);
+    assert.match(beta, /\*\*Slug:\*\* beta/);
+    assert.match(beta, /\*\*Domain:\*\* fintech/);
+    assert.doesNotMatch(beta, /Alpha/);
+    assert.doesNotMatch(beta, /\*\*Domain:\*\* saas/);
+
+    // The repo root must NOT have an AGENTS.md from either init.
+    assert.equal(fs.existsSync(path.join(cwd, 'AGENTS.md')), false);
+  });
+});
+
+test('init does not touch a pre-existing repo-root AGENTS.md', () => {
+  // Legacy / coexistence: if the user has their own AGENTS.md at the
+  // repo root (e.g., from a previous v3.0 install or from an unrelated
+  // tool), v3.1 init must NOT touch it. The new project's state lives
+  // entirely in output/<slug>/AGENTS.md.
+  withTempDir((cwd) => {
+    const rootAgentsPath = path.join(cwd, 'AGENTS.md');
+    const userContent = '# My repo-level AGENTS.md\n\nFoo bar baz, do not touch.\n';
+    fs.writeFileSync(rootAgentsPath, userContent);
 
     const r = runCli(
-      ['init', '--name', 'Foo', '--domain', 'saas', '--no-install'],
+      ['init', '--name', 'Gamma', '--slug', 'gamma', '--domain', 'saas', '--no-install'],
       { cwd },
     );
     assert.equal(r.status, 0, `stderr: ${r.stderr}`);
-    // File contents unchanged byte-for-byte.
-    assert.equal(fs.readFileSync(agentsPath, 'utf8'), userContent);
-    // stdout says preserved.
-    assert.match(r.stdout, /preserved AGENTS\.md/);
+
+    // Root AGENTS.md unchanged byte-for-byte.
+    assert.equal(fs.readFileSync(rootAgentsPath, 'utf8'), userContent);
+    // New per-project AGENTS.md was created in output/gamma/.
+    assert.ok(fs.existsSync(path.join(cwd, 'output', 'gamma', 'AGENTS.md')));
   });
 });
 
@@ -338,8 +392,10 @@ test('init --no-install skips the skill install entirely', () => {
     );
     assert.equal(r.status, 0, `stderr: ${r.stderr}\nstdout: ${r.stdout}`);
     assert.ok(fs.existsSync(path.join(cwd, 'output', 'foo')));
-    assert.ok(fs.existsSync(path.join(cwd, 'AGENTS.md')));
+    assert.ok(fs.existsSync(path.join(cwd, 'output', 'foo', 'AGENTS.md')));
     assert.equal(fs.existsSync(path.join(cwd, '.claude', 'skills')), false);
+    // Repo-root AGENTS.md is no longer created by init.
+    assert.equal(fs.existsSync(path.join(cwd, 'AGENTS.md')), false);
   });
 });
 

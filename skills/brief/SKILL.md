@@ -75,30 +75,11 @@ If a domain reference is loaded, supplement general questions with domain-specif
 
 ### 6. AGENTS.md update
 
-After saving `01_brief_{slug}.md`, create or update `AGENTS.md` in the current working directory (project root). This file helps AI agents in future sessions quickly understand the project context without re-reading all artifacts.
+`ba-toolkit init` already created `AGENTS.md` next to where the artifact lives — typically in the current working directory (the user is expected to `cd output/<slug>` after running init). After saving `01_brief_{slug}.md`, find the project's `AGENTS.md` (look in cwd first; fall back to walking up the directory tree if cwd has none, for legacy v3.0 single-project layouts).
 
-```markdown
-# BA Toolkit — Project Context
+**Update only the `## Pipeline Status` row for `/brief`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename in the `File` column. **Do not touch the managed block** (`<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->`) — that's owned by `ba-toolkit init`. **Do not recreate the file at the repo root.** **Do not add `## Artifacts` / `## Key context` sections** — those are not part of the v3.1+ template and would be ignored by future runs.
 
-**Project:** {Project Name}
-**Slug:** {slug}
-**Domain:** {domain}
-**Language:** {artifact language}
-**Pipeline stage:** Brief complete
-
-## Artifacts
-- `{output_dir}/01_brief_{slug}.md` — Project Brief
-
-## Key context
-- **Business goal:** {one-line summary}
-- **Target audience:** {one-line summary}
-- **Key constraints:** {comma-separated list}
-
-## Next step
-Run `/srs` to generate the Requirements Specification.
-```
-
-If `AGENTS.md` already exists and was created by BA Toolkit, update only the "Pipeline stage" and "Artifacts" sections — do not overwrite custom content added by the user.
+If you find no `AGENTS.md` at all (neither in cwd nor up the tree), warn the user that the project was likely set up before v3.1 and tell them to run `ba-toolkit init --name "..." --slug {slug}` to scaffold the per-project `AGENTS.md`. Do not create one yourself with arbitrary structure.
 
 ### 8. Iterative refinement
 

@@ -48,9 +48,16 @@ ba-toolkit init
 
 Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. All five use the native Agent Skills format (folder-per-skill with `SKILL.md`) — Claude Code at `.claude/skills/`, Codex at `~/.codex/skills/`, Gemini at `.gemini/skills/`, Cursor at `.cursor/skills/`, Windsurf at `.windsurf/skills/`. Pass `--dry-run` to preview the install step without writing files, or `--no-install` to create only the project structure and install skills later with `ba-toolkit install --for <agent>`.
 
+**New in v3.1** — multi-project + interview UX:
+
+- **Multi-project: each `ba-toolkit init` creates `output/<slug>/AGENTS.md`**, scoped to that project. Two agent windows in the same repo can `cd output/alpha && claude` and `cd output/beta && claude` independently — no AGENTS.md collision, no shared state.
+- **Interview options as a 2-column table with letter IDs** (`a`, `b`, `c`, …) instead of a numbered list. Renders cleanly across all 5 supported agents, easier to scan, last row is always free-text "Other".
+- **Inline context after slash commands**: `/brief I want to build an online store for construction materials...` is parsed as a lead-in answer; the skill skips redundant questions and jumps straight to what's missing. Works for all 12 interview-phase skills.
+- **Open-ended lead-in question** for `/brief` and `/principles` when there's no inline context — `Tell me about the project in your own words` — instead of dumping a structured table on the first turn.
+
 **New in v3.0** — `ba-toolkit init` UX improvements:
 
-- **Arrow-key menu navigation** for the domain and agent prompts in real terminals (`↑/↓` or `j/k` to move, `1-9` to jump, `Enter` to select, `Esc`/`Ctrl+C` to cancel). CI / piped input automatically falls back to the numbered prompt.
+- **Arrow-key menu navigation** for the domain and agent prompts in real terminals (`↑/↓` or `j/k` to move, `a-z` to jump, `Enter` to select, `Esc`/`Ctrl+C` to cancel). CI / piped input automatically falls back to a numbered prompt.
 - **Re-prompt on invalid input** instead of crashing on the first typo. Three attempts before aborting, so a piped input can't infinite-loop.
 - **`AGENTS.md` is merged on re-init**, not overwritten. Pipeline Status edits, Key Constraints, Open Questions, and any user notes outside the managed block are preserved byte-for-byte. See [docs/USAGE.md §8](docs/USAGE.md#8-agentsmd--persistent-project-context).
 - **Native Cursor and Windsurf skills** at `.cursor/skills/` and `.windsurf/skills/` — finally registered as actual Agent Skills instead of `.mdc` rules. v2.x users: see the v3.0 migration recipe in [CHANGELOG.md](CHANGELOG.md).
