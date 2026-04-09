@@ -9,42 +9,63 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [3.0.0] — 2026-04-09
+
+### ⚠️ BREAKING — Cursor and Windsurf install paths moved to native Agent Skills
+
+Cursor and Windsurf both have **two separate features**: Rules (`.cursor/rules/*.mdc`, `.windsurf/rules/*.mdc`) and Agent Skills (`.cursor/skills/<skill>/SKILL.md`, `.windsurf/skills/<skill>/SKILL.md`). BA Toolkit is a pipeline of skills, not rules, but every previous version installed it as `.mdc` rules under `.cursor/rules/` and `.windsurf/rules/`. Both editors loaded those files as **rules**, never as skills, so `/brief`, `/srs`, … slash commands were never registered with the agent. Users reported that the skills did not show up. v3.0 fixes this by switching to the native Agent Skills paths and the native folder-per-skill `SKILL.md` layout (the same one Claude Code, Codex CLI, and Gemini CLI use). Confirmed against the official Cursor and Windsurf documentation via ctx7 MCP:
+
+| Agent | v2.0 path (broken) | v3.0 path (correct) | Format |
+|---|---|---|---|
+| Cursor | `.cursor/rules/<skill>.mdc` (flat) | `.cursor/skills/<skill>/SKILL.md` (folder-per-skill) | Native |
+| Windsurf | `.windsurf/rules/<skill>.mdc` (flat) | `.windsurf/skills/<skill>/SKILL.md` (folder-per-skill) | Native |
+
+**Migration for v2.0 Cursor/Windsurf users:**
+
+```bash
+# 1. Upgrade the package
+npm install -g @kudusov.takhir/ba-toolkit@latest
+
+# 2. Reinstall — the old install was at the wrong path; upgrade can't find
+#    its manifest there, so just run install fresh against the correct path.
+ba-toolkit install --for cursor      # writes to .cursor/skills/
+ba-toolkit install --for windsurf    # writes to .windsurf/skills/
+
+# 3. Manually clean up the orphaned old install (it never actually worked
+#    as skills anyway — Cursor/Windsurf were loading it as rules):
+rm -rf .cursor/rules/*.mdc           # if those .mdc files came from BA Toolkit
+rm -rf .windsurf/rules/*.mdc
+```
+
+After this you'll see the BA Toolkit skills register as actual Agent Skills in Cursor and Windsurf for the first time — `/brief`, `/srs`, `/ac`, `/nfr`, … become real slash commands. Reload the editor window after install. Claude Code, Codex CLI, and Gemini CLI users are unaffected — their paths and behavior are unchanged.
+
 ### Added
 
-- **Arrow-key menu navigation in `ba-toolkit init`** for the domain and agent selection prompts. Real terminals now get an interactive menu — `↑/↓` (also `j/k`) to move, `1-9` to jump by index, `Enter` to confirm, `Esc` or `Ctrl+C` to cancel cleanly with exit code 130. The previous numbered prompt is the automatic fallback when stdin/stdout is not a TTY (CI, piped input, `TERM=dumb`, IDE shells), so all CI/integration tests, the `printf | ba-toolkit init` use case, and the test gate keep working unchanged. Cross-platform via Node's `readline.emitKeypressEvents` + `setRawMode` — works the same on bash, zsh, fish, Windows Terminal (PowerShell, cmd, WSL), Git Bash, and VSCode integrated terminal. Implementation split into three layers for testability: `menuStep(state, key)` — pure state machine, 11 unit tests covering up/down/wrap-around/enter/cancel/digit-jump/no-op-after-done/empty-list; `renderMenu(state, opts)` — pure renderer, 7 unit tests covering title, item enumeration, selected-marker placement, descriptions, keyboard help line, trailing newline, no-title path; and `runMenuTty` — the I/O glue, manually smoke-tested.
-- **Interview Protocol for every interview-phase skill** (`skills/references/interview-protocol.md`). Codifies the rule that AI skills must ask ONE question at a time, offer 3–5 domain-appropriate options per question sourced from `references/domains/{domain}.md`, always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question. Replaces the previous "dump a numbered questionnaire of 5+ questions at once" style that made users abandon long interviews. Every shipped SKILL.md with an `Interview` heading — 12 files: `brief`, `srs`, `stories`, `usecases`, `ac`, `nfr`, `datadict`, `apicontract`, `wireframes`, `scenarios`, `research`, `principles` — now opens its Interview section with a blockquote pointing to this protocol. A Node-level regression test (`test/cli.test.js`) walks every shipped SKILL.md and fails if any interview skill ever ships without the protocol link; a mirror validation step in `.github/workflows/validate.yml` catches the same at PR time.
-
-### Fixed
-
-- **`ba-toolkit init` no longer crashes on a single typo during interactive input.** The domain menu, agent menu, and manual slug entry now re-prompt on invalid input via a new `promptUntilValid(question, resolver, { maxAttempts, invalidMessage })` helper. After three consecutive invalid answers the command aborts with a clear "Too many invalid attempts — aborting." message so piped input can't infinite-loop. The flag-path (`--domain=banana`, `--for=vim`) still hard-fails immediately — that's the correct behavior for CI and scripting, and its tests are untouched.
-- **Fixed a `prompt()` race condition that silently dropped piped input lines.** The previous implementation used `rl.question()` on a shared `readline.Interface`; when stdin was piped with multiple answers at once (e.g. `printf "banana\nsaas\n" | ba-toolkit init`, or any test feeding a full input buffer via `spawnSync`), readline emitted `'line'` events before the next `question()` handler had been attached, and those answers were silently lost. The second prompt then saw EOF and aborted with `INPUT_CLOSED` despite the answer being in the buffer. The new `prompt()` owns the `'line'` event directly, buffers arriving lines into an internal `lineQueue`, and parks `waiters` when the queue is empty — no more lost input. Uncovered while wiring up the `promptUntilValid` retry path: the retry integration test would have passed a fake answer on attempt 2 that never reached the CLI under the old prompt implementation.
+- **Integration test suite for every CLI subcommand** (`test/cli.integration.test.js`, 33 tests). Spawns the real CLI as a child process against temporary directories and asserts exit codes, stdout/stderr content, and filesystem state. Covers `--version`/`--help`/no-args, typo detection for unknown flags, `init` with flag combinations and validation failures, `install`/`upgrade`/`uninstall` dry-runs for every supported agent, end-to-end install → manifest → status → upgrade → uninstall round-trips for both Claude Code and Cursor (native skill format), and a regression guard proving that `uninstall` leaves the user's own unrelated skills in the shared destination untouched (manifest-driven removal guarantee).
+- **Test gate in `.github/workflows/release.yml`**. A new `Run tests` step runs `npm test` between the smoke test and the npm publish step — if any unit or integration test fails, the `publish-npm` job exits before the classic-auth strip + publish steps, and no broken release reaches npm. The GitHub Release created by the preceding job still happens; npm and GitHub are intentionally independent.
+- **Test job in `.github/workflows/validate.yml`**. A new `run-tests` job mirrors the release gate at PR time, so regressions are caught on the PR instead of at tag push. Triggered for changes under `bin/**`, `test/**`, `skills/**`, `output/**`, or `package.json`.
+- **ASCII banner at the top of `ba-toolkit init`**. Decorative `ba-toolkit` wordmark printed before the "New Project Setup" heading. Suppressed on non-TTY stdout (CI logs, piped output, captured test stdout) via an `isTTY` guard in `printBanner()`, so the banner never pollutes automation. Covered by a regression test that asserts the banner glyphs don't appear in non-TTY runs.
+- **Arrow-key menu navigation in `ba-toolkit init`** for the domain and agent selection prompts. Real terminals now get an interactive menu — `↑/↓` (also `j/k`) to move, `1-9` to jump by index, `Enter` to confirm, `Esc` or `Ctrl+C` to cancel cleanly with exit code 130. The previous numbered prompt is the automatic fallback when stdin/stdout is not a TTY (CI, piped input, `TERM=dumb`, IDE shells), so all CI/integration tests and the `printf | ba-toolkit init` use case keep working unchanged. Cross-platform via Node's `readline.emitKeypressEvents` + `setRawMode` — works the same on bash, zsh, fish, Windows Terminal (PowerShell, cmd, WSL), Git Bash, and VSCode integrated terminal. Three-layer design for testability: `menuStep(state, key)` — pure state machine, 11 unit tests; `renderMenu(state, opts)` — pure renderer, 7 unit tests; `runMenuTty` — the I/O glue, manually smoke-tested.
+- **Interview Protocol for every interview-phase skill** (`skills/references/interview-protocol.md`). Codifies the rule that AI skills must ask ONE question at a time, offer 3–5 domain-appropriate options per question sourced from `references/domains/{domain}.md`, always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question. Replaces the previous "dump a numbered questionnaire of 5+ questions at once" style that made users abandon long interviews. Every shipped SKILL.md with an `Interview` heading — 12 files: `brief`, `srs`, `stories`, `usecases`, `ac`, `nfr`, `datadict`, `apicontract`, `wireframes`, `scenarios`, `research`, `principles` — now opens its Interview section with a blockquote pointing to this protocol. A Node-level regression test in `test/cli.test.js` walks every shipped SKILL.md and fails if any interview skill ever ships without the protocol link; a mirror validation step in `.github/workflows/validate.yml` catches the same at PR time.
 
 ### Changed
 
 - **`ba-toolkit init` now merges `AGENTS.md` instead of overwriting it.** The `agents-template.md` wraps the Active Project block (name/slug/domain/date) in `<!-- ba-toolkit:begin managed -->` / `<!-- ba-toolkit:end managed -->` anchors. On re-init, only the managed block is refreshed — Pipeline Status edits, Key Constraints, Open Questions, user notes, and anything else outside the anchors is preserved byte-for-byte. If an existing `AGENTS.md` has no anchors (legacy file or fully user-authored), it's left untouched and a `preserved` note is printed instead of overwriting. The old interactive "AGENTS.md already exists. Overwrite? (y/N)" prompt is removed — the merge is always safe. New pure helper `mergeAgentsMd(existing, ctx)` exported from `bin/ba-toolkit.js` with unit tests covering all three branches (`created`, `merged`, `preserved`) plus malformed-anchor edge cases; integration tests verify the double-init scenario and the unmanaged-file preservation.
+- `npm test` now runs both the pre-existing unit suite (`test/cli.test.js`) and the new integration suite — 154 tests total, ~2 seconds, still zero dependencies (only Node built-ins: `node:test`, `node:assert`, `node:child_process`).
+- `.gitignore` now excludes `.claude/settings.local.json` and `.claude/skills/` — local Claude Code state, never part of the package. `settings.local.json` was previously tracked and required a stash dance around `npm version`; that workaround is no longer needed.
 
 ### Fixed
 
-- **Windsurf install now targets `.windsurf/skills/` with native SKILL.md format, not `.windsurf/rules/` with `.mdc` conversion.** Mirror of the Cursor fix above. Confirmed against the [Windsurf Agent Skills documentation](https://docs.windsurf.com/windsurf/cascade/skills) via ctx7 MCP: Windsurf loads skills from `.windsurf/skills/<skill-name>/SKILL.md` as folder-per-skill with the same YAML frontmatter (`name`, `description`) as Claude Code and Cursor. `AGENTS.windsurf` is now `{ projectPath: '.windsurf/skills' }` and the `format` field is gone (see Removed). New e2e integration test for Windsurf install → uninstall round-trip mirrors the Cursor one.
+- **Cursor install now targets `.cursor/skills/` with native SKILL.md format, not `.cursor/rules/` with `.mdc` conversion.** See the BREAKING section above for the full story and migration steps.
+- **Windsurf install now targets `.windsurf/skills/` with native SKILL.md format, not `.windsurf/rules/` with `.mdc` conversion.** Mirror of the Cursor fix. Confirmed against the [Windsurf Agent Skills documentation](https://docs.windsurf.com/windsurf/cascade/skills) via ctx7 MCP: Windsurf loads skills from `.windsurf/skills/<skill-name>/SKILL.md` as folder-per-skill with the same YAML frontmatter (`name`, `description`) as Claude Code and Cursor.
+- **`ba-toolkit init` no longer crashes on a single typo during interactive input.** The domain menu, agent menu, and manual slug entry now re-prompt on invalid input via a new `promptUntilValid(question, resolver, { maxAttempts, invalidMessage })` helper. After three consecutive invalid answers the command aborts with a clear "Too many invalid attempts — aborting." message so piped input can't infinite-loop. The flag-path (`--domain=banana`, `--for=vim`) still hard-fails immediately — that's the correct behavior for CI and scripting, and its tests are untouched.
+- **`prompt()` race condition that silently dropped piped input lines.** The previous implementation used `rl.question()` on a shared `readline.Interface`; when stdin was piped with multiple answers at once (e.g. `printf "banana\nsaas\n" | ba-toolkit init`, or any test feeding a full input buffer via `spawnSync`), readline emitted `'line'` events before the next `question()` handler had been attached, and those answers were silently lost. The second prompt then saw EOF and aborted with `INPUT_CLOSED` despite the answer being in the buffer. The new `prompt()` owns the `'line'` event directly, buffers arriving lines into an internal `lineQueue`, and parks `waiters` when the queue is empty — no more lost input. Uncovered while wiring up the `promptUntilValid` retry path.
 
 ### Removed
 
-- **`.mdc` rule format support is gone** — every shipped agent now uses native Agent Skills, so the conversion path is dead code. Deleted: `skillToMdcContent()` (and its 2 unit tests), the `mdc` branch of `copySkills()`, the `format` field on every entry in `AGENTS`, the `format` parameter passed to `copySkills` and `writeManifest`, the runtime "format: .mdc (converted from SKILL.md)" log line. The `format` field is also gone from new manifests, but `readManifest` still parses legacy manifests that have it (covered by a forward-compat unit test). Net removal: ~80 lines of code + 2 unit tests; CLI surface unchanged.
-
-### Fixed
-
-- **Cursor install now targets `.cursor/skills/` with native SKILL.md format, not `.cursor/rules/` with `.mdc` conversion.** Cursor has two separate features — Rules (`.cursor/rules/*.mdc`) and [Agent Skills](https://cursor.com/docs/skills) (`.cursor/skills/<skill>/SKILL.md`). BA Toolkit is a pipeline of skills, not rules, so previous installs landed in the wrong feature entirely: skills were interpreted as rules, the `/brief`, `/srs`, … slash commands were never registered with Cursor's agent, and users reported that the skills did not show up. `AGENTS.cursor` is now `{ projectPath: '.cursor/skills', format: 'skill', ... }`. Cursor installs use the same folder-per-skill layout as Claude Code (`.cursor/skills/<skill-name>/SKILL.md`), and `skillToMdcContent` is no longer invoked for Cursor. Integration tests rewritten against the new layout; README updated. Confirmed against the Cursor Agent Skills documentation via ctx7 MCP. (Windsurf has the same architectural mismatch — its Agent Skills feature also expects `.windsurf/skills/<skill>/SKILL.md` per the Windsurf docs — but the fix is tracked separately; this change touches Cursor only.)
-
-### Added
-
-- **ASCII banner at the top of `ba-toolkit init`**. Decorative `ba-toolkit` wordmark printed before the "New Project Setup" heading. Suppressed on non-TTY stdout (CI logs, piped output, captured test stdout) via an `isTTY` guard in `printBanner()`, so the banner never pollutes automation. Covered by a regression test that asserts the banner glyphs don't appear in non-TTY runs.
-- **Integration test suite for every CLI subcommand** (`test/cli.integration.test.js`, 31 tests). Spawns the real CLI as a child process against temporary directories and asserts exit codes, stdout/stderr content, and filesystem state. Covers `--version`/`--help`/no-args, typo detection for unknown flags, `init` with flag combinations and validation failures, `install`/`upgrade`/`uninstall` dry-runs for every supported agent, an end-to-end install → manifest → status → upgrade → uninstall round-trip for both `skill` and `mdc` formats, and a regression guard proving that `uninstall` leaves the user's own unrelated skills in the shared destination untouched (manifest-driven removal guarantee).
-- **Test gate in `.github/workflows/release.yml`**. A new `Run tests` step runs `npm test` between the smoke test and the npm publish step — if any unit or integration test fails, the `publish-npm` job exits before the classic-auth strip + publish steps, and no broken release reaches npm. The GitHub Release created by the preceding job still happens; npm and GitHub are intentionally independent (CHANGELOG already documents version gaps like v1.2.1–v1.2.3).
-- **Test job in `.github/workflows/validate.yml`**. A new `run-tests` job mirrors the release gate at PR time, so regressions are caught on the PR instead of at tag push. Triggered for changes under `bin/**`, `test/**`, `skills/**`, `output/**`, or `package.json`.
-
-### Changed
-
-- `npm test` now runs both the pre-existing unit suite (`test/cli.test.js`) and the new integration suite. Still zero dependencies — only Node built-ins (`node:test`, `node:assert`, `node:child_process`).
+- **`.mdc` rule format conversion path is gone** — every shipped agent now uses native Agent Skills, so the conversion was dead code. Deleted: `skillToMdcContent()` (and its 2 unit tests), the `mdc` branch of `copySkills()`, the `format` field on every entry in `AGENTS`, the `format` parameter passed to `copySkills` and `writeManifest`, the runtime "format: .mdc (converted from SKILL.md)" log line. The `format` field is also gone from new manifests, but `readManifest` still parses legacy manifests that have it (covered by a forward-compat unit test). Net removal: ~80 lines of code + 2 unit tests; CLI surface unchanged.
 
 ---
 
@@ -387,7 +408,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.0.0...HEAD
+[3.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.5.0...v2.0.0
 [1.5.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.3.2...v1.4.0
