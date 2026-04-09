@@ -9,6 +9,10 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [3.3.0] — 2026-04-09
+
 ### Added
 
 - **Three new domain references — EdTech, GovTech, AI / ML.** The shipped domain catalog grows from 9 to 12 first-class industries, in addition to the `custom` fallback. Each new file (`skills/references/domains/edtech.md`, `govtech.md`, `ai-ml.md`) follows the established 9-section structure (one section per pipeline interview-phase skill: `/brief`, `/srs`, `/stories`, `/usecases`, `/ac`, `/nfr`, `/datadict`, `/apicontract`, `/wireframes`) plus a domain-specific glossary, and matches the depth of the existing references (~250 lines each). New entries appear in the `DOMAINS` array in `bin/ba-toolkit.js`, the `currently:` enumeration in `skills/brief/SKILL.md` and `skills/srs/SKILL.md`, the brief artifact-template `Domain:` line, the README intro / domain-table / badge, and the canonical domain-order rule in `CLAUDE.md` §5. **EdTech** covers K-12 platforms, higher-ed tools, MOOC marketplaces, corporate L&D, language learning, exam prep, and micro-credential platforms — with FERPA / COPPA / GDPR-K / Section 508 / WCAG, LTI / SCORM / xAPI / OneRoster / Clever rostering, and cohort-management mechanics baked in. **GovTech** covers citizen-facing e-services, permits and licensing, tax filing, benefits, public records / FOIA, court e-filing, and 311 — with national-digital-ID brokering (Login.gov / BankID / ItsMe / eIDAS), FedRAMP / StateRAMP / FISMA / CJIS / IRS Pub 1075 / Section 508 / EN 301 549 / plain-language and records-retention obligations. **AI / ML** covers LLM-powered apps, RAG pipelines, agent frameworks, model-serving and inference, fine-tuning, evals, and embedded AI features — with prompt-injection defence, hallucination metrics, eval regressions, model fallback, EU AI Act / NIST AI RMF / ISO 42001 risk classification, cost / token quotas, and RAG / vector-store data modelling. Skills are auto-discovered, so no CLI registration changes are needed beyond the `DOMAINS` array entry.
@@ -479,7 +483,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.2.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.3.0...HEAD
+[3.3.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.0.0...v3.1.0
