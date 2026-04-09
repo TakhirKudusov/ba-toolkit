@@ -27,9 +27,9 @@ If `01_brief_*.md` already exists in the same output directory, the project has 
 
 ### 3. Domain catalog
 
-The 9 supported domain references live in `references/domains/` (`saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`). Discovery does **not** load a single domain reference up front — instead, it offers a shortlist of candidate domains during the interview and lets the user pick one. The chosen domain is recorded in section 8 of the artifact and becomes the working domain for `/brief`.
+The 12 supported domain references live in `references/domains/` (`saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`, `edtech`, `govtech`, `ai-ml`). Discovery does **not** load a single domain reference up front — instead, it offers a shortlist of candidate domains during the interview and lets the user pick one. The chosen domain is recorded in section 8 of the artifact and becomes the working domain for `/brief`.
 
-If none of the 9 fits, record the recommended domain as `custom:{name}` and let `/brief` continue with general questions only.
+If none of the 12 fits, record the recommended domain as `custom:{name}` and let `/brief` continue with general questions only.
 
 ### 4. Interview
 
@@ -44,7 +44,7 @@ Cover 5–7 topics in 2 rounds. Do not generate the artifact until you can recom
 **Required topics:**
 1. Problem space — what pain point, gap, or opportunity is being explored.
 2. Target audience hypothesis — 1–2 candidate user segments, as concrete as possible.
-3. Domain shortlist — narrow to 1 of the 9 supported domains (or `custom`) with a one-line rationale; mark one row **Recommended** based on the problem/audience answers so far.
+3. Domain shortlist — narrow to 1 of the 12 supported domains (or `custom`) with a one-line rationale; mark one row **Recommended** based on the problem/audience answers so far.
 4. Reference products and analogues — what already exists in this space (3–5 examples), and what's missing or done badly.
 5. MVP feature hypotheses — 5–10 candidate features for a first version. Bullet list, not committed scope.
 6. Differentiation angle — why this idea would beat the existing analogues (one or two sentences).

@@ -91,7 +91,7 @@ Overall navigation structure: sections, hierarchy, transitions.
 - `/split [WF-NNN]` — extract modals etc.
 - `/clarify [focus]` — targeted ambiguity pass.
 - `/validate` — all Must-US have a screen; API links correct; 4 states described; navigation connected.
-- `/done` — pipeline complete. Suggest running `/trace`.
+- `/done` — finalize and move to the next pipeline step.
 
 ## Closing message
 
@@ -104,7 +104,7 @@ After saving the artifact, present the following summary to the user (see `refer
 
 Available commands: `/clarify [focus]` · `/revise [WF-NNN]` · `/expand [WF-NNN]` · `/split [WF-NNN]` · `/validate` · `/done`
 
-Pipeline complete. Run `/trace` to check full coverage or `/analyze` for a cross-artifact quality report.
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (look up the row where `Current` is `/wireframes`). Do not hardcode the next step here — that table is the single source of truth.
 
 ## Style
 

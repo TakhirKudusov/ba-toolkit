@@ -11,6 +11,19 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.4.1] — 2026-04-09
+
+### Fixed
+
+- **Content-hygiene audit pass after the v3.4.0 ship.** Five drift / staleness fixes flagged by a cross-file consistency check, all behaviour-neutral:
+  - **`skills/references/interview-protocol.md` "When this protocol applies"** — the enumerated list of interview-phase skills had drifted out of sync. `/discovery` (added in v3.2.0 with a literal `### 4. Interview` heading) was missing from the canonical list. Reordered the list to match the actual pipeline order (`discovery → principles → brief → srs → …`) and added `/discovery` to rule 8's "entry-point skills" sub-list alongside `/brief` and `/principles`. Added a follow-up paragraph documenting that `/publish` and `/implement-plan` also follow the protocol via differently-named sections (`### Format selection` and embedded calibration interview inside `### Tech stack resolution` respectively) — the existing `interview-protocol-link` regression test only matches a literal `Interview` heading, so these two skills are not auto-enforced and have to be kept in sync by hand.
+  - **`skills/discovery/SKILL.md` domain count** — two locations (the "Domain catalog" paragraph and required-topic 3) said "9 supported domain references" with the pre-v3.3.0 enumeration. Bumped to 12 and added the `edtech`, `govtech`, `ai-ml` references that shipped in v3.3.0.
+  - **`skills/wireframes/SKILL.md` closing message** — two places hardcoded "Pipeline complete" against the v3.1.0 single-source-of-truth rule (the `/done` description and the trailing line under "Available commands"). Wireframes is stage 9, not the terminal stage. Replaced with the standard "Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md`" instruction every other pipeline-stage skill uses.
+  - **`skills/scenarios/SKILL.md` closing message** — same pattern: hardcoded "Pipeline complete. Proceed to `/handoff`" line that bypassed the lookup table and was logically self-contradictory ("complete" + "proceed"). Replaced with the standard delegation. Existing `closing-message.md` lookup table already had the correct row, so the user-facing behaviour was already right when an AI agent followed the rules — the fix is purely about bringing the SKILL.md text into the same single-source-of-truth pattern.
+- **Existing regression tests still pass without modification** — the new `interview-protocol-link`, `closing-message-link`, `Recommended marker`, `5-rows-cap`, frontmatter parser, and skill-folder-count tests all auto-cover the edits since none of them changed the public surface area or the literal patterns the tests look for. 188/188 still green.
+
+---
+
 ## [3.4.0] — 2026-04-09
 
 ### Added
@@ -498,7 +511,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.1...HEAD
+[3.4.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.0...v3.4.1
 [3.4.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.1...v3.2.0

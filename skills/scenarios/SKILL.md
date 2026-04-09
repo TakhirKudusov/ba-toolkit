@@ -110,7 +110,7 @@ After saving the artifact, present the following summary (see `references/closin
 
 Available commands: `/clarify [focus]` · `/revise [SC-NNN]` · `/expand [SC-NNN]` · `/split [SC-NNN]` · `/validate` · `/done`
 
-Pipeline complete. Proceed to `/handoff` to package all artifacts for development.
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (look up the row where `Current` is `/scenarios`). Do not hardcode the next step here — that table is the single source of truth.
 
 ## Style
 
