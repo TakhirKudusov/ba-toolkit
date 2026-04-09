@@ -312,6 +312,12 @@ Answers to common questions — language support, offline use, custom domains, e
 
 ---
 
+## Roadmap
+
+What is currently in flight, what is planned next, what is explicitly out of scope, and the rationale for ideas that were considered and rejected — all in [ROADMAP.md](ROADMAP.md). The roadmap is the single source of truth for the next-shipping list and the project's known limitations.
+
+---
+
 ## Contributing
 
 New domains and skill improvements are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the PR workflow, and [docs/DOMAINS.md](docs/DOMAINS.md) for the domain file template.

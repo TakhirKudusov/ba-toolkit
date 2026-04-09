@@ -11,6 +11,15 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.9.0] — 2026-04-10
+
+### Added
+
+- **`ROADMAP.md` — single source of truth for the next-shipping list, known limitations, and explicitly-rejected ideas with rationale.** New top-level document at the repo root, linked from the README. Sections: Mission (polished from `CLAUDE.md` §1), Now (currently empty after the v3.8.1 release), Next (the upcoming items grouped by Documentation and reach / Quality and maintenance / New skills), Known limitations (eight explicit scope boundaries — does not generate code, does not validate code, does not handle secrets, does not collect telemetry, does not support agents without native skills, does not enforce a testing methodology, does not auto-translate, does not maintain a project after handoff), Removed from the backlog (full inline rationale for the four ideas considered and rejected: MCP server, slash command rename, use-case-compliance validator, dedicated TDD-test-generation skill), Recently shipped (table of the last eight releases), Versioning policy (a paraphrase of the SemVer rules from `CLAUDE.md` §6), and Contributing to the roadmap (concrete pathways for proposing new items, contesting "Removed" decisions, contributing domain references). The roadmap is intentionally **commitment-only** — no Wishlist section, no Later-aspirational, no speculation. Items move from Next into Now as they enter active work and into Recently shipped once they ship. Replaces scattered backlog mentions in `todo.md` for the public-facing audience.
+- **README gains a new "Roadmap" section** linking to `ROADMAP.md`. Slotted between FAQ and Contributing so a first-time reader can find the project's plans without leaving the README.
+
+---
+
 ## [3.8.1] — 2026-04-10
 
 ### Fixed
@@ -706,7 +715,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.1...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.9.0...HEAD
+[3.9.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.1...v3.9.0
 [3.8.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.0...v3.8.1
 [3.8.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.6.0...v3.7.0
