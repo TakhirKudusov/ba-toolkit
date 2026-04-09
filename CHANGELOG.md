@@ -9,6 +9,10 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [3.4.0] — 2026-04-09
+
 ### Added
 
 - **New `/implement-plan` skill — sequenced implementation plan for AI coding agents.** New stage 12 of the BA Toolkit pipeline, runs after `/handoff` and produces `12_implplan_{slug}.md`. Reads every prior pipeline artifact and emits a phase-by-phase plus DAG-by-task plan an AI coding agent (Claude Code, Cursor, Codex) can execute step by step. **Phase ladder** is the canonical 9 phases — Foundation → Data Layer → Auth & Identity → Core Domain → API Surface → UI / Wireframes → Integrations → Quality & NFRs → Validation & Launch Prep — with phases that have no tasks for the current project automatically dropped (e.g. UI for a CLI tool). **Each task** is atomic (30–120 min), has an id `T-<phase>-<seq>`, an imperative title, an explicit `dependsOn` list, at least one `references` id back to the BA artifacts (`FR-NNN`, `US-NNN`, `AC-NNN-NN`, `Entity:Name`, `Endpoint: METHOD /path`, `WF-NNN`, `SC-NNN`), an optional `files` list of paths to create or modify, and a `definitionOfDone` checklist pulled from the linked AC where possible. **Tech stack** is resolved with priority order: (1) parsed from `07a_research_{slug}.md` if `/research` was run; (2) short calibration interview (frontend / backend / database / hosting / auth / mandatory integrations) following the standard interview-protocol rules; (3) `[TBD: <slot>]` placeholder if neither yields a value, with a matching row in the new "Open Assumptions" section telling the AI agent to stop and ask before touching that slot. **Output** carries a Tech Stack header, "How to use this plan (for AI coding agents)" instructions, the per-phase task list, an "Open Assumptions" section, and a Task DAG appendix as a markdown table that a topo-sort can traverse. Per-phase merge on rerun via `/revise [phase]` (mirror of `/sprint`'s per-sprint merge). Includes the standard `/clarify`, `/expand`, `/validate`, `/done` subcommands. AGENTS.md migration: if an existing project predates v3.4 and has no row 12, the skill appends one and reports the migration in its reply.
@@ -494,7 +498,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.3.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.0...HEAD
+[3.4.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.2.0...v3.3.0
 [3.2.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.0...v3.1.1
