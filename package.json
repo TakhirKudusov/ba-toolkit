@@ -1,6 +1,6 @@
 {
   "name": "@kudusov.takhir/ba-toolkit",
-  "version": "3.2.0",
+  "version": "3.3.0",
   "description": "AI-powered Business Analyst pipeline — 23 skills from concept discovery to development handoff, with one-command Notion + Confluence publish. Works with Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf.",
   "keywords": [
     "business-analyst",
