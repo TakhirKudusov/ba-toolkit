@@ -10,7 +10,7 @@ Yes. The agent detects the language of your first message and generates all arti
 Yes. All skills are local Markdown files. The only network dependency is your AI agent itself (Claude Code, Codex CLI, etc.). No BA Toolkit component calls any external API.
 
 **My domain isn't SaaS, Fintech, or E-commerce — can I still use it?**
-Yes. Select "Custom" at `/brief` and the skills use general interview questions. You can add your own domain in 30 minutes by creating one Markdown file — see [DOMAINS.md](DOMAINS.md).
+Yes. Select "Custom" at `ba-toolkit init` (or pass `--domain custom`) and the skills use general interview questions. You can add your own domain in 30 minutes by creating one Markdown file — see [DOMAINS.md](DOMAINS.md).
 
 **Can I go back and edit a previous artifact?**
 Yes. Run `/revise [section]` at any step, or re-invoke the skill command (e.g., `/srs`) to regenerate from scratch. The agent warns before overwriting. Subsequent skills will read the updated version automatically.

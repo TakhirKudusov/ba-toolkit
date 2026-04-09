@@ -11,7 +11,7 @@ Run these in order. Each skill reads the output of all previous steps.
 | # | Command | Output file | What it generates |
 |:---:|---------|-------------|-------------------|
 | 0 | `/principles` | `00_principles_{slug}.md` | Project constitution: language, ID conventions, DoR, traceability rules, NFR baseline |
-| 1 | `/brief` | `01_brief_{slug}.md` | Project Brief: goals, audience, stakeholders, constraints, risks. Creates `AGENTS.md` |
+| 1 | `/brief` | `01_brief_{slug}.md` | Project Brief: goals, audience, stakeholders, constraints, risks. Updates the `AGENTS.md` Pipeline Status table (which `ba-toolkit init` already created) |
 | 2 | `/srs` | `02_srs_{slug}.md` | Requirements Specification (IEEE 830): scope, FRs, constraints, assumptions |
 | 3 | `/stories` | `03_stories_{slug}.md` | User Stories grouped by Epics, with priority and FR references |
 | 4 | `/usecases` | `04_usecases_{slug}.md` | Use Cases with main, alternative, and exception flows |

@@ -1,6 +1,6 @@
 # Adding a new domain
 
-Domain references live in `skills/references/domains/` — one Markdown file per domain, loaded automatically when `/brief` detects a matching domain name. Each skill reads **only its own section** from the reference file, keeping context usage efficient.
+Domain references live in `skills/references/domains/` — one Markdown file per domain, loaded automatically by interview-phase skills based on the domain you picked at `ba-toolkit init` (which writes it into `AGENTS.md`). Each skill reads **only its own section** from the reference file, keeping context usage efficient.
 
 ## File structure
 
@@ -36,7 +36,7 @@ Create `skills/references/domains/{domain}.md` following this layout:
 
 ## Naming
 
-Use a single lowercase slug with hyphens — `igaming`, `fintech`, `on-demand`, `real-estate`. The filename must match the slug used at `/brief` exactly; mismatches cause the reference to silently not load.
+Use a single lowercase slug with hyphens — `igaming`, `fintech`, `on-demand`, `real-estate`. The filename must match the domain id passed to `ba-toolkit init` (or selected from the domain menu) exactly; mismatches cause the reference to silently not load. To register a new domain in the `init` menu, also add it to the `DOMAINS` array in `bin/ba-toolkit.js`.
 
 ## Contributing
 
