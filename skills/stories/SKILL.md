@@ -80,9 +80,9 @@ After saving the artifact, present the following summary to the user (see `refer
 - Count of Must-priority FR covered.
 - Any stories flagged for `/split` due to complexity.
 
-Available commands: `/clarify [focus]` · `/revise [US-NNN]` · `/expand [US-NNN]` · `/split [US-NNN]` · `/validate` · `/done`
+Available commands for this artifact: `/clarify [focus]` · `/revise [US-NNN]` · `/expand [US-NNN]` · `/split [US-NNN]` · `/validate` · `/done`
 
-Next step: `/usecases`
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (row `Current = /stories`). Do not hardcode `/usecases` here.
 
 ## Style
 

@@ -93,9 +93,9 @@ After saving the artifact, present the following summary to the user (see `refer
 - DBMS chosen and naming convention confirmed.
 - Entities flagged for audit trail or versioning.
 
-Available commands: `/clarify [focus]` · `/revise [entity]` · `/expand [entity]` · `/split [entity]` · `/validate` · `/done`
+Available commands for this artifact: `/clarify [focus]` · `/revise [entity]` · `/expand [entity]` · `/split [entity]` · `/validate` · `/done`
 
-Next step: `/apicontract`
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (row `Current = /datadict`). Do not hardcode `/research` (or `/apicontract` if research is skipped) here — the lookup table is the canonical source.
 
 ## Style
 

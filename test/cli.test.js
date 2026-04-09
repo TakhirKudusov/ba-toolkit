@@ -519,6 +519,62 @@ test('closestMatch: empty input → null', () => {
   assert.equal(closestMatch('', [...KNOWN_FLAGS]), null);
 });
 
+test('closing message: every SKILL.md references the closing-message.md template', () => {
+  // Regression guard for the "use the lookup table, do not hardcode
+  // next-step" rule. Walks every shipped SKILL.md and asserts that it
+  // points at references/closing-message.md (which holds the canonical
+  // closing-block format and the pipeline next-step lookup table).
+  // Catches a future skill that ships its own roll-your-own closing
+  // block — that block would silently bypass the lookup table and
+  // re-introduce the kind of next-step drift the table was meant to
+  // eliminate.
+  const skillsDir = path.join(__dirname, '..', 'skills');
+  const closingPath = path.join(skillsDir, 'references', 'closing-message.md');
+  assert.ok(fs.existsSync(closingPath), 'closing-message.md must exist in skills/references/');
+
+  const skillFolders = fs.readdirSync(skillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && e.name !== 'references')
+    .map((e) => e.name);
+  const offenders = [];
+  for (const folder of skillFolders) {
+    const skillPath = path.join(skillsDir, folder, 'SKILL.md');
+    if (!fs.existsSync(skillPath)) continue;
+    const content = fs.readFileSync(skillPath, 'utf8');
+    if (!content.includes('closing-message.md')) {
+      offenders.push(folder);
+    }
+  }
+  assert.deepEqual(offenders, [], `skills with no closing-message.md reference: ${offenders.join(', ')}`);
+});
+
+test('closing message: no SKILL.md hardcodes a next-step line', () => {
+  // The pipeline next-step lookup table in closing-message.md is the
+  // single source of truth for what comes after each skill. SKILL.md
+  // files should NEVER ship a hardcoded `Next step: /xxx` line — that
+  // would silently override the table and cause drift on pipeline
+  // reorganisations. The closing-message.md template itself is allowed
+  // to use the placeholder `Next step: /{next_command}` because that's
+  // the documentation of the format, not an actual hardcoded value.
+  const skillsDir = path.join(__dirname, '..', 'skills');
+  const skillFolders = fs.readdirSync(skillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && e.name !== 'references')
+    .map((e) => e.name);
+  // Match `Next step:` followed by an actual slash command (not a
+  // placeholder like `/{next_command}`). Allow `Next step: (none)`
+  // for /handoff which has no next.
+  const hardcodedRe = /^Next step: `?\/[a-z]/m;
+  const offenders = [];
+  for (const folder of skillFolders) {
+    const skillPath = path.join(skillsDir, folder, 'SKILL.md');
+    if (!fs.existsSync(skillPath)) continue;
+    const content = fs.readFileSync(skillPath, 'utf8');
+    if (hardcodedRe.test(content)) {
+      offenders.push(folder);
+    }
+  }
+  assert.deepEqual(offenders, [], `skills hardcoding a Next step line: ${offenders.join(', ')}`);
+});
+
 test('interview protocol: every SKILL.md with an Interview section references the protocol file', () => {
   // Regression guard for the "ask one question at a time + 3–5 options"
   // rule. Walks every shipped SKILL.md, checks whether it has an

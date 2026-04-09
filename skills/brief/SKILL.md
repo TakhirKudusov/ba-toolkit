@@ -98,9 +98,9 @@ After saving the artifact, present the following summary to the user (see `refer
 - Count of business goals documented and key constraints captured.
 - List of identified risks.
 
-Available commands: `/clarify [focus]` · `/revise [section]` · `/expand [section]` · `/validate` · `/done`
+Available commands for this artifact: `/clarify [focus]` · `/revise [section]` · `/expand [section]` · `/validate` · `/done`
 
-Next step: `/srs`
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (look up the row where `Current` is `/brief`). Do not hardcode `/srs` here — that table is the single source of truth and includes the four `→` lines (what the next skill produces, output file, time estimate, what comes after).
 
 ## Style
 

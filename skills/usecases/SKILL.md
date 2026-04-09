@@ -86,9 +86,9 @@ After saving the artifact, present the following summary to the user (see `refer
 - Count of alternative and exceptional flows documented.
 - External system actors identified.
 
-Available commands: `/clarify [focus]` · `/revise [UC-NNN]` · `/expand [UC-NNN]` · `/split [UC-NNN]` · `/validate` · `/done`
+Available commands for this artifact: `/clarify [focus]` · `/revise [UC-NNN]` · `/expand [UC-NNN]` · `/split [UC-NNN]` · `/validate` · `/done`
 
-Next step: `/ac`
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (row `Current = /usecases`). Do not hardcode `/ac` here.
 
 ## Style
 

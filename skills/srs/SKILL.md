@@ -104,9 +104,9 @@ After saving the artifact, present the following summary to the user (see `refer
 - User roles identified.
 - External integrations and regulatory requirements captured.
 
-Available commands: `/clarify [focus]` · `/revise [section]` · `/expand [section]` · `/split [FR-NNN]` · `/validate` · `/done`
+Available commands for this artifact: `/clarify [focus]` · `/revise [section]` · `/expand [section]` · `/split [FR-NNN]` · `/validate` · `/done`
 
-Next step: `/stories`
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (look up the row where `Current` is `/srs`). Do not hardcode `/stories` here — copy the four `→` lines verbatim from the lookup table row.
 
 ## Style
 

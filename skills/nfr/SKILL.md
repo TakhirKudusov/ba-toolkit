@@ -80,9 +80,9 @@ After saving the artifact, present the following summary to the user (see `refer
 - Confirmation that section 5 of `02_srs_{slug}.md` was updated with NFR links.
 - Any categories flagged as missing or lacking measurable metrics.
 
-Available commands: `/clarify [focus]` · `/revise [NFR-NNN]` · `/expand [category]` · `/validate` · `/done`
+Available commands for this artifact: `/clarify [focus]` · `/revise [NFR-NNN]` · `/expand [category]` · `/validate` · `/done`
 
-Next step: `/datadict`
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (row `Current = /nfr`). Do not hardcode `/datadict` here.
 
 ## Style
 

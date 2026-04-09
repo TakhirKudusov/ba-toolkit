@@ -179,9 +179,9 @@ After saving the artifact, present the following summary to the user (see `refer
 - Quality gate threshold confirmed (which severity blocks `/done`).
 - NFR baseline categories listed.
 
-Available commands: `/revise [section]` · `/expand [section]`
+Available commands for this artifact: `/revise [section]` · `/expand [section]`
 
-Next step: `/brief` (if not yet started) or continue from where the pipeline left off — all skills now load `00_principles_{slug}.md` automatically.
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (row `Current = /principles`). The lookup table points at `/brief` as the typical next step. If the user has already started `/brief` for this project, instead suggest continuing from wherever the pipeline left off — all skills now load `00_principles_{slug}.md` automatically.
 
 ## Style
 

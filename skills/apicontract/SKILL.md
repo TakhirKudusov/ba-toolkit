@@ -108,9 +108,9 @@ After saving the artifact, present the following summary to the user (see `refer
 - Protocol and authentication method confirmed.
 - WebSocket events and Webhook contracts included (if applicable).
 
-Available commands: `/clarify [focus]` · `/revise [endpoint]` · `/expand [endpoint]` · `/validate` · `/done`
+Available commands for this artifact: `/clarify [focus]` · `/revise [endpoint]` · `/expand [endpoint]` · `/validate` · `/done`
 
-Next step: `/wireframes`
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (row `Current = /apicontract`). Do not hardcode `/wireframes` here.
 
 ## Style
 

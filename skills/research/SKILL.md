@@ -131,9 +131,9 @@ After saving the artifact, present the following summary (see `references/closin
 - Number of confirmed external integrations.
 - Any open questions that must be resolved before `/apicontract`.
 
-Available commands: `/clarify [focus]` · `/revise [ADR-NNN]` · `/expand [ADR-NNN]` · `/validate` · `/done`
+Available commands for this artifact: `/clarify [focus]` · `/revise [ADR-NNN]` · `/expand [ADR-NNN]` · `/validate` · `/done`
 
-Next step: `/apicontract`
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (row `Current = /research`). Do not hardcode `/apicontract` here.
 
 ## Style
 

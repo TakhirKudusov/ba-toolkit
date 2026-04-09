@@ -83,9 +83,9 @@ After saving the artifact, present the following summary to the user (see `refer
 - Count of user stories covered.
 - Confirmation that back-references in `03_stories_{slug}.md` were updated.
 
-Available commands: `/clarify [focus]` · `/revise [AC-NNN-NN]` · `/expand [US-NNN]` · `/split [AC-NNN-NN]` · `/validate` · `/done`
+Available commands for this artifact: `/clarify [focus]` · `/revise [AC-NNN-NN]` · `/expand [US-NNN]` · `/split [AC-NNN-NN]` · `/validate` · `/done`
 
-Next step: `/nfr`
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (row `Current = /ac`). Do not hardcode `/nfr` here.
 
 ## Style
 
