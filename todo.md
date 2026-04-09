@@ -34,7 +34,7 @@ Improvements batch 5:
 1. Read every shipped skill. Draft an improvement plan for each one — covering the professionalism of the SKILL.md content, the artifact template, and the end-user UX. When applying these skills the AI agent should behave like a professional business analyst with at least 25 years of experience at top-tier US companies. The improvement plan can be saved somewhere local for context, but it must not be committed to GitHub. (priority 4)
 2. ✅ Command for preparing exports of artifact files to Notion or Confluence. (priority 1) Done in Unreleased — new `ba-toolkit publish` CLI subcommand + thin `/publish` skill, zero-deps `markdownToHtml` helper, both Notion (Markdown bundle) and Confluence (HTML bundle + index.html) targets, intra-project cross-reference rewriting per target, AGENTS.md auto-included as the first page with managed-block stripped, 23 new unit + integration tests.
 3. MCP server. (priority 3)
-4. Expand the number of domain references. (priority 2)
+4. ✅ Expand the number of domain references. (priority 2) Done in Unreleased — three new first-class domains (`edtech`, `govtech`, `ai-ml`) added under `skills/references/domains/`, each following the 9-section template plus a domain glossary; `DOMAINS` array, `brief`/`srs` SKILL.md enumerations, README, CHANGELOG, and `CLAUDE.md` §4+§5 (canonical order, count 9 → 12) all updated.
 5. Update CLAUDE.md to match the current project state. (priority 6)
 6. Sync project documentation and the README. (priority 5)
 

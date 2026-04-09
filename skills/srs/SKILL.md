@@ -15,7 +15,7 @@ Second step of the BA Toolkit pipeline. Generates an SRS adapted from IEEE 830.
 0. If `00_principles_*.md` exists in the output directory, load it and apply its conventions (artifact language, ID format, traceability requirements, Definition of Ready, quality gate threshold).
 1. Read `01_brief_*.md` from the output directory. If missing, warn and suggest running `/brief`.
 2. Extract: slug, domain, business goals, functionality, stakeholders, constraints, glossary.
-3. If a matching `references/domains/{domain}.md` file exists (currently: `saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`), load it and apply its section `2. /srs`.
+3. If a matching `references/domains/{domain}.md` file exists (currently: `saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`, `edtech`, `govtech`, `ai-ml`), load it and apply its section `2. /srs`.
 
 ## Environment
 

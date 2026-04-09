@@ -2,10 +2,10 @@
 
 # 📋 BA Toolkit
 
-Structured BA pipeline for AI coding agents — concept to handoff, 23 skills, 9 domains, one-command Notion + Confluence publish.
+Structured BA pipeline for AI coding agents — concept to handoff, 23 skills, 12 domains, one-command Notion + Confluence publish.
 
 <img src="https://img.shields.io/badge/skills-23-blue" alt="Skills">
-<img src="https://img.shields.io/badge/domains-9-green" alt="Domains">
+<img src="https://img.shields.io/badge/domains-12-green" alt="Domains">
 <img src="https://img.shields.io/badge/format-Markdown-orange" alt="Format">
 <img src="https://img.shields.io/badge/language-auto--detect-purple" alt="Language">
 <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="License">
@@ -24,7 +24,7 @@ Structured BA pipeline for AI coding agents — concept to handoff, 23 skills, 9
 
 BA Toolkit is a set of 23 interconnected skills that run a full business-analysis pipeline inside your AI coding agent. You can start as early as `/discovery` (a brain-storm step for users who don't yet know what to build) or jump straight to `/brief` if you already have a project in mind, then work all the way through to a development handoff package. Each skill reads the output of the previous ones — maintaining cross-references between artifacts along the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario`. When you're ready to share with non-developer stakeholders, `/publish` (or `ba-toolkit publish`) bundles every artifact into import-ready folders for Notion and Confluence — drag-and-drop, no API tokens.
 
-Unlike one-shot prompting, every artifact is written to disk as Markdown, every ID links back to its source, and `/trace` verifies coverage across the whole pipeline. `/clarify` and `/analyze` catch ambiguities and quality gaps with CRITICAL/HIGH severity ratings. Domain references for 9 industries (SaaS, Fintech, E-commerce, Healthcare, Logistics, On-demand, Social/Media, Real Estate, iGaming) plug in automatically at `/brief`.
+Unlike one-shot prompting, every artifact is written to disk as Markdown, every ID links back to its source, and `/trace` verifies coverage across the whole pipeline. `/clarify` and `/analyze` catch ambiguities and quality gaps with CRITICAL/HIGH severity ratings. Domain references for 12 industries (SaaS, Fintech, E-commerce, Healthcare, Logistics, On-demand, Social/Media, Real Estate, iGaming, EdTech, GovTech, AI/ML) plug in automatically at `/brief`.
 
 Artifacts are generated in whatever language you write in — ask in English, get English docs; ask in any other language, the output follows.
 
@@ -243,6 +243,9 @@ The pipeline is domain-agnostic by default. At `ba-toolkit init` you pick a doma
 | **Social / Media** | Social networks, creator platforms, community forums, newsletters, short-video |
 | **Real Estate** | Property portals, agency CRM, rental management, property management, mortgage tools |
 | **iGaming** | Online slots, sports betting, casino lobbies, Telegram Mini Apps, promo mechanics |
+| **EdTech** | LMS, K-12, higher ed, MOOC, corporate L&D, language learning, exam prep |
+| **GovTech** | Citizen e-services, permits, tax filing, benefits, public records, court e-filing |
+| **AI / ML** | LLM apps, RAG pipelines, agents, model serving, fine-tuning, MLOps platforms |
 | **Custom** | Any other domain — works with general interview questions |
 
 Adding a new domain = creating one Markdown file in `skills/references/domains/`. See [docs/DOMAINS.md](docs/DOMAINS.md).

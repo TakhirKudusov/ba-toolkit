@@ -34,7 +34,7 @@ bin/ba-toolkit.js         # CLI entry point (~550 lines, single file, zero deps)
 skills/                   # 23 SKILL.md files + references/ (entry point: /discovery → /brief; /publish for Notion/Confluence)
   {skill}/SKILL.md        # Each skill has YAML frontmatter (name, description)
   references/
-    domains/              # 9 domain files + placeholder entries for custom
+    domains/              # 12 domain files + placeholder entries for custom
     templates/            # Reference artifact templates (loaded by skills)
     environment.md        # Output directory detection logic
     closing-message.md    # Shared closing message for all skills
@@ -56,7 +56,7 @@ todo.md                   # Planning backlog — keep in sync after task complet
 ### Style
 - **README + docs:** sentence case in H2+ headings (`## What is this`, not `## What Is This`). No emojis in H2+. H1 may keep a single logo emoji (`# 📋 BA Toolkit`). Emojis are allowed in bullets, tables, and blockquotes.
 - **Placeholder names:** `My App` / `my-app` in CLI prompts and `AGENTS.md` template. `Nova Analytics` / `nova-analytics` in reference templates that need a concrete fictional project. Never use `Lumen Goods` as a placeholder outside `example/lumen-goods/` — that's a real example project, not a stand-in.
-- **Domain order:** SaaS-first everywhere. Canonical order from `bin/ba-toolkit.js` `DOMAINS` array: `saas → fintech → ecommerce → healthcare → logistics → on-demand → social-media → real-estate → igaming → custom`. iGaming remains a first-class supported domain but is listed last. Any doc enumeration that lists domains must follow this order.
+- **Domain order:** SaaS-first everywhere. Canonical order from `bin/ba-toolkit.js` `DOMAINS` array: `saas → fintech → ecommerce → healthcare → logistics → on-demand → social-media → real-estate → igaming → edtech → govtech → ai-ml → custom`. The original 9 first-class domains stay in their established slots; new domains are appended before `custom` so existing AGENTS.md files and downstream tooling do not need to renumber. Any doc enumeration that lists domains must follow this order.
 
 ### Commits
 - **English**, Conventional Commits format: `<type>(<scope>): <description>`. Types: `feat`, `fix`, `docs`, `refactor`, `chore`, `style`, `test`, `perf`. Subject line under 72 chars.

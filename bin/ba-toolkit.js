@@ -80,6 +80,9 @@ const DOMAINS = [
   { id: 'social-media', name: 'Social/Media', desc: 'Social networks, creator platforms, community forums' },
   { id: 'real-estate',  name: 'Real Estate',  desc: 'Property portals, agency CRM, rental management' },
   { id: 'igaming',      name: 'iGaming',      desc: 'Slots, betting, casino, Telegram Mini Apps' },
+  { id: 'edtech',       name: 'EdTech',       desc: 'LMS, K-12, higher ed, MOOC, corporate L&D, language learning' },
+  { id: 'govtech',      name: 'GovTech',      desc: 'Citizen e-services, permits, tax, benefits, public records' },
+  { id: 'ai-ml',        name: 'AI / ML',      desc: 'LLM apps, RAG, agents, model serving, fine-tuning, MLOps' },
   { id: 'custom',       name: 'Custom',       desc: 'Any other domain — general interview questions' },
 ];
 

@@ -10,7 +10,7 @@ Starting point of the BA Toolkit pipeline. Generates a structured Project Brief 
 
 ## Loading domain reference
 
-Domain references are located in `references/domains/` relative to the `ba-toolkit` directory. Supported domains: `saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`. For other domains, work without a reference file.
+Domain references are located in `references/domains/` relative to the `ba-toolkit` directory. Supported domains: `saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`, `edtech`, `govtech`, `ai-ml`. For other domains, work without a reference file.
 
 ## Workflow
 
@@ -28,7 +28,7 @@ If `00_principles_*.md` exists in the output directory, load it and apply its co
 
 ### 3. Domain selection
 
-Ask the user about the project domain. If a matching `references/domains/{domain}.md` file exists (currently: `saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`), load it and use its domain-specific interview questions (section `1. /brief`), typical business goals, risks, and glossary.
+Ask the user about the project domain. If a matching `references/domains/{domain}.md` file exists (currently: `saas`, `fintech`, `ecommerce`, `healthcare`, `logistics`, `on-demand`, `social-media`, `real-estate`, `igaming`, `edtech`, `govtech`, `ai-ml`), load it and use its domain-specific interview questions (section `1. /brief`), typical business goals, risks, and glossary.
 
 If the domain does not match any supported one, record it as `custom:{name}` and use general questions only.
 
@@ -62,7 +62,7 @@ If a domain reference is loaded, supplement general questions with domain-specif
 ```markdown
 # Project Brief: {Project Name}
 
-**Domain:** {saas | fintech | ecommerce | healthcare | logistics | on-demand | social-media | real-estate | igaming | custom:{name}}
+**Domain:** {saas | fintech | ecommerce | healthcare | logistics | on-demand | social-media | real-estate | igaming | edtech | govtech | ai-ml | custom:{name}}
 **Date:** {date}
 
 ## 1. Project Summary
