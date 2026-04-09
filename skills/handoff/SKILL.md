@@ -110,6 +110,7 @@ Must-priority items confirmed for the first release:
 3. **Task breakdown** — import Must-priority US from section 2 into your backlog tool (Jira, Linear, GitHub Issues).
 4. **Spec-driven implementation** — consider using [Spec Kit](https://github.com/github/spec-kit) with `/speckit.specify` to generate implementation tasks from this handoff.
 5. **Validation** — use `10_scenarios_{slug}.md` (if present) for end-to-end acceptance testing scenarios.
+6. **Generate the implementation plan** — run `/implement-plan` to produce a phase-and-DAG plan an AI coding agent can execute step by step. Output: `12_implplan_{slug}.md`.
 
 ---
 
@@ -139,7 +140,7 @@ After saving the artifact, present the following summary (see `references/closin
 
 Available commands: `/revise [section]` · `/analyze` · `/trace`
 
-Pipeline complete. This document is the development handoff package.
+Build the `Next step:` block from the pipeline lookup table in `references/closing-message.md` (look up the row where `Current` is `/handoff`). Do not hardcode the next step here — that table is the single source of truth and now points at `/implement-plan` as the canonical follow-up after a handoff.
 
 ## Style
 

@@ -55,8 +55,9 @@ Skills use this table as the single source of truth for the `Next step:` block. 
 | /research    | /apicontract    | API Contract — endpoints, request/response schemas, errors      | 20–35 min    | /wireframes — Textual Wireframe Descriptions        |
 | /apicontract | /wireframes     | Textual Wireframe Descriptions — screens, components, nav       | 25–40 min    | /scenarios — End-to-end Validation Scenarios        |
 | /wireframes  | /scenarios      | End-to-end Validation Scenarios linking US, AC, WF, API         | 15–25 min    | /trace + /analyze — coverage + cross-artifact QA    |
-| /scenarios   | /handoff        | Development Handoff Package — inventory, MVP scope, open items  | 5–10 min     | (pipeline complete)                                 |
-| /handoff     | (none)          | Pipeline complete                                               | —            | Run /trace and /analyze for final coverage check    |
+| /scenarios   | /handoff        | Development Handoff Package — inventory, MVP scope, open items  | 5–10 min     | /implement-plan — sequenced plan for AI coding agents |
+| /handoff     | /implement-plan | Sequenced implementation plan for AI coding agents              | 10–20 min    | (pipeline complete — hand to Claude Code / Cursor)  |
+| /implement-plan | (none)       | Pipeline complete                                               | —            | Hand 12_implplan_<slug>.md to your AI coding agent  |
 
 ## Cross-cutting commands (no Next step line)
 

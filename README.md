@@ -2,9 +2,9 @@
 
 # 📋 BA Toolkit
 
-Structured BA pipeline for AI coding agents — concept to handoff, 23 skills, 12 domains, one-command Notion + Confluence publish.
+Structured BA pipeline for AI coding agents — concept to a phase-and-DAG implementation plan, 24 skills, 12 domains, one-command Notion + Confluence publish.
 
-<img src="https://img.shields.io/badge/skills-23-blue" alt="Skills">
+<img src="https://img.shields.io/badge/skills-24-blue" alt="Skills">
 <img src="https://img.shields.io/badge/domains-12-green" alt="Domains">
 <img src="https://img.shields.io/badge/format-Markdown-orange" alt="Format">
 <img src="https://img.shields.io/badge/language-auto--detect-purple" alt="Language">
@@ -22,7 +22,7 @@ Structured BA pipeline for AI coding agents — concept to handoff, 23 skills, 1
 
 ## What is this
 
-BA Toolkit is a set of 23 interconnected skills that run a full business-analysis pipeline inside your AI coding agent. You can start as early as `/discovery` (a brain-storm step for users who don't yet know what to build) or jump straight to `/brief` if you already have a project in mind, then work all the way through to a development handoff package. Each skill reads the output of the previous ones — maintaining cross-references between artifacts along the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario`. When you're ready to share with non-developer stakeholders, `/publish` (or `ba-toolkit publish`) bundles every artifact into import-ready folders for Notion and Confluence — drag-and-drop, no API tokens.
+BA Toolkit is a set of 24 interconnected skills that run a full business-analysis pipeline inside your AI coding agent. You can start as early as `/discovery` (a brain-storm step for users who don't yet know what to build) or jump straight to `/brief` if you already have a project in mind, then work all the way through to a development handoff package. Each skill reads the output of the previous ones — maintaining cross-references between artifacts along the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario`. After `/handoff`, run `/implement-plan` to produce a phase-and-DAG implementation plan an AI coding agent (Claude Code, Cursor, Codex) can execute step by step — every task references the FR / US / AC it implements and carries its own Definition of Done. When you're ready to share with non-developer stakeholders, `/publish` (or `ba-toolkit publish`) bundles every artifact into import-ready folders for Notion and Confluence — drag-and-drop, no API tokens.
 
 Unlike one-shot prompting, every artifact is written to disk as Markdown, every ID links back to its source, and `/trace` verifies coverage across the whole pipeline. `/clarify` and `/analyze` catch ambiguities and quality gaps with CRITICAL/HIGH severity ratings. Domain references for 12 industries (SaaS, Fintech, E-commerce, Healthcare, Logistics, On-demand, Social/Media, Real Estate, iGaming, EdTech, GovTech, AI/ML) plug in automatically at `/brief`.
 
@@ -114,11 +114,11 @@ Reload the CLI after copying.
 
 ### Cursor
 
-Cursor has two separate features — Rules (`.cursor/rules/*.mdc`) and [Agent Skills](https://cursor.com/docs/skills) (`.cursor/skills/<skill>/SKILL.md`). BA Toolkit is a set of skills, not rules, so `ba-toolkit install --for cursor` drops the 23 skills directly into `.cursor/skills/` using the native folder-per-skill `SKILL.md` format — no conversion needed. Reload the Cursor window to pick them up.
+Cursor has two separate features — Rules (`.cursor/rules/*.mdc`) and [Agent Skills](https://cursor.com/docs/skills) (`.cursor/skills/<skill>/SKILL.md`). BA Toolkit is a set of skills, not rules, so `ba-toolkit install --for cursor` drops the 24 skills directly into `.cursor/skills/` using the native folder-per-skill `SKILL.md` format — no conversion needed. Reload the Cursor window to pick them up.
 
 ### Windsurf
 
-Windsurf's [Agent Skills](https://docs.windsurf.com/windsurf/cascade/skills) feature loads skills from `.windsurf/skills/<skill>/SKILL.md`, the same folder-per-skill layout as Claude Code and Cursor. `ba-toolkit install --for windsurf` writes the 23 skills there natively. Reload the Windsurf window to pick them up.
+Windsurf's [Agent Skills](https://docs.windsurf.com/windsurf/cascade/skills) feature loads skills from `.windsurf/skills/<skill>/SKILL.md`, the same folder-per-skill layout as Claude Code and Cursor. `ba-toolkit install --for windsurf` writes the 24 skills there natively. Reload the Windsurf window to pick them up.
 
 ### Aider
 
@@ -195,6 +195,7 @@ Full traceability: FR → US → UC → AC → NFR → Entity → ADR → API �
 | 9 | `/wireframes` | Textual Wireframe Descriptions | `09_wireframes_{slug}.md` |
 | 10 | `/scenarios` | End-to-end Validation Scenarios — user journeys linking US, AC, WF, API | `10_scenarios_{slug}.md` |
 | 11 | `/handoff` | Development Handoff Package — artifact inventory, MVP scope, open items | `11_handoff_{slug}.md` |
+| 12 | `/implement-plan` | Implementation Plan for AI coding agents — phase ladder + Task DAG, every task references the FR/US/AC it implements | `12_implplan_{slug}.md` |
 | — | `/trace` | Traceability Matrix + coverage gaps | `00_trace_{slug}.md` |
 | — | `/clarify [focus]` | Targeted ambiguity resolution for any artifact | _(updates existing artifact)_ |
 | — | `/analyze` | Cross-artifact quality report with severity table | `00_analyze_{slug}.md` |
@@ -274,23 +275,23 @@ Every artifact links back to its predecessors, forming the chain `FR → US → 
 
 ## Minimum viable pipeline
 
-Not every project needs all 23 skills. Three common paths:
+Not every project needs all 24 skills. Three common paths:
 
 **Concept-first** (when you don't yet know what to build):
 ```
-/discovery → /brief → /srs → /stories → /ac → /nfr → /datadict → /apicontract → /wireframes → /handoff
+/discovery → /brief → /srs → /stories → /ac → /nfr → /datadict → /apicontract → /wireframes → /handoff → /implement-plan
 ```
 
-**Lean** (fastest path to handoff when you already have a project in mind — 9 steps):
+**Lean** (fastest path from a known idea to an AI-actionable plan — 10 steps):
 ```
-/brief → /srs → /stories → /ac → /nfr → /datadict → /apicontract → /wireframes → /handoff
+/brief → /srs → /stories → /ac → /nfr → /datadict → /apicontract → /wireframes → /handoff → /implement-plan
 ```
 
-**Full** (complete traceability and quality gates — 16 steps):
+**Full** (complete traceability and quality gates — 17 steps):
 ```
 /discovery → /principles → /brief → /srs → /stories → /usecases → /ac → /nfr → /datadict
           → /research → /apicontract → /wireframes → /scenarios
-          → /trace → /analyze → /handoff
+          → /trace → /analyze → /handoff → /implement-plan
 ```
 
 Use `/clarify` at any step to resolve ambiguities before moving on. Approximate time per step is in [docs/USAGE.md#appendix-time-estimates](docs/USAGE.md#appendix-time-estimates).

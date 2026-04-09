@@ -103,7 +103,7 @@ You:    a
         ... (interview continues normally) ...
 ```
 
-Both styles are supported by **every** interview-phase skill (`/discovery`, `/brief`, `/srs`, `/stories`, `/usecases`, `/ac`, `/nfr`, `/datadict`, `/research`, `/apicontract`, `/wireframes`, `/scenarios`, `/principles`, `/publish`). Inline context works for any of them — `/discovery I have a vague idea about a tool for freelance designers chasing late invoices`, `/srs focus on the payments module first`, `/stories I want to plan the onboarding epic`, `/nfr emphasise security and compliance`, `/publish notion`, etc. The agent uses it as a scope or focus hint, then runs the rest of the interview normally.
+Both styles are supported by **every** interview-phase skill (`/discovery`, `/brief`, `/srs`, `/stories`, `/usecases`, `/ac`, `/nfr`, `/datadict`, `/research`, `/apicontract`, `/wireframes`, `/scenarios`, `/principles`, `/publish`, `/implement-plan`). Inline context works for any of them — `/discovery I have a vague idea about a tool for freelance designers chasing late invoices`, `/srs focus on the payments module first`, `/stories I want to plan the onboarding epic`, `/nfr emphasise security and compliance`, `/publish notion`, `/implement-plan use Next.js, FastAPI, and Postgres on Fly.io`, etc. The agent uses it as a scope or focus hint, then runs the rest of the interview normally.
 
 Every interview follows the same protocol — one question at a time, 3–5 domain-appropriate variants in a 2-column markdown table with letter IDs (`a`, `b`, `c`, …), plus a free-text "Other" row you can always type into. See [`skills/references/interview-protocol.md`](../skills/references/interview-protocol.md) for the full rule. You never have to remember the format — every shipped skill enforces it.
 
@@ -352,6 +352,7 @@ Approximate, depends on project complexity and interview depth.
 | `/discovery` | — | 10–15 min |
 | `/principles` | — | 5–10 min |
 | `/brief` | 15–25 min | 20–35 min |
+| `/implement-plan` *(post-handoff)* | 10–20 min | 10–20 min |
 | `/publish` *(post-handoff, optional)* | 1–2 min | 1–2 min |
 | `/srs` | 25–40 min | 30–50 min |
 | `/stories` | 20–30 min | 25–40 min |

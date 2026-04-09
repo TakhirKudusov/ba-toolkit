@@ -1,3 +1,5 @@
+> **Definition of done — meta-rule.** Every feature release must end with a `CLAUDE.md` / `README.md` / `docs/` sync. This is part of the standard release flow, not a separate backlog item — do not list it as its own todo.
+
 Bugs and improvements batch 1:
 1. ✅ `init` now merges `AGENTS.md` via `mergeAgentsMd` + managed-block anchors. Legacy files without anchors are preserved untouched. Done in Unreleased.
 2. Invalid input during interactive init crashes the script. Split into:
@@ -31,22 +33,25 @@ Improvements batch 4:
 4. ✅ Sync project documentation and the README (priority 4). Done in Unreleased — `README.md`, `COMMANDS.md`, `package.json`, `docs/USAGE.md`, `docs/FAQ.md`, `bin/ba-toolkit.js` comments, and the `test/cli.test.js` skill-count assertion all updated.
 
 Improvements batch 5:
-1. Read every shipped skill. Draft an improvement plan for each one — covering the professionalism of the SKILL.md content, the artifact template, and the end-user UX. When applying these skills the AI agent should behave like a professional business analyst with at least 25 years of experience at top-tier US companies. The improvement plan can be saved somewhere local for context, but it must not be committed to GitHub. (priority 4)
+1. Pilot skill audit — read three of the most-used SKILL.md files (`/brief`, `/srs`, `/stories`) and draft an improvement plan for each as a senior US business analyst with 25+ years of experience would. The plan stays local (gitignored) and is intentionally scoped to 3 skills as a pilot — only roll out to the remaining 20 skills if the pilot surfaces systemic patterns worth generalising. (priority 4)
 2. ✅ Command for preparing exports of artifact files to Notion or Confluence. (priority 1) Done in Unreleased — new `ba-toolkit publish` CLI subcommand + thin `/publish` skill, zero-deps `markdownToHtml` helper, both Notion (Markdown bundle) and Confluence (HTML bundle + index.html) targets, intra-project cross-reference rewriting per target, AGENTS.md auto-included as the first page with managed-block stripped, 23 new unit + integration tests.
-3. MCP server. (priority 3)
-4. ✅ Expand the number of domain references. (priority 2) Done in Unreleased — three new first-class domains (`edtech`, `govtech`, `ai-ml`) added under `skills/references/domains/`, each following the 9-section template plus a domain glossary; `DOMAINS` array, `brief`/`srs` SKILL.md enumerations, README, CHANGELOG, and `CLAUDE.md` §4+§5 (canonical order, count 9 → 12) all updated.
-5. Update CLAUDE.md to match the current project state. (priority 6)
-6. Sync project documentation and the README. (priority 5)
+3. ✅ Expand the number of domain references. (priority 2) Done in Unreleased — three new first-class domains (`edtech`, `govtech`, `ai-ml`) added under `skills/references/domains/`, each following the 9-section template plus a domain glossary; `DOMAINS` array, `brief`/`srs` SKILL.md enumerations, README, CHANGELOG, and `CLAUDE.md` §4+§5 (canonical order, count 9 → 12) all updated.
 
 Improvements batch 6:
-1. Change the slash command format for skills — e.g. rename `/brief` to `/ba-toolkit.brief` and so on. (priority 1)
-2. Add a skill that generates a sequential implementation plan for an AI coding agent based on the artifacts produced by the other skills. (priority 2)
-3. Add a skill that generates the tests required for TDD based on the produced artifacts. (priority 3)
-4. Add a skill that validates a project against the generated artifacts (use cases, etc.). (priority 4)
-5. Update CLAUDE.md to match the current project state. Extend the pipeline description to cover the TDD-based delivery flow. (priority 6)
-6. Sync project documentation and the README. (priority 5)
+1. ✅ Add a skill that generates a sequential implementation plan for an AI coding agent based on the artifacts produced by the other skills. (priority 1) Done in Unreleased — new `/implement-plan` skill at `skills/implement-plan/SKILL.md` (stage 12), produces `12_implplan_<slug>.md` with a 9-phase ladder + Task DAG appendix; tech stack from `07a_research_*.md` with calibration-interview fallback; `agents-template.md` row 12, `closing-message.md` lookup-table extension, `/handoff` now points at `/implement-plan` as the canonical follow-up.
+2. Add a skill that generates the tests required for TDD based on the produced artifacts. (priority 1 — unblocked: now that `/implement-plan` ships and the handoff payload shape is known (`12_implplan_<slug>.md` with phase + DAG + per-task references and DoD), TDD test scaffolding can be built on top of that.)
 
 Improvements batch 7:
 1. Build a roadmap for further development / improvements and bug fixes. Possibly additional useful skills, for example. (priority 1)
 2. Build a GitHub-hosted website for the project. The site must surface the documentation, the roadmap, and links (npm, GitHub, my LinkedIn). It must be responsive and look good on both desktop and mobile. (priority 2)
-3. При необходимости еще раз переработать ридми и документацию. (приоритет 3)
+3. Review and rework the README and the documentation once more if the website work surfaces inconsistencies. (priority 3)
+
+---
+
+## Removed from the backlog (with rationale)
+
+Items previously parked here that we decided not to ship. Captured so we don't re-add them on autopilot.
+
+- **Batch 5 — MCP server.** Removed by user decision. Read-only MCP resource server would duplicate the existing native-skills install path for the 5 supported agents (Claude Code, Codex, Gemini, Cursor, Windsurf) and would either break the zero-runtime-deps invariant or require ~300 LoC of hand-rolled JSON-RPC. Defer until a real user reports needing BA Toolkit inside an agent that does not support native skills.
+- **Batch 6 — rename `/brief` → `/ba-toolkit.brief` (slash-command namespacing).** Premature optimisation against an unreported collision. Would break every existing user's muscle memory, every URL / doc / changelog reference, and require a 4.0.0 major bump plus a backward-compat alias on `/brief` for N versions. Re-open only if a real namespace collision with another skill pack is reported.
+- **Batch 6 — skill that validates a project against the generated artifacts (use-case compliance checker).** Research-grade idea: would need either per-language AST parsing (fragile, work per-stack) or LLM reasoning over a large codebase (slow, non-deterministic, no ground truth). The rest of BA Toolkit is about deterministic Markdown generation; this is the opposite direction. Re-open as a separate research spike if a feasible approach emerges.

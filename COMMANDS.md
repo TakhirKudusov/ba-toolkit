@@ -1,6 +1,6 @@
 # BA Toolkit — Command Reference
 
-Quick reference for all 23 skills and subcommands.
+Quick reference for all 24 skills and subcommands.
 
 ---
 
@@ -24,6 +24,7 @@ Run these in order. Each skill reads the output of all previous steps.
 | 9 | `/wireframes` | `09_wireframes_{slug}.md` | Textual Wireframe Descriptions: screens, components, navigation flows |
 | 10 | `/scenarios` | `10_scenarios_{slug}.md` | End-to-end Validation Scenarios linking US → AC → WF → API |
 | 11 | `/handoff` | `11_handoff_{slug}.md` | Development Handoff Package: artifact inventory, MVP scope, open items |
+| 12 | `/implement-plan` | `12_implplan_{slug}.md` | Implementation Plan for AI coding agents: phase ladder + Task DAG appendix; every task references the FR/US/AC it implements and carries its own Definition of Done |
 
 ---
 

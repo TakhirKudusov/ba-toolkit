@@ -1,7 +1,10 @@
 # FAQ
 
-**Do I need all 23 skills?**
-No. The lean pipeline (`/brief → /srs → /stories → /ac → /nfr → /datadict → /apicontract → /wireframes → /handoff`) covers the essentials in ~3–4 hours. Add `/usecases`, `/research`, `/scenarios`, `/trace`, and `/analyze` when you need deeper coverage.
+**Do I need all 24 skills?**
+No. The lean pipeline (`/brief → /srs → /stories → /ac → /nfr → /datadict → /apicontract → /wireframes → /handoff → /implement-plan`) covers the essentials and ends with an AI-actionable plan in ~3–4 hours. Add `/usecases`, `/research`, `/scenarios`, `/trace`, and `/analyze` when you need deeper coverage.
+
+**How do I hand the BA pipeline to an AI coding agent so it can actually build the project?**
+Run `/implement-plan` after `/handoff`. It reads every BA Toolkit artifact in your project folder and produces `12_implplan_{slug}.md` — a phase-and-DAG implementation plan with a tech-stack header, ordered phases (Foundation → Data → Auth → Core → API → UI → Integrations → Quality → Validation), and atomic tasks where each task references the FR / US / AC it implements and carries its own Definition of Done. Hand the file to Claude Code, Cursor, or Codex and they can step through it task by task. Tech-stack choices are pulled from `07a_research_{slug}.md` if `/research` was run; otherwise the skill asks a short calibration interview. This is *not* the same as `/sprint`, which groups stories into time-based sprints for a scrum master — `/implement-plan` sequences work for a coding agent, by dependency.
 
 **What if I don't know what to build yet?**
 Start with `/discovery` instead of `/brief`. It runs a structured brain-storm interview — problem space, target audience hypotheses, candidate domains, reference products, MVP feature ideas, open validation questions — and produces `00_discovery_{slug}.md` plus a concrete recommendation (domain, project name, slug, scope hint) you carry into `/brief`. Use it whenever you arrive with only a vague hunch and no fixed domain or feature list. `/brief` will auto-load `00_discovery_{slug}.md` if it exists and skip questions the discovery already answered.

@@ -21,7 +21,7 @@ const PKG = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 
 // All five supported agents — Claude Code, Codex CLI, Gemini CLI,
 // Cursor, and Windsurf — load Agent Skills as direct subfolders of
 // their skills root: `<skills-root>/<skill-name>/SKILL.md`. The toolkit
-// installs the 23 skills natively in this layout for every agent. No
+// installs the 24 skills natively in this layout for every agent. No
 // .mdc conversion. Confirmed against the Agent Skills documentation
 // for each platform via ctx7 MCP / official docs.
 //
