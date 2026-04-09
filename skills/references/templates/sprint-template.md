@@ -1,27 +1,32 @@
-# Sprint Plan: Nova Analytics
+# Sprint Plan: [PROJECT_NAME]
 
-**Domain:** saas
-**Date:** 2026-04-08
-**Slug:** nova-analytics
-**Sprint length:** 2 weeks
-**Team velocity:** 35 SP per sprint
-**Sources:** `00_estimate_nova-analytics.md`, `03_stories_nova-analytics.md`, `00_risks_nova-analytics.md`, `02_srs_nova-analytics.md`
+**Version:** 0.1
+**Status:** Draft
+**Domain:** [DOMAIN]
+**Date:** [DATE]
+**Slug:** [SLUG]
+**Sprint length:** [N] weeks
+**Theoretical velocity:** [N] SP per sprint (at 100% capacity)
+**Focus factor:** [N]%
+**Buffer / slack:** [N]%
+**Ceremonies cost:** [N] SP per sprint
+**Net velocity:** [N] SP per sprint  *(theoretical × focus × (1 − buffer) − ceremonies)*
+**Sources:** [list of artifacts used: 03_stories, 00_estimate, 00_risks, 02_srs, 00_principles, 00_discovery]
 
 ---
 
 ## Summary
 
-| Sprint | Goal | Stories | Points | Capacity |
-|--------|------|:-------:|:------:|:--------:|
-| SP-00 | Setup: environment, CI/CD, event-ingestion pipeline scaffold | — | — | — |
-| SP-01 | Users can sign up, connect a data source, and see events arrive | 6 | 34 SP | 97% |
-| SP-02 | Users can build dashboards with funnel, cohort, and trend widgets | 5 | 32 SP | 91% |
-| SP-03 | Alerts and collaboration: thresholds, notifications, sharing, SSO | 5 | 30 SP | 86% |
-| SP-04 | Admin workspace: usage, retention, billing, audit log | 4 | 28 SP | 80% |
-| **Total** | | **20** | **124 SP** | |
+| Sprint | Goal | Stories | Points | Capacity (vs net) |
+|--------|------|:-------:|:------:|:------------------:|
+| SP-00  | Setup and environment | — | — | — |
+| SP-01  | [User-outcome goal in one sentence] | [N] | [N] SP | [N]% |
+| SP-02  | [Goal] | [N] | [N] SP | [N]% |
+| SP-03  | [Goal] | [N] | [N] SP | [N]% |
+| **Total** | | **[N]** | **[N] SP** | |
 
-**Planned:** 20 stories / 124 SP across 4 sprints (8 weeks)
-**Unplanned backlog:** 4 stories / 18 SP (scope exceeds MVP capacity or marked Could/Won't)
+**Planned:** [N] stories / [N] SP across [N] sprints ([N] weeks total)
+**Unplanned backlog:** [N] stories / [N] SP (capacity exceeded or marked Could/Won't)
 
 ---
 
@@ -30,129 +35,91 @@
 ### SP-00 — Setup and environment
 
 **Duration:** Week 0 (pre-sprint)
-**Capacity:** Setup only — no story points assigned
+**Capacity:** Setup only — no Story Points assigned
 
 **Tasks:**
-- Configure CI/CD pipeline (GitHub Actions).
-- Provision staging environment on cloud infrastructure.
-- Scaffold Next.js web app and Node ingestion service with a base authentication stub.
-- Establish OLTP (Postgres) and columnar analytics (ClickHouse) schema baselines from `/datadict`.
-- Team alignment session on analytics domain concepts (event taxonomy, funnel modelling, cohort analysis).
+- [Configure CI/CD pipeline]
+- [Provision staging environment]
+- [Scaffold the project structure based on `12_implplan_[SLUG].md` Phase 1]
+- [Establish baseline schema from `07_datadict_[SLUG].md`]
+- [Team alignment session on the project domain]
 
 **Definition of Done for SP-00:**
 - [ ] All developers can run the project locally.
-- [ ] Staging environment is reachable from the team's workstations.
+- [ ] Staging environment reachable from the team's workstations.
 - [ ] Base CI pipeline runs lint + unit tests on every push.
 
 ---
 
-### SP-01 — Users can sign up, connect a data source, and see events arrive
+### SP-01 — [Sprint Goal — single user-outcome sentence]
 
-**Duration:** Weeks 1–2
-**Capacity:** 35 SP
+**Duration:** Weeks 1–[N]
+**Net capacity:** [N] SP
 
-| US | Title | Epic | Priority | Risk | Estimate |
-|----|-------|------|---------|------|---------|
-| US-001 | Sign up via email or Google SSO | E-01 Onboarding | Must | RISK-02 ↑ | 5 SP |
-| US-002 | Create a workspace and invite a teammate | E-01 Onboarding | Must | — | 3 SP |
-| US-003 | Connect first data source (Segment or warehouse) | E-06 Integrations | Must | RISK-03 ↑ | 13 SP |
-| US-004 | View the live event stream from the connected source | E-03 Events | Must | — | 3 SP |
-| US-005 | Validate the incoming event schema against expected taxonomy | E-03 Events | Must | — | 5 SP |
-| US-006 | View the default dashboard with sample metrics | E-02 Dashboards | Should | — | 5 SP |
+| US | Title | Epic | Persona | Priority | Value | Risk | Depends on | Estimate |
+|----|-------|------|---------|----------|:-----:|------|------------|---------:|
+| US-001 | [Title] | E-01 | [Persona name] | Must | 5 | RISK-02 ↑ | — | 5 SP |
+| US-002 | [Title] | E-01 | [Persona name] | Must | 4 | — | — | 3 SP |
+| US-005 | [Title] | E-02 | [Persona name] | Should | 3 | — | US-001 | 8 SP |
 
-**Sprint total:** 34 SP / 35 SP capacity (97%)
+**Sprint total:** [N] SP / [N] SP net capacity ([N]%)
 
-**Definition of Done for SP-01:**
+**Definition of Done for this sprint:**
 - [ ] All stories pass their Acceptance Criteria.
-- [ ] Sign-up and SSO flows tested on Chrome, Safari, and Firefox.
-- [ ] End-to-end event ingestion latency under 1 s at p95 from source emit to dashboard read.
+- [ ] API endpoints for this sprint are integrated and tested.
 - [ ] No 🔴 Critical open items in `/analyze` for completed stories.
+- [ ] [Sprint-specific gate, e.g. "End-to-end latency under 1s p95"]
 
 ---
 
-### SP-02 — Users can build dashboards with funnel, cohort, and trend widgets
+### SP-02 — [Sprint Goal]
 
-**Duration:** Weeks 3–4
-**Capacity:** 35 SP
+**Duration:** Weeks [N]–[N]
+**Net capacity:** [N] SP
 
-| US | Title | Epic | Priority | Risk | Estimate |
-|----|-------|------|---------|------|---------|
-| US-007 | Create a custom dashboard from scratch | E-02 Dashboards | Must | RISK-01 ↑ | 8 SP |
-| US-008 | Add a funnel widget with 3 configurable steps | E-02 Dashboards | Must | RISK-01 ↑ | 8 SP |
-| US-009 | Add a cohort retention widget for the last 30 days | E-02 Dashboards | Must | — | 8 SP |
-| US-010 | Save a dashboard to the workspace library | E-02 Dashboards | Should | — | 5 SP |
-| US-011 | Filter a dashboard by date range and segment | E-02 Dashboards | Must | — | 3 SP |
+| US | Title | Epic | Persona | Priority | Value | Risk | Depends on | Estimate |
+|----|-------|------|---------|----------|:-----:|------|------------|---------:|
+| US-[NNN] | [Title] | E-[NN] | [Persona] | Must | [1–5] | [—/RISK-NN ↑] | [—/US-NNN] | [N] SP |
 
-**Sprint total:** 32 SP / 35 SP capacity (91%)
+**Sprint total:** [N] SP / [N] SP net capacity ([N]%)
 
-**Definition of Done for SP-02:**
+**Definition of Done for this sprint:**
 - [ ] All stories pass their Acceptance Criteria.
-- [ ] Dashboard read query latency under 500 ms at p95 for the reference dataset (10 M events).
-- [ ] Funnel and cohort calculations verified against the reference dataset to within 0.1%.
-- [ ] Saved dashboards survive workspace reload and session refresh.
+- [ ] [Sprint-specific gate]
 
----
-
-### SP-03 — Alerts and collaboration: thresholds, notifications, sharing, SSO
-
-**Duration:** Weeks 5–6
-**Capacity:** 35 SP
-
-| US | Title | Epic | Priority | Risk | Estimate |
-|----|-------|------|---------|------|---------|
-| US-012 | Set a metric threshold alert on any dashboard widget | E-04 Alerts | Must | RISK-04 ↑ | 8 SP |
-| US-013 | Receive an alert email within 60 s of threshold breach | E-04 Alerts | Must | — | 5 SP |
-| US-014 | Invite a teammate and assign a role (admin, editor, viewer) | E-05 Collaboration | Should | — | 5 SP |
-| US-015 | Share a dashboard read-only link with internal and external viewers | E-05 Collaboration | Must | — | 5 SP |
-| US-016 | Enable SSO (SAML / OIDC) for the workspace | E-05 Collaboration | Should | — | 7 SP |
-
-**Sprint total:** 30 SP / 35 SP capacity (86%)
-
-**Definition of Done for SP-03:**
-- [ ] All stories pass their Acceptance Criteria.
-- [ ] Alert evaluation runs within 60 s of threshold breach in staging.
-- [ ] Read-only share links respect role permissions and expire as configured.
-
----
-
-### SP-04 — Admin workspace: usage, retention, billing, audit log
-
-**Duration:** Weeks 7–8
-**Capacity:** 35 SP
-
-| US | Title | Epic | Priority | Risk | Estimate |
-|----|-------|------|---------|------|---------|
-| US-017 | Admin views the workspace list with per-workspace event volume | E-07 Admin | Must | — | 5 SP |
-| US-018 | Admin adjusts data retention window and event quota per workspace | E-07 Admin | Must | — | 8 SP |
-| US-019 | Admin views the usage-based billing report for the current period | E-07 Admin | Should | — | 8 SP |
-| US-020 | Admin reviews the audit log of workspace and permission changes | E-07 Admin | Should | — | 7 SP |
-
-**Sprint total:** 28 SP / 35 SP capacity (80%)
-
-**Definition of Done for SP-04:**
-- [ ] All stories pass their Acceptance Criteria.
-- [ ] Retention changes take effect on the next hourly compaction run.
-- [ ] Billing report matches the underlying usage ledger to within 0.01%.
+<!-- Repeat sprint blocks as needed. SP-01, SP-02, SP-03, ... -->
 
 ---
 
 ## Unplanned Backlog
 
-Stories not assigned to any sprint — below MVP capacity or marked Could/Won't:
+Stories not assigned to any sprint — below MVP capacity, marked Could/Won't, or deferred for dependency reasons:
 
-| US | Title | Epic | Priority | Estimate | Reason |
-|----|-------|------|---------|---------|--------|
-| US-021 | Export a dashboard snapshot as PDF | E-02 Dashboards | Could | 5 SP | Capacity exceeded — defer to v1.1 |
-| US-022 | Mobile companion app for alert notifications | E-04 Alerts | Could | 8 SP | Deferred — requires mobile infrastructure |
-| US-023 | In-app chat support widget | E-08 Support | Could | 3 SP | Deferred — third-party integration |
-| US-024 | White-label dashboards for embedded use | E-05 Collaboration | Won't | 2 SP | Out of MVP scope |
+| US | Title | Epic | Persona | Priority | Estimate | Reason |
+|----|-------|------|---------|----------|---------:|--------|
+| US-[NNN] | [Title] | E-[NN] | [Persona] | Could | [N] SP | Capacity exceeded — defer to v1.1 |
+| US-[NNN] | [Title] | E-[NN] | [Persona] | Won't | [N] SP | Out of MVP scope |
+
+---
+
+## Capacity model
+
+| Component | Value |
+|-----------|-------|
+| Theoretical velocity (100% capacity) | [N] SP |
+| Focus factor | [N]% (industry baseline 65%) |
+| Buffer / slack for bugs and support | [N]% (industry baseline 15%) |
+| Ceremonies cost (planning + review + retro + refinement) | [N] SP per sprint |
+| **Net velocity used for assignment** | **[N] SP per sprint** |
 
 ---
 
 ## Assumptions
 
-- Sprint velocity: 35 SP based on a team of 4 full-stack developers (2 sprints of historical data from similar projects).
+- Sprint velocity is based on [source: user input / team-size estimate / historical data].
+- Focus factor of [N]% reflects [reason — meeting load / ceremonies overhead / mentoring / context-switching].
+- Buffer of [N]% reserved for [reason — production bugs / customer support / unplanned work].
 - SP-00 is a pre-sprint setup week; its effort is not tracked in Story Points.
 - Frontend and backend are developed in parallel within each sprint.
-- No hard release deadline was specified; the plan targets an 8-week MVP delivery window.
-- Risk-elevated stories (RISK-01, RISK-02, RISK-03, RISK-04) were pulled into earlier sprints to validate mitigations sooner.
+- [Hard release deadline if applicable, or "no fixed deadline; the plan targets an N-week MVP delivery window"].
+- Risk-elevated stories are pulled into earlier sprints to validate mitigations sooner.

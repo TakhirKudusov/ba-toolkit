@@ -35,6 +35,31 @@ Examples:
 
 Read `references/environment.md` from the `ba-toolkit` directory to determine the output directory.
 
+## Calibration interview
+
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 options plus a free-text "Other" row last (5 rows max), mark exactly one row **Recommended**, render variants in the user's language (rule 11), and wait for an answer.
+>
+> **Inline context (protocol rule 9):** if the user wrote text after `/risk` (e.g., `/risk medium tolerance, focus on compliance`), parse it and skip the matching questions.
+
+If the user invokes `/risk` with no inline hint, ask the following short calibration interview (skip any question already answered by `00_principles_*.md` or by the project Brief):
+
+1. **Risk tolerance** — what is the project's appetite for risk? Drives which risks get accepted vs avoided. **Recommended:** Medium for a typical commercial project; Low for regulated / public-sector / safety-critical; High for early-stage prototypes.
+2. **Domain-specific frameworks** — beyond the canonical 4 risk categories (Technical / Business / Compliance / External), do any industry frameworks apply? E.g. **FAIR** (Factor Analysis of Information Risk) for cyber, **ISO 14971** for medical devices, **COSO ERM** for financial controls, **NIST RMF** for US federal systems.
+3. **Review cadence** — how often will the risk register be re-assessed in production? **Recommended:** monthly for High and above, quarterly for Medium, ad-hoc for Low.
+4. **Treatment strategy preference** — does the project prefer Avoid (eliminate), Reduce (mitigate), Transfer (insurance / vendor), or Accept (budget for)? Determines the default treatment recommendation per risk.
+
+## Standards alignment
+
+The skill follows **ISO 31000** (Risk Management — Guidelines) and **PMI PMBOK 7** risk-management practices. Each risk carries the canonical risk-management fields:
+
+- **Probability × Impact = Score** (5×5 matrix, range 1–25).
+- **Velocity** — how fast the risk materialises once triggered (Days / Weeks / Months / Years). Determines reaction time and whether mitigation has to be in place before the trigger or whether reactive response is enough.
+- **Treatment strategy** — Avoid / Reduce / Transfer / Accept (PMBOK 7 + ISO 31000 vocabulary).
+- **Mitigation** (Reduce: lower probability or impact before the risk occurs).
+- **Contingency** (post-event response if mitigation fails).
+- **Owner** (single accountable role).
+- **Review cadence** (when this risk will be re-assessed — drives the "set and forget" failure mode).
+
 ## Analysis pass
 
 ### Step 1 — Risk extraction
@@ -61,23 +86,32 @@ Assign each risk to one category:
 
 ### Step 3 — Scoring
 
-Score each risk on two axes (1–5):
+Score each risk on three axes:
 
-| Score | Probability | Impact |
-|-------|------------|--------|
-| 1 | Very unlikely | Negligible — no effect on delivery |
-| 2 | Unlikely | Minor — small rework or delay |
-| 3 | Possible | Moderate — scope or timeline affected |
-| 4 | Likely | Major — milestone at risk |
-| 5 | Very likely | Critical — project viability threatened |
+| Score | Probability | Impact | Velocity |
+|-------|-------------|--------|----------|
+| 1 | Very unlikely | Negligible — no effect on delivery | Years — long warning |
+| 2 | Unlikely | Minor — small rework or delay | Months — moderate warning |
+| 3 | Possible | Moderate — scope or timeline affected | Weeks — short warning |
+| 4 | Likely | Major — milestone at risk | Days — minimal warning |
+| 5 | Very likely | Critical — project viability threatened | Immediate — no warning |
 
-**Risk Score = Probability × Impact** (range 1–25).
+**Risk Score = Probability × Impact** (range 1–25). Velocity is recorded separately and influences treatment strategy: a high-Velocity risk with Days-level warning *cannot* be treated reactively — mitigation must be in place before the trigger fires.
 
 Priority thresholds:
 - 🔴 **Critical:** score ≥ 15
 - 🟡 **High:** score 8–14
 - 🟢 **Medium:** score 4–7
 - ⚪ **Low:** score 1–3
+
+### Step 4 — Treatment strategy
+
+Assign each risk one of the four canonical treatment strategies (PMBOK 7 / ISO 31000 vocabulary). The strategy determines what "mitigation" and "contingency" actually mean for that risk:
+
+- **Avoid** — eliminate the cause entirely. Drop the feature, change the architecture, switch the vendor. Used when the risk is unacceptable and cheap to eliminate.
+- **Reduce / Mitigate** — lower the probability or the impact via active steps before the trigger. The default for most technical and process risks.
+- **Transfer** — move the risk to a third party via insurance, contract terms, vendor SLA, or escrow. Used for risks the project cannot directly control.
+- **Accept** — acknowledge the risk and budget for it. Used when the cost of the other three strategies exceeds the expected impact, or when no realistic treatment exists.
 
 ## Generation
 

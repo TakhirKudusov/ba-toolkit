@@ -11,6 +11,61 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.7.0] — 2026-04-10
+
+### Highlights
+
+- **Group B skill audit pass on `/trace`, `/analyze`, `/clarify`, `/estimate`, `/glossary`, `/risk`, `/sprint`** — 7 cross-cutting utilities brought to senior-BA rigour. ~33 Critical + High findings applied. Highlights: full ISO 31000 + PMBOK 7 alignment for `/risk` (Velocity axis, treatment-strategy classification), Cone of Uncertainty + confidence bands for `/estimate`, IEEE 830 §4.3 quality attributes mapped to `/analyze` finding categories, definition-quality discipline (Aristotelian form) for `/glossary`, structured table output for `/clarify`, bidirectional traceability + `/implement-plan` integration for `/trace`, focus-factor + ceremonies-aware net velocity for `/sprint`. Two utility templates (`risk-template.md`, `sprint-template.md`) rewritten from concrete Nova Analytics worked examples back to placeholder convention to match the other 19 templates.
+
+### Changed
+
+- **`skills/trace/SKILL.md` and `skills/references/templates/trace-template.md`** — bidirectional traceability + `/implement-plan` integration:
+  - Inline template removed; standalone is the single source of truth (drift fix — inline had 8 columns, standalone had 11; mismatched column sets).
+  - **Bidirectional traceability is now the default.** Forward (FR → downstream) catches "what does this requirement become?"; reverse (US/UC/AC/NFR/Entity/API/WF/SC/Task → FR) catches "why does this artifact exist?". Senior BA needs both directions to validate provenance.
+  - **`/implement-plan` integration.** The matrix now includes a `Task` column populated from `12_implplan_*.md` (introduced in v3.4.0). The chain is now `FR → US → UC → AC → NFR → Entity → ADR → API → WF → SC → Task`.
+  - **Calibration interview added** (was generation-only): direction (forward / reverse / bidirectional, default bidirectional), scope, severity-thresholds source.
+  - **Coverage Gaps now grouped by severity** (🔴 Critical / 🟠 High / 🟡 Medium / 🟢 Low) read from `00_principles_*.md` §3 instead of just listing orphans flat.
+- **`skills/analyze/SKILL.md` and `skills/references/templates/analyze-template.md`** — IEEE 830 alignment + Owner column + delta mode:
+  - **Finding categories expanded from 5 to 8** and explicitly mapped to **IEEE 830 §4.3 SRS quality attributes**: Duplication (consistency), Ambiguity (unambiguous, including modal-verb confusion), Coverage Gap (complete + traceable), Terminology Drift (consistent), Invalid Reference (traceable), **Inconsistency** (same fact stated differently across artifacts), **Underspecified Source** (post-v3.5.0 provenance discipline — FR/UC/AC/Entity/Endpoint missing the `Source` field), **Stakeholder Validation Gap** (post-v3.5.0 assumption discipline — assumptions without Owner or past Validate by date).
+  - **Owner column added** to every finding. Senior BAs always assign accountability — a finding with no owner doesn't get fixed.
+  - **Calibration interview added**: severity threshold source, categories to include, delta mode (only new findings since the last `/analyze` run).
+- **`skills/clarify/SKILL.md`** — extended ambiguity catalogue + structured table output + ripple-effect handling:
+  - **Ambiguity categories expanded from 6 to 11.** Added: Quantification gaps (numbers without units, frequencies without windows), Time-zone gaps (timestamps without TZ), Currency gaps (amounts without currency), Scale gaps ("users" without specifying CCU/registered/MAU/DAU), Modal verb confusion (must / shall / should / may inconsistency per IEEE 830).
+  - **Output format changed from numbered list to structured table** with columns `# | Location | Category | Question | Answer`. The user can answer in-place by filling the rightmost column or defer with `(deferred)`.
+  - **Ripple-effect check added.** Before saving, the skill identifies any answer that affects other artifacts (e.g., a new role propagates from `/srs` to `/stories` personas, `/usecases` actors, `/scenarios` personas) and offers to update each affected file via `/revise`. Was previously a single sentence buried in step 2.
+- **`skills/estimate/SKILL.md`** — Cone of Uncertainty + confidence bands + planning poker honesty:
+  - **Cone of Uncertainty discipline.** Calibration question 5 asks the estimation phase (Discovery / Brief / SRS / AC / Wireframes / Implementation Plan) and emits the confidence band that matches the standard variance for that phase: ±400% / ±100% / ±50% / ±25% / ±10%. Every estimate now carries a confidence label (Order of magnitude / ROM / Budget / Definitive / Control). Single-point estimates without a confidence band are misread as commitments — the Cone discipline prevents this.
+  - **Risk multiplier and tech-debt allocation added** as calibration questions. Stories linked to 🔴 Critical risks default to +20%; tech-debt reservation defaults to 20% of velocity.
+  - **Planning poker honesty.** New section "Estimation discipline — what this skill is and is not" makes explicit that this is an analytical single-estimator pass, not a team commitment, and recommends running planning poker with the dev team using these numbers as the starting anchor. Senior BAs never confuse an analytical estimate with a team commit.
+  - **Estimation Summary table** now carries the confidence band per story, the risk-adjusted total, the tech-debt reservation, and the net feature capacity — not just a flat SP total that hides the assumptions.
+- **`skills/glossary/SKILL.md`** — Aristotelian definition discipline + ISO 1087-1 alignment + extended sources:
+  - **Standard alignment with ISO 1087-1** (Terminology Work — Vocabulary). Definitions follow the **Aristotelian form**: genus + differentia + purpose. The skill rejects circular definitions ("a User is a user of the system"), self-referential definitions, definitions that name features without identifying the genus, and definitions that name the genus without distinguishing from siblings.
+  - **New Step 2b — Definition quality check.** Walks every term in the glossary, classifies definitions as Circular / Self-referential / Missing genus / Missing differentia, and lists weak definitions in a sub-section of the drift report with a recommended rewrite. Senior BAs catch this on every glossary review.
+  - **Sources expanded** to include `00_discovery_*.md` (concept terms), `00_principles_*.md` (convention names), and `12_implplan_*.md` (phase names, technology choices). 12 source files → 14.
+  - **Drift report now requires a justification** for the canonical name choice — not just "Customer" but "Customer because it appears earliest, most frequently, and matches the domain reference". Without justification, drift recommendations are arbitrary.
+- **`skills/risk/SKILL.md` and `skills/references/templates/risk-template.md`** — full ISO 31000 + PMBOK 7 alignment, Velocity axis, Treatment Strategy classification, calibration interview, document control, placeholder template:
+  - **Standard alignment with ISO 31000** (Risk Management — Guidelines) and **PMI PMBOK 7**. Each risk now carries the canonical risk-management fields, not just probability × impact.
+  - **Velocity axis added** (Years / Months / Weeks / Days / Immediate). Velocity records how fast the risk materialises once triggered — determines reaction time and whether mitigation has to be in place before the trigger or whether reactive response is enough. P × I alone is insufficient for a senior risk register.
+  - **Treatment strategy field added** with the four canonical strategies from PMBOK 7 / ISO 31000: **Avoid** (eliminate the cause), **Reduce / Mitigate** (lower probability or impact), **Transfer** (insurance / vendor / contract), **Accept** (acknowledge and budget). Previous version only documented mitigation + contingency without classifying the strategy.
+  - **Review cadence per risk** (Monthly / Quarterly / Ad hoc). Without a cadence, risks become "set and forget" — the canonical failure mode.
+  - **Calibration interview added** (was generation-only): risk tolerance (Low / Medium / High), domain-specific frameworks (FAIR for cyber, ISO 14971 for medical, COSO ERM for financial, NIST RMF for US federal), review cadence, treatment-strategy preference.
+  - **`risk-template.md` rewritten from a concrete Nova Analytics worked example to placeholder convention** with `[PROJECT_NAME]`, `[Owner]`, `[Velocity]`, etc. Aligns with the other 19 templates that use placeholder syntax. The Nova Analytics example was misread as the canonical content by agents that didn't realise it was a sample.
+  - Document-control metadata (`Version`, `Status`) added to the template.
+- **`skills/sprint/SKILL.md` and `skills/references/templates/sprint-template.md`** — focus factor + ceremonies-aware net velocity, persona column, dependency awareness, placeholder template:
+  - **Net velocity replaces theoretical velocity as the assignment basis.** The skill now distinguishes theoretical velocity (100% capacity) from net velocity, applying focus factor (default 65%), buffer / slack (default 15%), and ceremonies cost (default 1 day per developer per 2-week sprint). Formula: `Net = Theoretical × Focus × (1 − Buffer) − Ceremonies`. Senior scrum masters never schedule against the theoretical number — that's how teams overcommit and miss sprints. Was assigning against raw theoretical velocity.
+  - **Calibration interview extended from 6 to 10 questions**: focus factor, buffer / slack, ceremonies overhead, holidays / PTO added.
+  - **Persona column added** to every sprint detail table (per the v3.5.0+ stories template). Sprint plans now reflect which personas each sprint serves so the team builds empathy.
+  - **Business Value Score and Depends on fields read from the v3.5.0+ stories template** explicitly in the priority-ordering algorithm. Was relying on implicit prerequisites only.
+  - **Context loading extended** to read `00_principles_*.md` for team capacity defaults and `00_discovery_*.md` for early MVP signals.
+  - **`sprint-template.md` rewritten from a concrete Nova Analytics worked example to placeholder convention** with `[PROJECT_NAME]`, `[Persona]`, etc. The new template carries the net-velocity header, the persona column, the explicit capacity model section, and explicit assumption documentation. Aligns with the other 19 templates.
+  - Document-control metadata (`Version`, `Status`) added to the template.
+
+### Cross-pattern impact
+
+After the pilot, Group A, and Group B, **15 of the 24 shipped skills** carry the senior-BA improvements: standards conformance to canonical frameworks (BABOK v3, IEEE 830, ISO 25010, ISO 31000, ISO 1087-1, OpenAPI 3.x, Cockburn use cases, INVEST, MoSCoW, PMBOK 7, Cone of Uncertainty, IEEE 830 §4.3 quality attributes), explicit "why" / provenance fields, cross-artifact forward and reverse traceability, document control, single-source-of-truth templates without inline drift, and BA-grade required-topics coverage. Group C (bookend skills: `/discovery`, `/principles`, `/research`, `/handoff`, `/implement-plan`, `/export`, `/publish`) remains at current rigour and may receive a lighter sweep in a future session.
+
+---
+
 ## [3.6.0] — 2026-04-10
 
 ### Highlights
@@ -595,7 +650,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.6.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.7.0...HEAD
+[3.7.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.1...v3.5.0
 [3.4.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.0...v3.4.1

@@ -22,12 +22,13 @@ Examples:
 
 ## Context loading
 
-0. If `00_principles_*.md` exists, load it — apply language convention (section 1) and ID naming convention (section 2).
+0. If `00_principles_*.md` exists, load it — apply language convention (section 1), ID naming convention (section 2), and any team capacity defaults from section 8 (Project-Specific Notes).
 1. Load `00_estimate_{slug}.md` or check `03_stories_{slug}.md` for inline `**Estimate:**` fields. **Required** — sprint planning cannot proceed without estimates.
-2. Load `03_stories_{slug}.md` — source of story priority (MoSCoW or custom), epic grouping, and acceptance criteria count.
+2. Load `03_stories_{slug}.md` — source of story priority (MoSCoW or custom), persona, business value score, epic grouping, **Depends on** field (per v3.5.0+ template), and acceptance criteria count.
 3. Load `00_risks_{slug}.md` if it exists — use risk scores to elevate priority of stories that mitigate 🔴 Critical or 🟡 High risks.
-4. Load `02_srs_{slug}.md` — to extract any sequencing constraints (dependencies, technical prerequisites).
-5. Load `00_sprint_{slug}.md` if it exists — merge mode: preserve confirmed sprints, re-plan only future ones.
+4. Load `02_srs_{slug}.md` — to extract any sequencing constraints (dependencies, technical prerequisites) beyond the explicit `Depends on` fields in stories.
+5. Load `00_discovery_{slug}.md` if it exists — for early signals about which features matter most to MVP success.
+6. Load `00_sprint_{slug}.md` if it exists — merge mode: preserve confirmed sprints, re-plan only future ones.
 
 ## Environment
 
@@ -35,16 +36,32 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 ## Calibration interview
 
-Ask the following before planning (skip questions already answered in context or via syntax flags):
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 options plus a free-text "Other" row last (5 rows max), mark exactly one row **Recommended**, render variants in the user's language (rule 11), and wait for an answer.
+>
+> **Inline context (protocol rule 9):** if the user wrote text after `/sprint` (e.g., `/sprint 2-week sprints, 35 SP velocity, 70% focus factor`), parse it and skip the matching questions.
 
-1. **Sprint length:** How many weeks per sprint? _(default: 2 weeks)_
-2. **Team velocity:** Estimated Story Points per sprint (or T-shirt / person-days equivalent)? _(if not given, estimate from story count: assume 30–40 SP for a 3–5 developer team)_
-3. **Team size:** Number of developers contributing to this project? _(used to sanity-check velocity)_
-4. **Sprint 0:** Does the team need a sprint 0 for setup, architecture, or environment? _(yes/no — if yes, add SP-00 with no user stories)_
-5. **Hard deadline:** Is there a fixed release date or milestone? _(if yes, flag stories that will not fit before the deadline)_
-6. **Parallel tracks:** Are frontend and backend worked on simultaneously, or sequentially? _(affects story ordering within a sprint)_
+Ask the following before planning (skip questions already answered in context or via inline flags):
+
+1. **Sprint length:** How many weeks per sprint? **Recommended:** 2 weeks.
+2. **Theoretical velocity:** Maximum Story Points per sprint at 100% capacity (or T-shirt / person-days equivalent)? *(If not given, estimate from team size: assume 8–10 SP per developer per 2-week sprint at 100% capacity, before focus factor.)*
+3. **Team size:** Number of developers contributing to this project? *(Used to sanity-check velocity.)*
+4. **Focus factor** — what percentage of theoretical capacity is actually available for new feature work? **Recommended: 65%**. Industry baseline accounts for: meetings, code review, mentoring, context-switching. A team that runs at 100% theoretical velocity is a team that's burning out.
+5. **Buffer / slack** — what percentage of capacity is reserved for bugs, support, and unplanned work? **Recommended: 15%**. Without explicit slack the first production incident derails the whole sprint.
+6. **Ceremonies overhead** — planning + review + retro + refinement time per sprint? **Recommended: 1 day per 2-week sprint per developer.**
+7. **Holidays / PTO** — any planned absence during the sprint window that should reduce capacity?
+8. **Sprint 0:** Does the team need a sprint 0 for setup, architecture, or environment? *(Yes / no — if yes, add SP-00 with no user stories.)*
+9. **Hard deadline:** Is there a fixed release date or milestone? *(If yes, flag stories that will not fit before the deadline.)*
+10. **Parallel tracks:** Are frontend and backend worked on simultaneously, or sequentially? *(Affects story ordering within a sprint.)*
 
 If the user types `/sprint` without additional input and prior context is sufficient, apply defaults and state assumptions explicitly in the output.
+
+**Net velocity formula:**
+
+```
+Net velocity = Theoretical velocity × Focus factor × (1 − Buffer fraction) − Ceremonies cost
+```
+
+Example: 50 SP theoretical × 0.65 focus × (1 − 0.15) buffer − 5 SP ceremonies = **22.6 SP net velocity**. The skill assigns stories against **net velocity**, not theoretical. Senior scrum masters never schedule against the theoretical number — that's how teams overcommit and miss sprints.
 
 ## Planning algorithm
 
@@ -54,16 +71,17 @@ Sort stories for assignment using this precedence:
 
 1. **Must** stories first (MoSCoW: Must > Should > Could > Won't).
 2. Within the same priority tier, elevate stories that mitigate 🔴 Critical or 🟡 High risks (from `00_risks_{slug}.md`).
-3. Within the same priority and risk tier, order by dependencies: stories that are prerequisite to others go first.
-4. Within the same tier with no dependencies, order by estimate ascending (smaller stories first — reduces WIP).
+3. Within the same priority and risk tier, sort by **Business Value Score** (per v3.5.0+ stories template) — higher value first.
+4. Within the same priority, risk, and value tier, order by dependencies: stories that are prerequisite to others go first. **Read the `Depends on` field per v3.5.0+ stories template** for explicit story-to-story dependencies, plus any sequencing constraints from `02_srs_*.md`.
+5. Within the same tier with no dependencies, order by estimate ascending (smaller stories first — reduces WIP).
 
 ### Step 2 — Sprint assignment
 
-Fill sprints greedily from the ordered list:
+Fill sprints greedily from the ordered list against **net velocity** (not theoretical):
 
-- Assign stories to the current sprint until adding the next story would exceed velocity.
-- If a story alone exceeds velocity, flag it for splitting: `⚠️ US-NNN (N SP) exceeds sprint capacity — consider /split US-NNN`.
-- If a story has an explicit prerequisite not yet assigned, defer it to the sprint after its prerequisite completes.
+- Assign stories to the current sprint until adding the next story would exceed net velocity.
+- If a story alone exceeds net velocity, flag it for splitting: `⚠️ US-NNN (N SP) exceeds sprint capacity — consider /split US-NNN`.
+- If a story has an explicit `Depends on` not yet assigned, defer it to the sprint after its prerequisite completes.
 - When a hard deadline is provided, mark the sprint that contains it and flag any Must stories not scheduled before it as 🚨 **At risk**.
 
 ### Step 3 — Sprint goal derivation
@@ -74,78 +92,7 @@ For each sprint, derive a one-sentence goal that describes the primary user-faci
 
 ## Generation
 
-Save `00_sprint_{slug}.md` to the output directory.
-
-```markdown
-# Sprint Plan: {PROJECT_NAME}
-
-**Domain:** {DOMAIN}
-**Date:** {DATE}
-**Slug:** {SLUG}
-**Sprint length:** {N} weeks
-**Team velocity:** {N} SP per sprint
-**Sources:** {list of artifacts used}
-
----
-
-## Summary
-
-| Sprint | Goal | Stories | Points | Capacity |
-|--------|------|:-------:|:------:|:--------:|
-| SP-00  | Setup and environment | — | — | — |
-| SP-01  | [Goal] | N | N SP | N% |
-| SP-02  | [Goal] | N | N SP | N% |
-| **Total** | | **N** | **N SP** | |
-
-**Planned:** N stories / N SP across N sprints
-**Unplanned backlog:** N stories / N SP (scope exceeds capacity or marked Won't)
-
----
-
-## Sprint Details
-
-### SP-01 — [Sprint Goal]
-
-**Duration:** Week 1–2
-**Capacity:** {N} SP
-
-| US | Title | Epic | Priority | Risk | Estimate |
-|----|-------|------|---------|------|---------|
-| US-001 | [Title] | E-01 | Must | RISK-02 ↑ | 5 SP |
-| US-002 | [Title] | E-01 | Must | — | 3 SP |
-| US-005 | [Title] | E-02 | Should | — | 8 SP |
-
-**Sprint total:** N SP / {velocity} SP capacity (N%)
-
-**Definition of Done for this sprint:**
-- [ ] All stories pass their Acceptance Criteria.
-- [ ] API endpoints for this sprint are integrated and tested.
-- [ ] No 🔴 Critical open items in `/analyze` for completed stories.
-
----
-
-### SP-02 — [Sprint Goal]
-
-...
-
----
-
-## Unplanned Backlog
-
-Stories not assigned to any sprint (capacity exceeded, low priority, or deferred):
-
-| US | Title | Epic | Priority | Estimate | Reason |
-|----|-------|------|---------|---------|--------|
-| US-018 | [Title] | E-04 | Could | 3 SP | Capacity exceeded |
-| US-022 | [Title] | E-05 | Won't | 8 SP | Out of MVP scope |
-
----
-
-## Assumptions
-
-- Sprint velocity: {N} SP based on {source: user input / estimate from team size}.
-- {Any other assumption made during planning.}
-```
+Save `00_sprint_{slug}.md` to the output directory. The full layout lives at `references/templates/sprint-template.md` and is the single source of truth — including the per-story Persona column (per v3.5.0+ stories template), the net-velocity header, and the sprint-level Definition of Done.
 
 Sprint IDs are sequential (SP-00, SP-01, SP-02, …). SP-00 is reserved for setup/architecture sprint if requested.
 

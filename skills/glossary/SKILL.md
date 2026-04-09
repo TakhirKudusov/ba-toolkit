@@ -19,22 +19,27 @@ Examples:
 - `/glossary drift` — only show terminology drift findings, do not regenerate
 - `/glossary add [Term]: [Definition]` — manually add a term to the glossary
 
+**Standard alignment:** definition style follows the **Aristotelian definition** (genus + differentia + purpose) used by ISO 1087-1 (Terminology Work — Vocabulary). A well-formed definition names the **kind** the term belongs to (genus), then **what makes it specific** (differentia), and optionally its **purpose**. Example: "A **Workspace** is a tenant boundary [genus: tenant boundary] for billing and access control [differentia + purpose]." Bad definitions are circular ("a User is someone who uses the system") or self-referential ("a Subscription is a user's subscription") — `/glossary` rejects these and asks for a rewrite.
+
 ## Context loading
 
-0. If `00_principles_*.md` exists, load it — apply language convention (section 1) and ID naming convention (section 2).
+0. If `00_principles_*.md` exists, load it — apply language convention (section 1), ID naming convention (section 2), and any glossary-specific rules in section 8 (Project-Specific Notes).
 1. Scan the output directory for all existing artifacts. Load each one found:
+   - `00_discovery_{slug}.md` — concept terms, candidate audience names, reference product names
+   - `00_principles_{slug}.md` — convention names, mandatory category names
    - `01_brief_{slug}.md` — Brief Glossary section
    - `02_srs_{slug}.md` — Definitions and Abbreviations section, User Roles
-   - `03_stories_{slug}.md` — actor names used in "As a..." statements
-   - `04_usecases_{slug}.md` — actor names, system names
+   - `03_stories_{slug}.md` — persona names, role names used in "As a..." statements
+   - `04_usecases_{slug}.md` — actor names, system names, stakeholder names
    - `05_ac_{slug}.md` — state names, condition terms
-   - `06_nfr_{slug}.md` — category names, compliance standard names
-   - `07_datadict_{slug}.md` — entity names, field names, enum values
+   - `06_nfr_{slug}.md` — category names, compliance standard names, ISO 25010 sub-characteristics
+   - `07_datadict_{slug}.md` — entity names, field names, enum values, state machine state names
    - `07a_research_{slug}.md` — technology names, ADR decisions
-   - `08_apicontract_{slug}.md` — error codes, resource names
+   - `08_apicontract_{slug}.md` — error codes, resource names, scope names
    - `09_wireframes_{slug}.md` — screen names, UI component names
    - `10_scenarios_{slug}.md` — persona names, scenario types
    - `11_handoff_{slug}.md` — any additional terms
+   - `12_implplan_{slug}.md` — phase names, task ids, technology choices from the Tech Stack header
 2. Load `skills/references/domains/{domain}.md` — Domain Glossary section.
 3. If `00_glossary_{slug}.md` already exists, load it to merge rather than replace.
 
@@ -61,17 +66,29 @@ For each term, record:
 
 ### Step 2 — Terminology drift detection
 
-Identify cases where the same concept appears under different names in different artifacts:
+Identify cases where the same concept appears under different names in different artifacts. The recommendation must include a **justification** for the canonical name choice — not just "Customer" but "Customer because it appears earliest (in the Brief), most frequently (8 occurrences), and matches the domain reference":
 
 ```
 ⚠️ Drift: "Customer" (Brief), "User" (SRS), "Account" (Data Dictionary) — all refer to the registered buyer entity.
 → Recommend canonical name: "Customer"
+→ Justification: appears in the Brief (the source-of-truth glossary per project convention), used 8 times across artifacts vs 3 for "User" and 2 for "Account", and matches the e-commerce domain reference glossary.
 ```
 
 Flag drift as:
 - 🔴 **Critical** — core entity or actor name differs across more than 2 artifacts (impairs traceability).
 - 🟡 **Medium** — synonym used in 1 artifact (easy to harmonise).
 - 🟢 **Low** — informal variation in a description field only.
+
+### Step 2b — Definition quality check
+
+For every term that has a definition, verify the definition follows the Aristotelian form (genus + differentia + purpose). Flag definitions that are:
+
+- 🔴 **Circular** — define the term using the term itself ("a User is a user of the system", "a Subscription is the user's subscription").
+- 🔴 **Self-referential** — define the term by quoting the artifact that uses it ("a Workspace is the workspace described in section 2").
+- 🟡 **Missing genus** — definition lists features but never names the kind ("Workspace: has billing, members, settings" — what *kind of thing* is it?).
+- 🟡 **Missing differentia** — names the genus but doesn't distinguish from siblings ("a Workspace is a container").
+
+The drift report includes a "Definition quality" sub-section that lists all weak definitions with a recommended rewrite. Senior BAs catch this on every glossary review.
 
 ### Step 3 — Undefined term detection
 
