@@ -9,6 +9,18 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [3.1.0] — 2026-04-09
+
+### Highlights
+
+- **Multi-project in one repo.** `ba-toolkit init` now writes `AGENTS.md` inside `output/<slug>/`, scoped to that project. Two agent windows in the same repo can `cd output/alpha && claude` and `cd output/beta && claude` independently — no AGENTS.md collision, no shared state.
+- **Interview options as a 2-column markdown table with letter IDs** (`a`, `b`, `c`, …) instead of a numbered list. Same change cascades through every interview-phase skill via the protocol link.
+- **Inline context after slash commands**: `/brief I want to build an online store for construction materials...` is parsed as a lead-in answer; the skill skips redundant questions and jumps straight to what's missing. Works for all 12 interview-phase skills.
+- **Open-ended lead-in question** for `/brief` and `/principles` when there's no inline context — `Tell me about the project in your own words` — instead of dumping a structured table on the first turn.
+- **Detailed next-step closing block** driven by a 13-row pipeline lookup table in `closing-message.md`, replacing per-skill hardcoded `Next step: /xxx` lines. Locked in by two regression tests.
+
 ### Changed
 
 - **Closing message of every skill is now driven by a single source of truth** — `skills/references/closing-message.md` got a full rewrite that includes (a) a richer closing-block format with an `Available commands` table explaining when to use each subcommand, (b) a 4-line `Next step:` block detailing what the next skill produces, the output filename, the time estimate, and what comes after that, and (c) a 13-row pipeline next-step lookup table that every skill reads from instead of hardcoding `Next step: /xxx` in its own SKILL.md. 10 pipeline-phase SKILL.md files (`brief`, `srs`, `stories`, `usecases`, `ac`, `nfr`, `datadict`, `research`, `apicontract`, `principles`) had their hardcoded `Next step:` lines removed and replaced with an instruction to copy the row from the lookup table. Cross-cutting skills (`/clarify`, `/analyze`, `/trace`, `/estimate`, `/glossary`, `/export`, `/risk`, `/sprint`) keep their per-skill `Available commands` lines but skip the next-step block entirely (as documented in the template). New "If you're stuck" nudge in the closing format suggests `/clarify` and `/validate` for users who don't know what to do next.
@@ -428,7 +440,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.0.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.0...HEAD
+[3.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v2.0.0...v3.0.0
 [2.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.5.0...v2.0.0
 [1.5.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v1.4.0...v1.5.0
