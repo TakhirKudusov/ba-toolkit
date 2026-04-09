@@ -704,7 +704,25 @@ test('menuStep: cancel sets done=true and choice=null', () => {
   assert.equal(r.choice, null);
 });
 
-test('menuStep: digit jumps to that 1-based position', () => {
+test('menuStep: letter "a" jumps to index 0', () => {
+  const at2 = { ...freshState(), index: 2 };
+  const r = menuStep(at2, 'a');
+  assert.equal(r.index, 0);
+});
+
+test('menuStep: letter "c" jumps to index 2', () => {
+  const r = menuStep(freshState(), 'c');
+  assert.equal(r.index, 2);
+});
+
+test('menuStep: letter out of range is a no-op (sample has 3 items, "j" is index 9)', () => {
+  const before = freshState();
+  const r = menuStep(before, 'j');
+  assert.equal(r.index, before.index);
+  assert.equal(r.done, false);
+});
+
+test('menuStep: digit jump kept as backward-compat fallback ("3" → index 2)', () => {
   const r = menuStep(freshState(), '3');
   assert.equal(r.index, 2);
 });
@@ -748,24 +766,24 @@ test('renderMenu: contains the title when provided', () => {
   assert.match(out, /Pick a domain:/);
 });
 
-test('renderMenu: lists every item with a 1-based index', () => {
+test('renderMenu: lists every item with a letter ID', () => {
   const out = renderMenu(freshState(), { title: 'Pick:' });
-  assert.match(out, / 1\) SaaS/);
-  assert.match(out, / 2\) Fintech/);
-  assert.match(out, / 3\) E-commerce/);
+  assert.match(out, / a\) SaaS/);
+  assert.match(out, / b\) Fintech/);
+  assert.match(out, / c\) E-commerce/);
 });
 
 test('renderMenu: marks the selected item with > and unselected with space', () => {
   const at1 = { ...freshState(), index: 1 };
   const out = renderMenu(at1, { title: 'Pick:' });
   // The format per item line is: 2-space prefix, marker (`>` for
-  // selected or ` ` for unselected), 1-space gap, 2-char padded index,
+  // selected or ` ` for unselected), 1-space gap, 1-char letter ID,
   // `)`, label, ...
-  // Selected line — `>` followed by space + " 2)" (idx is padStart(2)).
-  assert.match(out, /^ {2}> {2}2\) Fintech/m);
-  // Unselected lines — 5 leading spaces (2 prefix + 1 placeholder + 1 gap + 1 from padStart of single-digit idx).
-  assert.match(out, /^ {5}1\) SaaS/m);
-  assert.match(out, /^ {5}3\) E-commerce/m);
+  // Selected line — `>` followed by space + "b)".
+  assert.match(out, /^ {2}> b\) Fintech/m);
+  // Unselected lines — 4 leading spaces (2 prefix + 1 placeholder + 1 gap).
+  assert.match(out, /^ {4}a\) SaaS/m);
+  assert.match(out, /^ {4}c\) E-commerce/m);
 });
 
 test('renderMenu: includes item descriptions', () => {
@@ -778,6 +796,7 @@ test('renderMenu: shows the keyboard help line', () => {
   const out = renderMenu(freshState(), { title: 'Pick:' });
   assert.match(out, /↑\/↓ navigate/);
   assert.match(out, /Enter select/);
+  assert.match(out, /a-z jump/);
   assert.match(out, /Esc cancel/);
 });
 
@@ -789,7 +808,7 @@ test('renderMenu: ends with a trailing newline', () => {
 test('renderMenu: works without a title', () => {
   const out = renderMenu(freshState(), {});
   // No title section, but items still rendered.
-  assert.match(out, / 1\) SaaS/);
+  assert.match(out, / a\) SaaS/);
   // First non-empty content line is an item, not a title.
   const firstLine = out.split('\n').find((l) => l.trim().length > 0);
   assert.match(firstLine, /SaaS/);

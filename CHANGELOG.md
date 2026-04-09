@@ -9,6 +9,11 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Interview options are now presented as a 2-column markdown table with letter IDs** instead of a numbered list. Every interview-phase skill (12 SKILL.md files) inherits this automatically through the protocol — the change lives in `skills/references/interview-protocol.md` rule 2, no SKILL.md was touched. Each question now carries `| ID | Variant |` columns where ID is `a`, `b`, `c`, … (lowercase letters); the last row is always the free-text "Other" option. Tables render cleanly in Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf, scan faster than a numbered list, and let users reply with the letter ID, the verbatim variant text, or — for the free-text row — any text of their own.
+- **CLI domain/agent menus now use letter IDs** to match the interview-protocol convention. Arrow-key navigation, vim-bindings (`j/k`), Enter, and Esc/Ctrl+C are unchanged; the jump key is now `a-z` instead of `1-9`. The non-TTY numbered fallback (CI, piped input) accepts a letter ID as the primary input, with digit and verbatim id-string kept as backward-compat fallbacks so existing scripts and muscle memory still work. New regression test asserts both letter and digit input paths through the fallback. `menuStep`, `renderMenu`, and `runMenuTty` were updated; the keypress handler accepts `[a-z]` as primary and `[0-9]` as fallback.
+
 ---
 
 ## [3.0.0] — 2026-04-09

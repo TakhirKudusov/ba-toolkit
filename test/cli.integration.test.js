@@ -209,6 +209,36 @@ test('init: ASCII banner is suppressed when stdout is not a TTY', () => {
   });
 });
 
+test('init: non-TTY menu fallback accepts a letter ID (b → second item)', () => {
+  // Two pieces of input: letter for the domain menu (b → fintech),
+  // letter for the agent menu (a → claude-code).
+  withTempDir((cwd) => {
+    const r = runCli(
+      ['init', '--name', 'Letter Test'],
+      { cwd, input: 'b\na\n' },
+    );
+    assert.equal(r.status, 0, `stderr: ${r.stderr}\nstdout: ${r.stdout}`);
+    // Domain menu fallback should print letter IDs, not 1-9 digits.
+    assert.match(r.stdout, /^\s+a\) SaaS/m);
+    assert.match(r.stdout, /^\s+b\) Fintech/m);
+    // The chosen domain ended up in AGENTS.md.
+    const agents = fs.readFileSync(path.join(cwd, 'AGENTS.md'), 'utf8');
+    assert.match(agents, /\*\*Domain:\*\* fintech/);
+  });
+});
+
+test('init: non-TTY menu fallback still accepts a digit (backward compat)', () => {
+  withTempDir((cwd) => {
+    const r = runCli(
+      ['init', '--name', 'Digit Compat'],
+      { cwd, input: '2\n1\n' },
+    );
+    assert.equal(r.status, 0, `stderr: ${r.stderr}\nstdout: ${r.stdout}`);
+    const agents = fs.readFileSync(path.join(cwd, 'AGENTS.md'), 'utf8');
+    assert.match(agents, /\*\*Domain:\*\* fintech/);
+  });
+});
+
 test('init: invalid interactive domain input re-prompts, then accepts valid answer', () => {
   // Scenario: `ba-toolkit init` was launched without --domain, so it
   // shows the numbered menu. User types "banana" (unknown), gets a

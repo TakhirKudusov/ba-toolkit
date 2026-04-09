@@ -277,7 +277,17 @@ function menuStep(state, key) {
       return { ...state, done: true, choice: state.items[state.index] };
     case 'cancel':
       return { ...state, done: true, choice: null };
-    default:
+    default: {
+      // Letter jump: 'a' → 0, 'b' → 1, …, 'i' → 8.
+      if (/^[a-z]$/.test(key)) {
+        const idx = key.charCodeAt(0) - 'a'.charCodeAt(0);
+        if (idx < len) {
+          return { ...state, index: idx };
+        }
+        return state;
+      }
+      // Digit jump kept as a backward-compat fallback so existing
+      // CI scripts and muscle-memory keep working: '1' → 0, '9' → 8.
       if (/^[0-9]$/.test(key)) {
         const n = parseInt(key, 10);
         if (n >= 1 && n <= len) {
@@ -285,6 +295,7 @@ function menuStep(state, key) {
         }
       }
       return state;
+    }
   }
 }
 
@@ -298,13 +309,16 @@ function renderMenu(state, { title } = {}) {
   state.items.forEach((item, i) => {
     const selected = i === state.index;
     const marker = selected ? cyan('>') : ' ';
-    const idx = String(i + 1).padStart(2);
+    // Letter ID — `a`, `b`, `c`, … — matches the interview-protocol
+    // table format and works for menus up to 26 items (we currently
+    // ship 10 domains and 5 agents, so this is plenty).
+    const id = String.fromCharCode('a'.charCodeAt(0) + i);
     const label = selected ? bold(item.label.padEnd(labelWidth)) : item.label.padEnd(labelWidth);
     const desc = item.desc ? '  ' + gray('— ' + item.desc) : '';
-    lines.push(`  ${marker} ${idx}) ${label}${desc}`);
+    lines.push(`  ${marker} ${id}) ${label}${desc}`);
   });
   lines.push('');
-  lines.push('  ' + gray('↑/↓ navigate · Enter select · 1-9 jump · Esc cancel'));
+  lines.push('  ' + gray('↑/↓ navigate · Enter select · a-z jump · Esc cancel'));
   return lines.join('\n') + '\n';
 }
 
@@ -362,6 +376,12 @@ function runMenuTty(items, { title } = {}) {
       else if (key.name === 'up' || key.name === 'k') action = 'up';
       else if (key.name === 'down' || key.name === 'j') action = 'down';
       else if (key.name === 'return') action = 'enter';
+      // Letter jump (a-z) is the new primary; digit (0-9) stays as a
+      // backward-compat fallback for users who muscle-memory cipher
+      // navigation. menuStep parses both — see its switch statement.
+      // Note: 'j' and 'k' are intercepted above as down/up (vim-bindings),
+      // so they never reach the letter-jump path.
+      else if (key.sequence && /^[a-z]$/.test(key.sequence)) action = key.sequence;
       else if (key.sequence && /^[0-9]$/.test(key.sequence)) action = key.sequence;
       if (!action) return;
       state = menuStep(state, action);
@@ -389,15 +409,15 @@ async function selectMenu(items, { title, fallbackPrompt }) {
   if (isInteractiveTerminal()) {
     return await runMenuTty(items, { title });
   }
-  // Non-TTY fallback: print the numbered list once, then prompt with
+  // Non-TTY fallback: print the lettered list once, then prompt with
   // promptUntilValid so a single typo doesn't kill the wizard.
   log('');
   if (title) log('  ' + yellow(title));
   const labelWidth = Math.max(...items.map((it) => it.label.length));
   items.forEach((item, i) => {
-    const idx = String(i + 1).padStart(2);
+    const id = String.fromCharCode('a'.charCodeAt(0) + i);
     const desc = item.desc ? '  ' + gray('— ' + item.desc) : '';
-    log(`    ${idx}) ${bold(item.label.padEnd(labelWidth))}${desc}`);
+    log(`    ${id}) ${bold(item.label.padEnd(labelWidth))}${desc}`);
   });
   log('');
   return await promptUntilValid(
@@ -405,13 +425,21 @@ async function selectMenu(items, { title, fallbackPrompt }) {
     (raw) => {
       const trimmed = String(raw || '').toLowerCase().trim();
       if (!trimmed) return null;
+      // Letter ID is the primary input (a → 0, b → 1, …).
+      if (/^[a-z]$/.test(trimmed)) {
+        const idx = trimmed.charCodeAt(0) - 'a'.charCodeAt(0);
+        return idx < items.length ? items[idx] : null;
+      }
+      // Digit ID stays as a fallback so legacy CI scripts and pasted
+      // numbers still work (1 → 0, 2 → 1, …).
       if (/^\d+$/.test(trimmed)) {
         const n = parseInt(trimmed, 10);
         return n >= 1 && n <= items.length ? items[n - 1] : null;
       }
+      // Verbatim id-string fallback (e.g., 'saas', 'claude-code').
       return items.find((it) => it.id === trimmed) || null;
     },
-    { invalidMessage: `Invalid selection — pick a number between 1 and ${items.length} or an id.` },
+    { invalidMessage: `Invalid selection — pick a letter (a–${String.fromCharCode('a'.charCodeAt(0) + items.length - 1)}), a number, or an id.` },
   );
 }
 
@@ -881,7 +909,7 @@ async function cmdInit(args) {
       DOMAINS.map((d) => ({ id: d.id, label: d.name, desc: d.desc })),
       {
         title: 'Pick a domain:',
-        fallbackPrompt: `  Select [1-${DOMAINS.length}]: `,
+        fallbackPrompt: `  Select [a-${String.fromCharCode('a'.charCodeAt(0) + DOMAINS.length - 1)}]: `,
       },
     );
     if (chosen == null) {
@@ -909,7 +937,7 @@ async function cmdInit(args) {
         agentEntries.map(([id, a]) => ({ id, label: a.name, desc: '(' + id + ')' })),
         {
           title: 'Pick your AI agent:',
-          fallbackPrompt: `  Select [1-${agentEntries.length}]: `,
+          fallbackPrompt: `  Select [a-${String.fromCharCode('a'.charCodeAt(0) + agentEntries.length - 1)}]: `,
         },
       );
       if (chosen == null) {

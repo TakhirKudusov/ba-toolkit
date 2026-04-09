@@ -74,85 +74,7 @@ Items are sequential — each unblocks the next.
 
 ---
 
-### 5. Example project (`example/`)
-
-**What:** A complete, realistic sample project with all pipeline artifacts generated for one fictional product (e.g. "Dragon Fortune" — an iGaming Telegram Mini App). Stored in `example/dragon-fortune/`.
-
-**Why:** Best onboarding tool in the repo. Answers "what does the output actually look like?" better than any documentation.
-
-**Blocked by:** Items 3 and 4 — the example must include `/risk` and `/sprint` artifacts to be complete. Doing it earlier means rewriting it later.
-
-**Artifacts to include:**
-- `00_principles_dragon-fortune.md`
-- `01_brief_dragon-fortune.md`
-- `02_srs_dragon-fortune.md`
-- `03_stories_dragon-fortune.md`
-- `04_usecases_dragon-fortune.md`
-- `05_ac_dragon-fortune.md`
-- `06_nfr_dragon-fortune.md`
-- `07_datadict_dragon-fortune.md`
-- `07a_research_dragon-fortune.md`
-- `08_apicontract_dragon-fortune.md`
-- `09_wireframes_dragon-fortune.md`
-- `10_scenarios_dragon-fortune.md`
-- `11_handoff_dragon-fortune.md`
-- `00_risks_dragon-fortune.md`
-- `00_sprint_dragon-fortune.md`
-
-**Effort:** High (each artifact needs to be realistic and cross-referenced).
-**Linked README section:** `## 🗂️ What the Output Looks Like` — replace collapsed stubs with links to real files.
-
----
-
 ## Medium priority
-
-Independent of High priority items — can be done in parallel or between tasks.
-
-### 7. npm package — `npx ba-toolkit`
-
-**What:** Publish BA Toolkit as an npm package so users can install and initialise it without cloning the repository.
-
-**Target commands:**
-
-```bash
-# One-time project setup (no install required)
-npx ba-toolkit init
-
-# Copy skills into the correct directory for a specific agent
-npx ba-toolkit install --for claude-code
-npx ba-toolkit install --for claude-code --global
-npx ba-toolkit install --for codex
-npx ba-toolkit install --for gemini
-npx ba-toolkit install --for cursor   # converts to .mdc format
-
-# Global install for repeated use
-npm install -g ba-toolkit
-ba-toolkit init
-ba-toolkit install --for claude-code
-```
-
-**Why:** Current installation requires `git clone` + manual directory copy — two friction points before the user can run `/brief`. `npx ba-toolkit init` reduces that to one command with zero prerequisites beyond Node.js, which most developers already have.
-
-**Package structure:**
-- `bin/ba-toolkit.js` — CLI entry point (Node.js, no framework needed)
-- `skills/` — bundled as-is inside the package
-- `init.ps1` / `init.sh` — kept for users who prefer shell scripts
-- `package.json` — `bin` field pointing to CLI, `files` field including only `bin/` and `skills/`
-
-**CLI behaviour:**
-- `init` — interactive: asks for slug, name, domain; creates `output/{slug}/` and `AGENTS.md`
-- `install --for <agent>` — copies `skills/` to the correct path for the chosen agent; `--global` flag for user-wide install; `--project` (default) for project-level
-- `install --for cursor` — additionally converts each `SKILL.md` to `.mdc` format with required YAML frontmatter
-- `--dry-run` flag — shows what would be copied without writing files
-- `--version` — prints current toolkit version from `package.json`
-
-**Versioning:** npm version mirrors the toolkit's SemVer tag (e.g. `v1.1.0` → `npm publish` with version `1.1.0`). GitHub release workflow (item 2) should trigger `npm publish` automatically on new tags.
-
-**Effort:** Medium (CLI logic is ~150 lines of Node.js; main work is testing cross-platform path handling and the Cursor `.mdc` conversion).
-
-**Dependencies:** zero runtime dependencies — only Node.js built-ins (`fs`, `path`, `readline`, `child_process`).
-
----
 
 ### 8. More domain references
 
@@ -219,3 +141,19 @@ Bugs and improvements:
 4. ✅ AI interview skills follow the new `skills/references/interview-protocol.md`: one question at a time, 3–5 domain-appropriate options, free-text "Other" option, wait for answer. Applied to all 12 interview-phase skills. Guarded by unit test (`test/cli.test.js`) and CI validation step (`.github/workflows/validate.yml`). Done in Unreleased.
 5. ✅ Cursor install now targets `.cursor/skills/` with native folder-per-skill `SKILL.md` layout (`format: 'skill'`). Was writing to `.cursor/rules/` as flat `.mdc` files — wrong Cursor feature. Done in Unreleased.
 6. ✅ Windsurf install now targets `.windsurf/skills/` natively. Mirror of the Cursor fix in pt.5. Done in Unreleased — also removed all dead `.mdc` conversion code (`skillToMdcContent`, `mdc` branch of `copySkills`, `format` field across the AGENTS map and the manifest payload). All 5 supported agents now use a single uniform install path.
+
+Улучшения 2:
+1. ✅ Вопросы и ответы к ним сделать в виде таблицы. Done in Unreleased — interview-protocol rule 2 теперь требует `| ID | Variant |` markdown-таблицу под каждым вопросом.
+2. Улучшить пользовательский опыт при работе с командами:
+- Сделать более user-friendly
+- ✅ Вместо чисел - буквы вариантов. Done in Unreleased — буквенные ID `a-z` в interview-protocol и в CLI menu (TTY arrow-key и non-TTY fallback). Цифры остаются как backward-compat fallback.
+- Сделать инструмент приспособленным к работе одновременно над артефактами для нескольких проектов. Например, когда открыты 2 окна агентов. Сейчас попытка начать новый проект просто перезаписывает AGENTS.md.
+- Сделать более подробное описание того, как продолжить работу после завершения работы с очередной командой.
+- Добавить возможность того, чтобы можно было вводить текст, если такой возможности нет, для каждой команды из основных, например, "/brief я хочу создать онлай-магазин строй-материалов..."
+- Сделай так, чтобы /brief уточнял в первую очередь, что именно за проект будет и его необходимые подробности, если текст для /brief не введен, а только потом начинал работу.
+
+Улучшения 3:
+1. Выделять один из вариантов как recommended
+2. Вариантов всегда не более 5, включая кастомный ответ (например, 4 предложенных готовых вариант + 1 кастомный)
+3. Варианты всегда на языке запроса для /brief
+4. Заменить существующие примеры артефактов в example на артефакты для более универсального проекта, а не из сферы IGaming.
