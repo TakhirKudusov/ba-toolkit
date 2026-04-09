@@ -24,28 +24,29 @@ Improvements batch 3:
 3. ✅ Variant text in `/brief` is always written in the language of the user's first request — domain references should be translated on the fly when the interview language is not English. Done in Unreleased — `interview-protocol.md` new rule 11, applies to every interview-phase skill (not just `/brief`); domain reference files stay English-only per the project convention, translation happens at runtime; example block now includes a Russian rendering.
 4. ✅ Replaced `example/dragon-fortune/` with `example/lumen-goods/` — a sustainable home-goods D2C e-commerce walkthrough. All 15 artifacts rewritten end-to-end; CLAUDE.md and README updated. Done in Unreleased.
 
-Улучшения 4:
-1. Добавить команду для брейн-шторма с ИИ, чтобы создать первоначальный концепт на тот случай, если пользователь не определился с доменом проекта и тем, какие функции должны быть у него (приоритет 1)
-2. Дополнить примеры при необходимости (приоритет 2)
-3. Обновить CLAUDE.md, чтобы он соответствовал проекту (приоритет 3)
-4. Синхронизировать с проектом документацию и ридми (приоритет 4)
+Improvements batch 4:
+1. ✅ Add an AI brain-storm command to draft an initial concept for users who haven't decided on a project domain or feature set yet (priority 1). Done in Unreleased — new `/discovery` skill at `skills/discovery/SKILL.md`, template at `skills/references/templates/discovery-template.md`, wired into `agents-template.md` (stage 0, /principles → 0a) and `closing-message.md` lookup table; `/brief` consumes `00_discovery_*.md` if present.
+2. ✅ Extend examples as needed (priority 2). Done in Unreleased — `example/lumen-goods/00_discovery_lumen-goods.md` added so the walkthrough is end-to-end consistent with the new pipeline entry point.
+3. ✅ Update CLAUDE.md to match the current project state (priority 3). Done in Unreleased — bumped skill count 21 → 22 in §1 and §4, added /discovery as the entry point.
+4. ✅ Sync project documentation and the README (priority 4). Done in Unreleased — `README.md`, `COMMANDS.md`, `package.json`, `docs/USAGE.md`, `docs/FAQ.md`, `bin/ba-toolkit.js` comments, and the `test/cli.test.js` skill-count assertion all updated.
 
-Улучшения 5:
-1. Прочесть каждый из скиллов. Составить план улучшения для каждого с точки зрения профессионализма того, что описано в скилле и шаблоне для артефакта и UX. ИИ-агент при применении скиллов должен действовать как профессиональный бизнес-аналитик с опытом не менее 25 лет в крупнейших американских компаниях. 
-2. Команда для подготовки экспорта файлов в notion ли confluence.
-3. MCP-сервер.
-4. Расширить количество доменов в референсах.
-5. Обновить CLAUDE.md, чтобы он соответствовал проекту
-6. Синхронизировать с проектом документацию и ридми
+Improvements batch 5:
+1. Read every shipped skill. Draft an improvement plan for each one — covering the professionalism of the SKILL.md content, the artifact template, and the end-user UX. When applying these skills the AI agent should behave like a professional business analyst with at least 25 years of experience at top-tier US companies. The improvement plan can be saved somewhere local for context, but it must not be committed to GitHub. (priority 4)
+2. ✅ Command for preparing exports of artifact files to Notion or Confluence. (priority 1) Done in Unreleased — new `ba-toolkit publish` CLI subcommand + thin `/publish` skill, zero-deps `markdownToHtml` helper, both Notion (Markdown bundle) and Confluence (HTML bundle + index.html) targets, intra-project cross-reference rewriting per target, AGENTS.md auto-included as the first page with managed-block stripped, 23 new unit + integration tests.
+3. MCP server. (priority 3)
+4. Expand the number of domain references. (priority 2)
+5. Update CLAUDE.md to match the current project state. (priority 6)
+6. Sync project documentation and the README. (priority 5)
 
-Улучшения 6:
-1. Изменить формат команд для скиллов: например, вместо /brief сделать /ba-toolkit.brief и т.д.
-2. Создать скилл, который будет генерировать последовательный план для ИИ-агента по реализации проекта на основе сгенерированных артефактов другими скиллами.
-3. Создать скилл, который будет генерировать необходимые тесты на основе созданных артефактов для TDD.
-4. Создать скилл, который будет валидировать проект на предмет соответствия сгенерированным артефактам (use cases и т.п.)
-5. Обновить CLAUDE.md, чтобы он соответствовал проекту. Дополнить пайплайн с учетом возможности создания проекта на основе TDD.
-6. Синхронизировать с проектом документацию и ридми
+Improvements batch 6:
+1. Change the slash command format for skills — e.g. rename `/brief` to `/ba-toolkit.brief` and so on. (priority 1)
+2. Add a skill that generates a sequential implementation plan for an AI coding agent based on the artifacts produced by the other skills. (priority 2)
+3. Add a skill that generates the tests required for TDD based on the produced artifacts. (priority 3)
+4. Add a skill that validates a project against the generated artifacts (use cases, etc.). (priority 4)
+5. Update CLAUDE.md to match the current project state. Extend the pipeline description to cover the TDD-based delivery flow. (priority 6)
+6. Sync project documentation and the README. (priority 5)
 
-Улучшения 7:
-1. Создать дальнейший план развития/улучшения проекта и исправления проблем. Возможно, будут полезные еще какие-либо скиллы, например.
-2. Создать сайт на базе github для проекта. Отразить на сайте документацию + дальнейшие планы + предоставить ссылки (npm, github, мой linkedin).
+Improvements batch 7:
+1. Build a roadmap for further development / improvements and bug fixes. Possibly additional useful skills, for example. (priority 1)
+2. Build a GitHub-hosted website for the project. The site must surface the documentation, the roadmap, and links (npm, GitHub, my LinkedIn). It must be responsive and look good on both desktop and mobile. (priority 2)
+3. При необходимости еще раз переработать ридми и документацию. (приоритет 3)

@@ -43,6 +43,7 @@ Skills use this table as the single source of truth for the `Next step:` block. 
 
 | Current      | Next            | What it produces                                                | Time         | After that                                          |
 |--------------|-----------------|-----------------------------------------------------------------|--------------|-----------------------------------------------------|
+| /discovery   | /brief          | Project Brief — goals, audience, stakeholders, constraints      | 20–35 min    | /srs — Requirements Specification (IEEE 830)        |
 | /principles  | /brief          | Project Brief — goals, audience, stakeholders, constraints      | 20–35 min    | /srs — Requirements Specification (IEEE 830)        |
 | /brief       | /srs            | Requirements Specification (IEEE 830) — scope, FRs, MoSCoW      | 25–40 min    | /stories — User Stories grouped by Epics            |
 | /srs         | /stories        | User Stories grouped by Epics, with priority and FR refs        | 20–30 min    | /usecases — Use Cases with main/alt/exception flows |
@@ -67,6 +68,7 @@ These skills do not advance the pipeline — they update or report on existing a
 - `/estimate` — effort estimation
 - `/glossary` — glossary maintenance
 - `/export` — export to Jira / GitHub Issues / Linear / CSV
+- `/publish` — bundle artifacts for Notion (Markdown) or Confluence (HTML) import
 - `/risk` — risk register
 - `/sprint` — sprint plan
 

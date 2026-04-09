@@ -16,7 +16,8 @@
 
 | Stage | Skill | Status | File |
 |-------|-------|--------|------|
-| 0 | /principles | ⬜ Not started | — |
+| 0 | /discovery | ⬜ Not started | — |
+| 0a | /principles | ⬜ Not started | — |
 | 1 | /brief | ⬜ Not started | — |
 | 2 | /srs | ⬜ Not started | — |
 | 3 | /stories | ⬜ Not started | — |
@@ -42,6 +43,7 @@ Utilities available throughout the pipeline. No fixed stage — invoke whenever 
 | /estimate | Effort estimation — Fibonacci SP, T-shirt sizes, or person-days |
 | /glossary | Unified project glossary with terminology drift detection |
 | /export [format] | Export User Stories to Jira / GitHub Issues / Linear / CSV |
+| /publish [format] | Bundle artifacts for Notion (Markdown) or Confluence (HTML) — drag-and-drop import |
 | /risk | Risk register — probability × impact matrix, mitigation per risk |
 | /sprint | Sprint plan — stories grouped by velocity and capacity with sprint goals |
 

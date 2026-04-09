@@ -4,7 +4,7 @@
 
 ## 1. What this project is
 
-BA Toolkit is an AI-powered Business Analyst pipeline: 21 interconnected skills that take a project from rough brief to development handoff. Published to npm as **`@kudusov.takhir/ba-toolkit`** (scoped, public). Works with Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf. The CLI is a single-file Node.js script with **zero runtime dependencies**.
+BA Toolkit is an AI-powered Business Analyst pipeline: 23 interconnected skills that take a project from a vague concept through brief, handoff, and stakeholder publishing (Notion + Confluence). Published to npm as **`@kudusov.takhir/ba-toolkit`** (scoped, public). Works with Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf. The CLI is a single-file Node.js script with **zero runtime dependencies**.
 
 ## 2. Language rule — English only
 
@@ -31,7 +31,7 @@ There is **no build step** — the CLI runs directly with `node`. There are **no
 
 ```
 bin/ba-toolkit.js         # CLI entry point (~550 lines, single file, zero deps)
-skills/                   # 21 SKILL.md files + references/
+skills/                   # 23 SKILL.md files + references/ (entry point: /discovery → /brief; /publish for Notion/Confluence)
   {skill}/SKILL.md        # Each skill has YAML frontmatter (name, description)
   references/
     domains/              # 9 domain files + placeholder entries for custom

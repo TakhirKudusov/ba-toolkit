@@ -26,6 +26,13 @@ const {
   mergeAgentsMd,
   menuStep,
   renderMenu,
+  markdownToHtml,
+  htmlEscape,
+  slugifyHeading,
+  rewriteLinks,
+  stripManagedBlock,
+  compareArtifactFilenames,
+  ARTIFACT_FILE_RE,
   KNOWN_FLAGS,
   DOMAINS,
   AGENTS,
@@ -667,7 +674,7 @@ test('parseSkillFrontmatter: parses every shipped SKILL.md without losing the de
   const skillFolders = fs.readdirSync(skillsDir, { withFileTypes: true })
     .filter((e) => e.isDirectory() && e.name !== 'references')
     .map((e) => e.name);
-  assert.ok(skillFolders.length >= 20, `expected ~21 skill folders, found ${skillFolders.length}`);
+  assert.ok(skillFolders.length >= 23, `expected at least 23 skill folders, found ${skillFolders.length}`);
   for (const folder of skillFolders) {
     const skillPath = path.join(skillsDir, folder, 'SKILL.md');
     if (!fs.existsSync(skillPath)) continue;
@@ -1044,4 +1051,112 @@ test('renderAgentsMd: preserves [focus] and [format] in the cross-cutting table'
   const out = renderAgentsMd({ name: 'My App', slug: 'my-app', domain: 'saas' });
   assert.match(out, /\/clarify \[focus\]/);
   assert.match(out, /\/export \[format\]/);
+  assert.match(out, /\/publish \[format\]/);
+});
+
+// --- markdownToHtml + supporting helpers (cmdPublish) -----------------
+
+test('htmlEscape: escapes the four html-significant characters', () => {
+  assert.equal(htmlEscape('<a href="x">b & c</a>'), '&lt;a href=&quot;x&quot;&gt;b &amp; c&lt;/a&gt;');
+});
+
+test('slugifyHeading: produces github-style anchor ids', () => {
+  assert.equal(slugifyHeading('FR-001 Login'), 'fr-001-login');
+  assert.equal(slugifyHeading('1. Project Summary'), '1-project-summary');
+  assert.equal(slugifyHeading('Table of contents!'), 'table-of-contents');
+});
+
+test('markdownToHtml: headings get id attributes from their text', () => {
+  const html = markdownToHtml('# Project Brief\n\n## 1. Goals');
+  assert.match(html, /<h1 id="project-brief">Project Brief<\/h1>/);
+  assert.match(html, /<h2 id="1-goals">1\. Goals<\/h2>/);
+});
+
+test('markdownToHtml: paragraph + bold + italic + inline code', () => {
+  const html = markdownToHtml('This is **bold** and *italic* and `code`.');
+  assert.equal(html, '<p>This is <strong>bold</strong> and <em>italic</em> and <code>code</code>.</p>');
+});
+
+test('markdownToHtml: link gets href and label', () => {
+  const html = markdownToHtml('See [FR-001](02_srs.md#fr-001) for details.');
+  assert.match(html, /<a href="02_srs\.md#fr-001">FR-001<\/a>/);
+});
+
+test('markdownToHtml: unordered list', () => {
+  const html = markdownToHtml('- alpha\n- beta\n- gamma');
+  assert.equal(html, '<ul><li>alpha</li><li>beta</li><li>gamma</li></ul>');
+});
+
+test('markdownToHtml: ordered list', () => {
+  const html = markdownToHtml('1. first\n2. second');
+  assert.equal(html, '<ol><li>first</li><li>second</li></ol>');
+});
+
+test('markdownToHtml: GFM table with header + body', () => {
+  const md = '| ID | Name |\n|----|------|\n| 1 | Alice |\n| 2 | Bob |';
+  const html = markdownToHtml(md);
+  assert.match(html, /<table><thead><tr><th>ID<\/th><th>Name<\/th><\/tr><\/thead>/);
+  assert.match(html, /<tbody><tr><td>1<\/td><td>Alice<\/td><\/tr><tr><td>2<\/td><td>Bob<\/td><\/tr><\/tbody>/);
+});
+
+test('markdownToHtml: fenced code block preserves content and language', () => {
+  const md = '```js\nconst x = 1;\n```';
+  const html = markdownToHtml(md);
+  assert.match(html, /<pre><code class="language-js">const x = 1;<\/code><\/pre>/);
+});
+
+test('markdownToHtml: blockquote and horizontal rule', () => {
+  const html = markdownToHtml('> a quote\n\n---');
+  assert.match(html, /<blockquote><p>a quote<\/p><\/blockquote>/);
+  assert.match(html, /<hr>/);
+});
+
+test('markdownToHtml: html special chars in content are escaped', () => {
+  const html = markdownToHtml('Use <script> tags & "quotes" carefully.');
+  assert.match(html, /Use &lt;script&gt; tags &amp; &quot;quotes&quot; carefully\./);
+});
+
+test('rewriteLinks: notion mode prefixes intra-project markdown links with ./', () => {
+  const out = rewriteLinks('See [FR-001](02_srs_x.md#fr-001) and [docs](https://example.com).', 'notion');
+  assert.match(out, /\[FR-001\]\(\.\/02_srs_x\.md#fr-001\)/);
+  assert.match(out, /\[docs\]\(https:\/\/example\.com\)/);
+});
+
+test('rewriteLinks: confluence mode swaps .md for .html in intra-project links', () => {
+  const out = rewriteLinks('See [FR-001](02_srs_x.md#fr-001) and [docs](https://example.com).', 'confluence');
+  assert.match(out, /\[FR-001\]\(02_srs_x\.html#fr-001\)/);
+  assert.match(out, /\[docs\]\(https:\/\/example\.com\)/);
+});
+
+test('stripManagedBlock: removes the ba-toolkit managed marker block', () => {
+  const input = '# Title\n\n<!-- ba-toolkit:begin managed -->\n## Active Project\n**Project:** X\n<!-- ba-toolkit:end managed -->\n\n## Pipeline Status';
+  const out = stripManagedBlock(input);
+  assert.ok(!out.includes('ba-toolkit:begin managed'));
+  assert.ok(!out.includes('Active Project'));
+  assert.ok(out.includes('# Title'));
+  assert.ok(out.includes('## Pipeline Status'));
+});
+
+test('compareArtifactFilenames: orders 01 < 02 < 07 < 07a < 08 < 11', () => {
+  const files = ['11_handoff_x.md', '07a_research_x.md', '02_srs_x.md', '01_brief_x.md', '07_datadict_x.md', '08_apicontract_x.md'];
+  files.sort(compareArtifactFilenames);
+  assert.deepEqual(files, [
+    '01_brief_x.md',
+    '02_srs_x.md',
+    '07_datadict_x.md',
+    '07a_research_x.md',
+    '08_apicontract_x.md',
+    '11_handoff_x.md',
+  ]);
+});
+
+test('ARTIFACT_FILE_RE: matches every shipped artifact filename pattern', () => {
+  assert.ok(ARTIFACT_FILE_RE.test('00_discovery_my-app.md'));
+  assert.ok(ARTIFACT_FILE_RE.test('00_principles_my-app.md'));
+  assert.ok(ARTIFACT_FILE_RE.test('01_brief_my-app.md'));
+  assert.ok(ARTIFACT_FILE_RE.test('07a_research_my-app.md'));
+  assert.ok(ARTIFACT_FILE_RE.test('11_handoff_my-app.md'));
+  assert.ok(!ARTIFACT_FILE_RE.test('AGENTS.md'));
+  assert.ok(!ARTIFACT_FILE_RE.test('README.md'));
+  assert.ok(!ARTIFACT_FILE_RE.test('1_brief_x.md')); // single digit
 });

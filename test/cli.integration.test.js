@@ -699,3 +699,137 @@ test('status in an empty directory reports no installations', () => {
     assert.match(r.stdout, /No BA Toolkit installations found/);
   });
 });
+
+// --------------------------------------------------------------------
+// Group 8 — publish (Notion / Confluence bundle export)
+// --------------------------------------------------------------------
+
+// Helper for the publish tests: write three minimal artifacts with
+// known content and a cross-reference between them. Mirrors what a
+// real project's output/<slug>/ folder looks like after running the
+// pipeline through /stories.
+function writePublishFixture(dir) {
+  fs.writeFileSync(
+    path.join(dir, '01_brief_test.md'),
+    '# Project Brief: Test\n\n**Domain:** saas\n\n## 1. Goal\n\nBuild a thing. See [FR-001](02_srs_test.md#fr-001) for details.\n',
+  );
+  fs.writeFileSync(
+    path.join(dir, '02_srs_test.md'),
+    '# Requirements: Test\n\n## FR-001\n\nThe **system** shall do `X`.\n\n| ID | Priority |\n|----|----------|\n| FR-001 | Must |\n',
+  );
+  fs.writeFileSync(
+    path.join(dir, '03_stories_test.md'),
+    '# Stories: Test\n\n- US-001: as a user I can foo\n- US-002: as a user I can bar\n',
+  );
+}
+
+test('publish in an empty directory exits non-zero with a clear error', () => {
+  withTempDir((cwd) => {
+    const r = runCli(['publish'], { cwd });
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr + r.stdout, /No BA Toolkit artifacts found/);
+  });
+});
+
+test('publish --format both produces notion and confluence bundles', () => {
+  withTempDir((cwd) => {
+    writePublishFixture(cwd);
+    const r = runCli(['publish', '--format', 'both'], { cwd });
+    assert.equal(r.status, 0, `stderr: ${r.stderr}\nstdout: ${r.stdout}`);
+    // Both bundles exist.
+    assert.ok(fs.existsSync(path.join(cwd, 'publish', 'notion')));
+    assert.ok(fs.existsSync(path.join(cwd, 'publish', 'confluence')));
+    // Notion bundle: one .md per artifact, original filenames preserved.
+    const notionFiles = fs.readdirSync(path.join(cwd, 'publish', 'notion')).sort();
+    assert.deepEqual(notionFiles, ['01_brief_test.md', '02_srs_test.md', '03_stories_test.md']);
+    // Notion link rewrite: cross-reference now starts with `./`.
+    const briefNotion = fs.readFileSync(path.join(cwd, 'publish', 'notion', '01_brief_test.md'), 'utf8');
+    assert.match(briefNotion, /\[FR-001\]\(\.\/02_srs_test\.md#fr-001\)/);
+    // Confluence bundle: one .html per artifact + index.html.
+    const confluenceFiles = fs.readdirSync(path.join(cwd, 'publish', 'confluence')).sort();
+    assert.deepEqual(confluenceFiles, ['01_brief_test.html', '02_srs_test.html', '03_stories_test.html', 'index.html']);
+    // Confluence link rewrite: cross-reference now points at .html sibling.
+    const briefHtml = fs.readFileSync(path.join(cwd, 'publish', 'confluence', '01_brief_test.html'), 'utf8');
+    assert.match(briefHtml, /<a href="02_srs_test\.html#fr-001">FR-001<\/a>/);
+    // Confluence: SRS table renders as <table>.
+    const srsHtml = fs.readFileSync(path.join(cwd, 'publish', 'confluence', '02_srs_test.html'), 'utf8');
+    assert.match(srsHtml, /<table><thead>/);
+    assert.match(srsHtml, /<strong>system<\/strong>/);
+    assert.match(srsHtml, /<code>X<\/code>/);
+    // Confluence: index.html lists every artifact in pipeline order.
+    const index = fs.readFileSync(path.join(cwd, 'publish', 'confluence', 'index.html'), 'utf8');
+    const briefIdx = index.indexOf('01_brief_test.html');
+    const srsIdx = index.indexOf('02_srs_test.html');
+    const storiesIdx = index.indexOf('03_stories_test.html');
+    assert.ok(briefIdx > 0 && srsIdx > briefIdx && storiesIdx > srsIdx, 'index.html must list pages in pipeline order');
+    // Stdout summary mentions both bundles.
+    assert.match(r.stdout, /Notion bundle/);
+    assert.match(r.stdout, /Confluence bundle/);
+    assert.match(r.stdout, /Next steps/);
+  });
+});
+
+test('publish --format notion only writes the notion bundle', () => {
+  withTempDir((cwd) => {
+    writePublishFixture(cwd);
+    const r = runCli(['publish', '--format', 'notion'], { cwd });
+    assert.equal(r.status, 0);
+    assert.ok(fs.existsSync(path.join(cwd, 'publish', 'notion')));
+    assert.ok(!fs.existsSync(path.join(cwd, 'publish', 'confluence')));
+  });
+});
+
+test('publish --format confluence only writes the confluence bundle', () => {
+  withTempDir((cwd) => {
+    writePublishFixture(cwd);
+    const r = runCli(['publish', '--format', 'confluence'], { cwd });
+    assert.equal(r.status, 0);
+    assert.ok(!fs.existsSync(path.join(cwd, 'publish', 'notion')));
+    assert.ok(fs.existsSync(path.join(cwd, 'publish', 'confluence')));
+  });
+});
+
+test('publish --dry-run writes nothing but reports the planned files', () => {
+  withTempDir((cwd) => {
+    writePublishFixture(cwd);
+    const r = runCli(['publish', '--format', 'both', '--dry-run'], { cwd });
+    assert.equal(r.status, 0);
+    assert.ok(!fs.existsSync(path.join(cwd, 'publish')));
+    assert.match(r.stdout, /dry-run/);
+    assert.match(r.stdout, /would write/);
+  });
+});
+
+test('publish --format invalid exits non-zero', () => {
+  withTempDir((cwd) => {
+    writePublishFixture(cwd);
+    const r = runCli(['publish', '--format', 'pdf'], { cwd });
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr + r.stdout, /Unknown --format/);
+  });
+});
+
+test('publish includes AGENTS.md as the first page when present', () => {
+  withTempDir((cwd) => {
+    writePublishFixture(cwd);
+    fs.writeFileSync(
+      path.join(cwd, 'AGENTS.md'),
+      '# Test project\n\n<!-- ba-toolkit:begin managed -->\n## Active Project\n**Project:** Test\n<!-- ba-toolkit:end managed -->\n\n## Pipeline Status\n\n- /brief done\n',
+    );
+    const r = runCli(['publish', '--format', 'both'], { cwd });
+    assert.equal(r.status, 0);
+    // Notion bundle includes AGENTS.md.
+    const notionFiles = fs.readdirSync(path.join(cwd, 'publish', 'notion')).sort();
+    assert.ok(notionFiles.includes('AGENTS.md'));
+    // Managed block is stripped from the published copy.
+    const agentsBody = fs.readFileSync(path.join(cwd, 'publish', 'notion', 'AGENTS.md'), 'utf8');
+    assert.ok(!agentsBody.includes('ba-toolkit:begin managed'));
+    assert.ok(!agentsBody.includes('Active Project'));
+    assert.ok(agentsBody.includes('Pipeline Status'));
+    // Confluence bundle has AGENTS.html before the artifact pages in index.html.
+    const index = fs.readFileSync(path.join(cwd, 'publish', 'confluence', 'index.html'), 'utf8');
+    const agentsIdx = index.indexOf('AGENTS.html');
+    const briefIdx = index.indexOf('01_brief_test.html');
+    assert.ok(agentsIdx > 0 && agentsIdx < briefIdx, 'AGENTS.html must appear before the first pipeline artifact in the index');
+  });
+});

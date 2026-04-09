@@ -103,7 +103,7 @@ You:    a
         ... (interview continues normally) ...
 ```
 
-Both styles are supported by **every** interview-phase skill (`/brief`, `/srs`, `/stories`, `/usecases`, `/ac`, `/nfr`, `/datadict`, `/research`, `/apicontract`, `/wireframes`, `/scenarios`, `/principles`). Inline context works for any of them — `/srs focus on the payments module first`, `/stories I want to plan the onboarding epic`, `/nfr emphasise security and compliance`, etc. The agent uses it as a scope or focus hint, then runs the rest of the interview normally.
+Both styles are supported by **every** interview-phase skill (`/discovery`, `/brief`, `/srs`, `/stories`, `/usecases`, `/ac`, `/nfr`, `/datadict`, `/research`, `/apicontract`, `/wireframes`, `/scenarios`, `/principles`, `/publish`). Inline context works for any of them — `/discovery I have a vague idea about a tool for freelance designers chasing late invoices`, `/srs focus on the payments module first`, `/stories I want to plan the onboarding epic`, `/nfr emphasise security and compliance`, `/publish notion`, etc. The agent uses it as a scope or focus hint, then runs the rest of the interview normally.
 
 Every interview follows the same protocol — one question at a time, 3–5 domain-appropriate variants in a 2-column markdown table with letter IDs (`a`, `b`, `c`, …), plus a free-text "Other" row you can always type into. See [`skills/references/interview-protocol.md`](../skills/references/interview-protocol.md) for the full rule. You never have to remember the format — every shipped skill enforces it.
 
@@ -281,7 +281,8 @@ If you re-run `ba-toolkit init --slug <existing-slug>` for an existing project, 
 
 | Stage | Skill | Status | File |
 |-------|-------|--------|------|
-| 0 | /principles | ⬜ Not started | — |
+| 0 | /discovery | ⬜ Not started | — |
+| 0a | /principles | ⬜ Not started | — |
 | 1 | /brief | ⬜ Not started | — |
 | 2 | /srs | ⬜ Not started | — |
 | ... | ... | ... | ... |
@@ -314,7 +315,31 @@ If `AGENTS.md` exists but has no managed-block anchors (legacy file from before 
 
 ### How `/brief` and `/srs` interact with AGENTS.md
 
-`/brief` and `/srs` both read `AGENTS.md` for the slug, domain, and language at the start, and update the `## Pipeline Status` table when they finish — toggling their row to `✅ Done` and filling in the artifact filename. They never touch the managed block. `/principles` and the other skills follow the same rule.
+`/brief` and `/srs` both read `AGENTS.md` for the slug, domain, and language at the start, and update the `## Pipeline Status` table when they finish — toggling their row to `✅ Done` and filling in the artifact filename. They never touch the managed block. `/discovery`, `/principles`, and the other skills follow the same rule.
+
+---
+
+## Sharing artifacts with stakeholders
+
+Once the pipeline is far enough along to be useful (typically after `/brief` or `/srs`, definitely by `/handoff`), you can hand the artifacts to non-developer stakeholders who live in Notion or Confluence rather than in your repo.
+
+Use `ba-toolkit publish` (or `/publish` inside your AI agent) to bundle the markdown artifacts into import-ready folders:
+
+```bash
+cd output/<slug>
+ba-toolkit publish                       # both formats, default ./publish/
+ba-toolkit publish --format notion       # Notion only
+ba-toolkit publish --format confluence   # Confluence only
+ba-toolkit publish --format both --out ../share
+ba-toolkit publish --dry-run             # preview the file list, write nothing
+```
+
+The command produces two folders under `./publish/`:
+
+- **`publish/notion/`** — clean Markdown files. Drag-and-drop the folder into Notion's **Import → Markdown & CSV** dialog. Notion creates one page per file, the filename becomes the page title, and intra-project cross-references like `[FR-001](02_srs_<slug>.md#fr-001)` are preserved as page-to-page links.
+- **`publish/confluence/`** — Self-contained HTML files plus `index.html` as the entry point. Zip the folder using your OS, then upload via **Space settings → Content tools → Import → HTML** in Confluence Cloud or Data Center. Tables, code blocks, headings, and cross-references all convert.
+
+No API tokens, no OAuth, no network calls — the conversion happens entirely on your machine and the upload is a manual drag-and-drop. Re-running `ba-toolkit publish` overwrites the previous bundle, so it is safe to publish again after `/clarify`, `/revise`, or any later pipeline step.
 
 ---
 
@@ -324,8 +349,10 @@ Approximate, depends on project complexity and interview depth.
 
 | Step | Lean pipeline | Full pipeline |
 |------|:---:|:---:|
+| `/discovery` | — | 10–15 min |
 | `/principles` | — | 5–10 min |
 | `/brief` | 15–25 min | 20–35 min |
+| `/publish` *(post-handoff, optional)* | 1–2 min | 1–2 min |
 | `/srs` | 25–40 min | 30–50 min |
 | `/stories` | 20–30 min | 25–40 min |
 | `/usecases` | — | 20–35 min |

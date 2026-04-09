@@ -1,6 +1,6 @@
 # BA Toolkit — Command Reference
 
-Quick reference for all 21 skills and subcommands.
+Quick reference for all 23 skills and subcommands.
 
 ---
 
@@ -10,7 +10,8 @@ Run these in order. Each skill reads the output of all previous steps.
 
 | # | Command | Output file | What it generates |
 |:---:|---------|-------------|-------------------|
-| 0 | `/principles` | `00_principles_{slug}.md` | Project constitution: language, ID conventions, DoR, traceability rules, NFR baseline |
+| 0 | `/discovery` | `00_discovery_{slug}.md` | Concept Discovery: problem space, audience hypotheses, candidate domains, MVP feature ideas, validation questions. Use when you don't yet know what to build — feeds the chosen domain, name, and scope hint into `/brief` |
+| 0a | `/principles` | `00_principles_{slug}.md` | Project constitution: language, ID conventions, DoR, traceability rules, NFR baseline |
 | 1 | `/brief` | `01_brief_{slug}.md` | Project Brief: goals, audience, stakeholders, constraints, risks. Updates the `AGENTS.md` Pipeline Status table (which `ba-toolkit init` already created) |
 | 2 | `/srs` | `02_srs_{slug}.md` | Requirements Specification (IEEE 830): scope, FRs, constraints, assumptions |
 | 3 | `/stories` | `03_stories_{slug}.md` | User Stories grouped by Epics, with priority and FR references |
@@ -38,6 +39,7 @@ Available at any pipeline stage.
 | `/estimate` | `00_estimate_{slug}.md` | Effort estimation for User Stories: Fibonacci SP, T-shirt sizes, or person-days |
 | `/glossary` | `00_glossary_{slug}.md` | Unified project glossary: scans all artifacts, detects terminology drift, undefined terms |
 | `/export [format]` | `export_{slug}_{format}.json` / `.csv` | Export User Stories to Jira, GitHub Issues, Linear, or CSV |
+| `/publish [format]` | `publish/notion/`, `publish/confluence/` | Bundle artifacts for Notion (Markdown bundle) and Confluence (HTML bundle) — drag-and-drop import, no API tokens. Wraps the `ba-toolkit publish` CLI subcommand |
 | `/risk` | `00_risks_{slug}.md` | Risk register: probability × impact matrix, mitigation and contingency per risk |
 | `/sprint` | `00_sprint_{slug}.md` | Sprint plan: stories grouped into sprints by velocity, capacity, and risk priority |
 

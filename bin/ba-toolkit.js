@@ -21,7 +21,7 @@ const PKG = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 
 // All five supported agents — Claude Code, Codex CLI, Gemini CLI,
 // Cursor, and Windsurf — load Agent Skills as direct subfolders of
 // their skills root: `<skills-root>/<skill-name>/SKILL.md`. The toolkit
-// installs the 21 skills natively in this layout for every agent. No
+// installs the 23 skills natively in this layout for every agent. No
 // .mdc conversion. Confirmed against the Agent Skills documentation
 // for each platform via ctx7 MCP / official docs.
 //
@@ -523,6 +523,7 @@ function stringFlag(args, key) {
 const KNOWN_FLAGS = new Set([
   'name', 'slug', 'domain', 'for', 'no-install',
   'global', 'project', 'dry-run',
+  'format', 'out',
   'version', 'v', 'help', 'h',
 ]);
 
@@ -1008,19 +1009,22 @@ async function cmdInit(args) {
     log('    2. ' + bold(`cd ${outputDir}`) + ' — open your AI agent in this folder.');
     log('       Each project has its own AGENTS.md, so two agent windows');
     log('       can work on two different projects in the same repo.');
-    log('    3. Optional: run /principles to define project-wide conventions');
+    log('    3. Optional: run /discovery if you do not yet know what to build,');
+    log('       or /principles to define project-wide conventions');
     log('    4. Run /brief to start the BA pipeline');
   } else if (installed === false) {
     log('    1. Skill install was cancelled. To install later, run:');
     log('         ' + gray(`ba-toolkit install --for ${agentId}`));
     log('    2. ' + bold(`cd ${outputDir}`) + ' and open your AI agent there.');
-    log('    3. Optional: run /principles to define project-wide conventions');
+    log('    3. Optional: run /discovery if you do not yet know what to build,');
+    log('       or /principles to define project-wide conventions');
     log('    4. Run /brief to start the BA pipeline');
   } else {
     log('    1. Install skills for your agent:');
     log('         ' + gray('ba-toolkit install --for claude-code'));
     log('    2. ' + bold(`cd ${outputDir}`) + ' and open your AI agent there.');
-    log('    3. Optional: run /principles to define project-wide conventions');
+    log('    3. Optional: run /discovery if you do not yet know what to build,');
+    log('       or /principles to define project-wide conventions');
     log('    4. Run /brief to start the BA pipeline');
   }
   log('');
@@ -1061,7 +1065,7 @@ function writeManifest(destDir, items) {
 }
 
 // Detect the v1.x install layout: every previous install path nested
-// our 21 skills under an extra `ba-toolkit/` folder, which made them
+// the v1.x skills under an extra `ba-toolkit/` folder, which made them
 // invisible to every agent's skill loader. Returns the absolute paths
 // of any legacy folders that still exist for the given agent, so the
 // caller can warn the user to clean them up before installing v2.0.
@@ -1472,6 +1476,385 @@ async function cmdUninstall(args) {
   log('');
 }
 
+// --- Publish (Notion / Confluence export) ------------------------------
+
+// Escape the four HTML special characters that matter inside text
+// content. Used by markdownToHtml everywhere user-controlled text is
+// emitted into an HTML attribute or body. Keep this list short and
+// uncontroversial — any further entity table belongs in a real HTML
+// library, which we deliberately avoid (zero deps).
+function htmlEscape(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// GitHub-style heading slug: lowercase, spaces → dashes, drop everything
+// that isn't a word char or dash. Used to give every heading a stable
+// `id` so cross-references like `02_srs.html#fr-001` resolve.
+function slugifyHeading(text) {
+  return String(text)
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+// Convert the BA Toolkit subset of Markdown to plain HTML. Scope is
+// intentionally small (no nested lists, no images, no raw HTML, no
+// reference-style links, no footnotes) — these features don't appear in
+// any shipped artifact template. The aim is a converter small enough to
+// audit by hand and fully covered by snapshot tests.
+//
+// Block pass: walk lines, group them into blocks (paragraph, heading,
+// list, table, fenced code, blockquote, hr). Inline pass: rewrite
+// emphasis, links and code spans inside each block's text content.
+function markdownToHtml(src) {
+  const lines = String(src).replace(/\r\n/g, '\n').split('\n');
+  const out = [];
+  let i = 0;
+
+  // Inline-rewrite a single line of text. Order matters: extract code
+  // spans first so we don't touch their contents, then links, then
+  // emphasis. Each step replaces the matched span with a placeholder,
+  // and a final pass swaps placeholders back so emphasis inside link
+  // text still resolves.
+  function inline(text) {
+    const placeholders = [];
+    const stash = (html) => {
+      placeholders.push(html);
+      return `\u0000${placeholders.length - 1}\u0000`;
+    };
+    // Code spans `x` — stashed first so their contents are immune to
+    // every other inline rule.
+    text = text.replace(/`([^`\n]+)`/g, (_, code) => stash(`<code>${htmlEscape(code)}</code>`));
+    // Links [text](url) — also stashed so the raw <a> tag survives the
+    // final htmlEscape pass.
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, url) => {
+      // Recursively inline-format the label so emphasis inside links works.
+      const inner = inline(label);
+      return stash(`<a href="${htmlEscape(url)}">${inner}</a>`);
+    });
+    // Bold **x** — stash, otherwise the trailing htmlEscape would
+    // re-escape the `<strong>` tags we just emitted.
+    text = text.replace(/\*\*([^*\n]+)\*\*/g, (_, body) => stash(`<strong>${htmlEscape(body)}</strong>`));
+    // Italic *x* and _x_ — same stashing rule. Narrow patterns avoid
+    // eating any leftover ** (there are none after the bold pass, but
+    // the guard keeps the regex robust against pathological input).
+    text = text.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, (_, pre, body) => `${pre}${stash(`<em>${htmlEscape(body)}</em>`)}`);
+    text = text.replace(/(^|[^_])_([^_\n]+)_(?!_)/g, (_, pre, body) => `${pre}${stash(`<em>${htmlEscape(body)}</em>`)}`);
+    // Escape every character that survived the stashing passes. The
+    // placeholder marker \u0000 is not in the escape list and the
+    // ASCII digits inside the marker are also unaffected, so the swap
+    // below still finds them.
+    text = htmlEscape(text);
+    // Restore placeholders.
+    text = text.replace(/\u0000(\d+)\u0000/g, (_, idx) => placeholders[Number(idx)]);
+    return text;
+  }
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Blank lines separate blocks; collapse runs of them.
+    if (/^\s*$/.test(line)) { i++; continue; }
+
+    // Fenced code block ```lang
+    const fenceMatch = /^```(\w*)\s*$/.exec(line);
+    if (fenceMatch) {
+      const lang = fenceMatch[1];
+      const body = [];
+      i++;
+      while (i < lines.length && !/^```\s*$/.test(lines[i])) {
+        body.push(lines[i]);
+        i++;
+      }
+      // Skip the closing fence (or accept EOF as the close).
+      if (i < lines.length) i++;
+      const cls = lang ? ` class="language-${htmlEscape(lang)}"` : '';
+      out.push(`<pre><code${cls}>${htmlEscape(body.join('\n'))}</code></pre>`);
+      continue;
+    }
+
+    // Heading # … ######
+    const headingMatch = /^(#{1,6})\s+(.*)$/.exec(line);
+    if (headingMatch) {
+      const level = headingMatch[1].length;
+      const text = headingMatch[2].trim();
+      const id = slugifyHeading(text);
+      out.push(`<h${level} id="${htmlEscape(id)}">${inline(text)}</h${level}>`);
+      i++;
+      continue;
+    }
+
+    // Horizontal rule
+    if (/^---+\s*$/.test(line)) {
+      out.push('<hr>');
+      i++;
+      continue;
+    }
+
+    // Table — header row + alignment row + body rows. We require both
+    // the header and the alignment row to exist; otherwise treat the
+    // line as a paragraph.
+    if (/^\|.*\|\s*$/.test(line) && i + 1 < lines.length && /^\|[\s:|-]+\|\s*$/.test(lines[i + 1])) {
+      const splitRow = (row) => row.replace(/^\||\|\s*$/g, '').split('|').map((c) => c.trim());
+      const header = splitRow(line);
+      i += 2; // skip header + alignment
+      const body = [];
+      while (i < lines.length && /^\|.*\|\s*$/.test(lines[i])) {
+        body.push(splitRow(lines[i]));
+        i++;
+      }
+      const thead = '<thead><tr>' + header.map((c) => `<th>${inline(c)}</th>`).join('') + '</tr></thead>';
+      const tbody = body.length > 0
+        ? '<tbody>' + body.map((row) => '<tr>' + row.map((c) => `<td>${inline(c)}</td>`).join('') + '</tr>').join('') + '</tbody>'
+        : '';
+      out.push(`<table>${thead}${tbody}</table>`);
+      continue;
+    }
+
+    // Blockquote
+    if (/^>\s?/.test(line)) {
+      const body = [];
+      while (i < lines.length && /^>\s?/.test(lines[i])) {
+        body.push(lines[i].replace(/^>\s?/, ''));
+        i++;
+      }
+      out.push(`<blockquote><p>${inline(body.join(' '))}</p></blockquote>`);
+      continue;
+    }
+
+    // Unordered list
+    if (/^[-*]\s+/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^[-*]\s+/.test(lines[i])) {
+        items.push(lines[i].replace(/^[-*]\s+/, ''));
+        i++;
+      }
+      out.push('<ul>' + items.map((it) => `<li>${inline(it)}</li>`).join('') + '</ul>');
+      continue;
+    }
+
+    // Ordered list
+    if (/^\d+\.\s+/.test(line)) {
+      const items = [];
+      while (i < lines.length && /^\d+\.\s+/.test(lines[i])) {
+        items.push(lines[i].replace(/^\d+\.\s+/, ''));
+        i++;
+      }
+      out.push('<ol>' + items.map((it) => `<li>${inline(it)}</li>`).join('') + '</ol>');
+      continue;
+    }
+
+    // Default: paragraph (greedy until blank line or another block).
+    const para = [];
+    while (i < lines.length && !/^\s*$/.test(lines[i]) && !/^#{1,6}\s/.test(lines[i]) &&
+           !/^```/.test(lines[i]) && !/^[-*]\s/.test(lines[i]) && !/^\d+\.\s/.test(lines[i]) &&
+           !/^>\s?/.test(lines[i]) && !/^---+\s*$/.test(lines[i]) &&
+           !(/^\|.*\|\s*$/.test(lines[i]) && i + 1 < lines.length && /^\|[\s:|-]+\|\s*$/.test(lines[i + 1]))) {
+      para.push(lines[i]);
+      i++;
+    }
+    out.push(`<p>${inline(para.join(' '))}</p>`);
+  }
+
+  return out.join('\n');
+}
+
+// Match every BA Toolkit artifact filename in a project output dir:
+// `00_discovery_<slug>.md`, `00_principles_<slug>.md`, `01_brief_<slug>.md`,
+// `07a_research_<slug>.md`, `11_handoff_<slug>.md`, `00_risks_<slug>.md`,
+// etc. The pattern is intentionally permissive — anything that starts
+// with two digits (and an optional letter) followed by `_<word>_` is
+// in.
+const ARTIFACT_FILE_RE = /^\d{2}[a-z]?_[a-z]+_.*\.md$/;
+
+// Numeric-aware sort: 01 < 02 < … < 07 < 07a < 08 < … < 11. Strips the
+// suffix letter and uses it only as a tiebreaker so `7a` always sorts
+// after `7` and before `8`.
+function compareArtifactFilenames(a, b) {
+  const m1 = /^(\d{2})([a-z]?)/.exec(a);
+  const m2 = /^(\d{2})([a-z]?)/.exec(b);
+  const n1 = parseInt(m1[1], 10);
+  const n2 = parseInt(m2[1], 10);
+  if (n1 !== n2) return n1 - n2;
+  if (m1[2] !== m2[2]) return m1[2] < m2[2] ? -1 : 1;
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
+// Rewrite intra-project markdown links inside an artifact body so they
+// survive the import. Mode is one of:
+//   'notion'     — `[txt](02_srs_x.md#anchor)` → `[txt](./02_srs_x.md#anchor)`
+//                  Notion's bulk markdown importer resolves relative
+//                  links between files in the same import batch.
+//   'confluence' — `[txt](02_srs_x.md#anchor)` → `[txt](02_srs_x.html#anchor)`
+//                  HTML import expects sibling .html filenames.
+// External links (http, https, mailto) and anchors-only (#fr-001) pass
+// through unchanged.
+function rewriteLinks(body, mode) {
+  return String(body).replace(/\[([^\]]+)\]\(([^)]+)\)/g, (full, label, url) => {
+    if (/^(https?:|mailto:|#|\/)/i.test(url)) return full;
+    if (!/\.md(\b|$|#)/.test(url)) return full;
+    if (mode === 'notion') {
+      const target = url.startsWith('./') || url.startsWith('../') ? url : './' + url;
+      return `[${label}](${target})`;
+    }
+    if (mode === 'confluence') {
+      const target = url.replace(/\.md(\b|$|#)/, '.html$1');
+      return `[${label}](${target})`;
+    }
+    return full;
+  });
+}
+
+// Strip the managed-block markers that `init` writes into AGENTS.md so
+// the imported page doesn't render the HTML comments as visible text in
+// importers that don't strip comments. Everything between the markers
+// (including the markers themselves) is removed.
+function stripManagedBlock(body) {
+  return String(body).replace(
+    /<!-- ba-toolkit:begin managed -->[\s\S]*?<!-- ba-toolkit:end managed -->\s*/g,
+    '',
+  );
+}
+
+async function cmdPublish(args) {
+  const formatRaw = (stringFlag(args, 'format') || 'both').toLowerCase();
+  const validFormats = new Set(['notion', 'confluence', 'both']);
+  if (!validFormats.has(formatRaw)) {
+    logError(`Unknown --format value: ${formatRaw}`);
+    log('  Valid formats: ' + cyan('notion') + ', ' + cyan('confluence') + ', ' + cyan('both'));
+    process.exit(1);
+  }
+  const dryRun = args.flags['dry-run'] === true;
+  const cwd = process.cwd();
+  const outDir = stringFlag(args, 'out')
+    ? path.resolve(cwd, stringFlag(args, 'out'))
+    : path.join(cwd, 'publish');
+
+  const allFiles = fs.readdirSync(cwd);
+  const artifacts = allFiles.filter((f) => ARTIFACT_FILE_RE.test(f)).sort(compareArtifactFilenames);
+  const hasAgents = allFiles.includes('AGENTS.md');
+
+  if (artifacts.length === 0) {
+    logError(`No BA Toolkit artifacts found in ${cwd}.`);
+    log('  Run this command from inside ' + cyan('output/<slug>/') + ' after generating artifacts.');
+    process.exit(1);
+  }
+
+  log('');
+  log('  ' + cyan('BA Toolkit — Publish'));
+  log('  ' + cyan('===================='));
+  log('');
+  log(`  source:       ${cwd}`);
+  log(`  destination:  ${outDir}`);
+  log(`  format:       ${formatRaw}`);
+  log(`  artifacts:    ${artifacts.length}${hasAgents ? ' (+ AGENTS.md)' : ''}`);
+  if (dryRun) log('  ' + yellow('mode:         dry-run (no files will be written)'));
+  log('');
+
+  const writeFile = (relPath, body) => {
+    const abs = path.join(outDir, relPath);
+    if (dryRun) {
+      log('    ' + gray('would write ') + path.relative(cwd, abs));
+      return;
+    }
+    fs.mkdirSync(path.dirname(abs), { recursive: true });
+    fs.writeFileSync(abs, body);
+  };
+
+  // Build the ordered file list once. AGENTS.md goes first if present
+  // so the imported workspace has project context up top.
+  const ordered = [];
+  if (hasAgents) ordered.push('AGENTS.md');
+  ordered.push(...artifacts);
+
+  let notionCount = 0;
+  let confluenceCount = 0;
+
+  if (formatRaw === 'notion' || formatRaw === 'both') {
+    for (const filename of ordered) {
+      let body = fs.readFileSync(path.join(cwd, filename), 'utf8');
+      if (filename === 'AGENTS.md') body = stripManagedBlock(body);
+      body = rewriteLinks(body, 'notion');
+      writeFile(path.join('notion', filename), body);
+      notionCount++;
+    }
+  }
+
+  if (formatRaw === 'confluence' || formatRaw === 'both') {
+    const indexEntries = [];
+    for (const filename of ordered) {
+      let body = fs.readFileSync(path.join(cwd, filename), 'utf8');
+      if (filename === 'AGENTS.md') body = stripManagedBlock(body);
+      body = rewriteLinks(body, 'confluence');
+      const html = markdownToHtml(body);
+      const htmlName = filename.replace(/\.md$/, '.html');
+      // Per-page wrapper. No <head> styles — let Confluence's own page
+      // styling take over after import. Title comes from the filename
+      // so the importer has something to use.
+      const title = filename.replace(/\.md$/, '');
+      const page = `<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="utf-8"><title>${htmlEscape(title)}</title></head>
+<body>
+${html}
+</body>
+</html>`;
+      writeFile(path.join('confluence', htmlName), page);
+      indexEntries.push({ htmlName, title });
+      confluenceCount++;
+    }
+    // index.html — entry point for Confluence's HTML importer. Lists
+    // every page in pipeline order with a basic style block so the
+    // import preview is readable.
+    const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>BA Toolkit — project artifacts</title>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 720px; margin: 2em auto; padding: 0 1em; color: #222; }
+  h1 { border-bottom: 1px solid #ddd; padding-bottom: 0.3em; }
+  ul { line-height: 1.8; }
+  a { color: #0052cc; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { background: #f4f5f7; padding: 0.1em 0.3em; border-radius: 3px; font-family: monospace; }
+</style>
+</head>
+<body>
+<h1>BA Toolkit — project artifacts</h1>
+<p>Generated by <code>ba-toolkit publish</code>. Each link below becomes a page in the imported Confluence space.</p>
+<ul>
+${indexEntries.map((e) => `  <li><a href="${htmlEscape(e.htmlName)}">${htmlEscape(e.title)}</a></li>`).join('\n')}
+</ul>
+</body>
+</html>`;
+    writeFile(path.join('confluence', 'index.html'), indexHtml);
+    confluenceCount++;
+  }
+
+  log('');
+  if (formatRaw === 'notion' || formatRaw === 'both') {
+    log(`  ${green('✓')} Notion bundle:      ${path.relative(cwd, path.join(outDir, 'notion'))}/  (${notionCount} files)`);
+  }
+  if (formatRaw === 'confluence' || formatRaw === 'both') {
+    log(`  ${green('✓')} Confluence bundle:  ${path.relative(cwd, path.join(outDir, 'confluence'))}/  (${confluenceCount} files, including index.html)`);
+  }
+  log('');
+  log('  ' + bold('Next steps:'));
+  if (formatRaw === 'notion' || formatRaw === 'both') {
+    log('    Notion:     drag-and-drop ' + cyan(path.relative(cwd, path.join(outDir, 'notion')) + '/') + ' into "Import → Markdown & CSV" in your workspace.');
+  }
+  if (formatRaw === 'confluence' || formatRaw === 'both') {
+    log('    Confluence: zip ' + cyan(path.relative(cwd, path.join(outDir, 'confluence')) + '/') + ' and upload via "Space settings → Content tools → Import → HTML".');
+  }
+  log('');
+}
+
 function cmdHelp() {
   log(`${bold('ba-toolkit')} v${PKG.version} — AI-powered Business Analyst pipeline
 
@@ -1497,6 +1880,12 @@ ${bold('COMMANDS')}
                                  supported agent (project + global) and
                                  report which versions are installed where.
                                  Read-only; no flags.
+  publish [--format <fmt>]       Bundle the artifacts in the current
+                                 output/<slug>/ folder into import-ready
+                                 files for Notion (markdown) and Confluence
+                                 (HTML). Format: notion, confluence, or
+                                 both (default). No API calls, no tokens —
+                                 the user runs the actual import manually.
 
 ${bold('OPTIONS')}
   --name <name>                  init only — skip the project name prompt
@@ -1514,8 +1903,12 @@ ${bold('OPTIONS')}
   --project                      install/uninstall/upgrade — target the
                                  project-level install (default when the
                                  agent supports it)
-  --dry-run                      init/install/uninstall/upgrade — preview
-                                 without writing or removing files
+  --dry-run                      init/install/uninstall/upgrade/publish —
+                                 preview without writing or removing files
+  --format <fmt>                 publish only — notion, confluence, or both
+                                 (default: both)
+  --out <path>                   publish only — output directory for the
+                                 bundles (default: ./publish/)
 
 ${bold('GENERAL OPTIONS')}
   --version, -v                  Print version and exit
@@ -1546,6 +1939,12 @@ ${bold('EXAMPLES')}
 
   # See where (and which version) BA Toolkit is installed.
   ba-toolkit status
+
+  # Bundle a project's artifacts for Notion + Confluence import.
+  cd output/my-app
+  ba-toolkit publish
+  ba-toolkit publish --format notion --out ./share
+  ba-toolkit publish --format confluence --dry-run
 
 ${bold('LEARN MORE')}
   https://github.com/TakhirKudusov/ba-toolkit
@@ -1586,6 +1985,9 @@ async function main() {
     case 'status':
       cmdStatus();
       break;
+    case 'publish':
+      await cmdPublish(args);
+      break;
     case 'help':
       cmdHelp();
       break;
@@ -1616,6 +2018,13 @@ module.exports = {
   mergeAgentsMd,
   menuStep,
   renderMenu,
+  markdownToHtml,
+  htmlEscape,
+  slugifyHeading,
+  rewriteLinks,
+  stripManagedBlock,
+  compareArtifactFilenames,
+  ARTIFACT_FILE_RE,
   KNOWN_FLAGS,
   DOMAINS,
   AGENTS,

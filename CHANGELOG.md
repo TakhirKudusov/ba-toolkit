@@ -11,6 +11,30 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.2.0] — 2026-04-09
+
+### Highlights
+
+- **New `/discovery` skill — concept brain-storm before `/brief`** for users who don't yet know what to build.
+- **`ba-toolkit publish` CLI subcommand + `/publish` skill** — one-command Notion (Markdown) and Confluence (HTML) import-ready bundles, zero deps, zero tokens, zero network.
+
+### Added
+
+- **New `ba-toolkit publish` CLI subcommand + `/publish` skill — Notion / Confluence bundle export.** Bundles every BA Toolkit artifact in the current `output/<slug>/` folder into import-ready files for two destinations: a clean Markdown bundle (`publish/notion/`) for Notion's bulk **Import → Markdown & CSV** dialog, and an HTML bundle with an `index.html` entry point (`publish/confluence/`) for Confluence's **Space settings → Content tools → Import → HTML** tool. **Zero API calls, zero tokens, zero network** — the conversion happens entirely on disk and the user does the upload manually using each tool's native importer. Cross-references between artifacts (`[FR-001](02_srs_<slug>.md#fr-001)`) are rewritten per target: Notion gets `./02_srs_<slug>.md#fr-001`, Confluence gets `02_srs_<slug>.html#fr-001`, and external HTTP/HTTPS links pass through unchanged. `AGENTS.md` (if present) is included as the first page in both bundles, with the `<!-- ba-toolkit:begin managed -->` block stripped so the management markers don't render as visible text. Surface: `ba-toolkit publish [--format notion|confluence|both] [--out PATH] [--dry-run]`. Default format is `both`, default output is `./publish/`. Comes with a thin `skills/publish/SKILL.md` discoverability layer that the AI agent invokes via the Bash tool when the user types `/publish` in any supported agent (Claude Code, Codex, Gemini, Cursor, Windsurf).
+- **In-tree `markdownToHtml` helper in `bin/ba-toolkit.js`.** Pure function, ~190 lines, handles the bounded Markdown surface used by every shipped artifact template: ATX headings (with auto-generated GitHub-style anchor IDs), paragraphs, bold / italic / inline code with placeholder-based stashing so emphasis inside link labels and code spans round-trips correctly, links, single-level unordered and ordered lists, GFM tables with thead/tbody, fenced code blocks (language hint preserved), blockquotes, horizontal rules, and HTML special-character escaping. Out of scope by design: nested lists, images, footnotes, math, raw HTML pass-through. Exported alongside `htmlEscape`, `slugifyHeading`, `rewriteLinks`, `stripManagedBlock`, `compareArtifactFilenames`, and `ARTIFACT_FILE_RE` so the test suite can cover each piece in isolation.
+- **23 new tests covering the publish flow.** 14 unit tests in `test/cli.test.js` for the converter and supporting helpers (one per supported Markdown element class plus link rewriting, managed-block stripping, the `7 < 7a < 8` filename sort, and the artifact-filename regex). 7 integration tests in `test/cli.integration.test.js` that spawn the real CLI against fixture markdown files inside a temp dir and assert the bundle layout, link rewriting in both modes, the Confluence `index.html` ordering, the AGENTS.md-as-first-page rule, the empty-directory error path, the invalid-format error path, and the `--dry-run` no-write contract. The skill-folder-count assertion bumps from `>= 22` to `>= 23` and the existing protocol-link / closing-message / Recommended-marker / 5-rows-cap regression tests auto-cover `skills/publish/SKILL.md`.
+
+- **New `/discovery` skill — concept brain-storm before `/brief`.** For users who arrive with only a vague hunch and no fixed domain or feature list, `/discovery` runs a structured concept-discovery interview (problem space, target audience hypotheses, candidate domains, reference products, MVP feature ideas, differentiation angle, open validation questions) and writes a hypothesis document to `00_discovery_{slug}.md`. The artifact ends with a concrete recommendation (chosen domain, project name, slug, scope hint) that flows directly into `/brief` as inline context. Modeled on `/principles` (the only other optional pre-brief skill) — same workflow phases, same closing-message contract, same interview-protocol rules (5-row cap, Recommended marker, user-language variants). Lives at `skills/discovery/SKILL.md` with a matching artifact template at `skills/references/templates/discovery-template.md`. Pipeline lookup table in `closing-message.md` gains a new row `/discovery → /brief`. The `agents-template.md` Pipeline Status table inserts `/discovery` at stage `0` and demotes `/principles` to stage `0a` (mirror of how `/research` sits at stage `7a`) — `/brief` stays at stage `1`, no downstream renumbering, no risk of breaking existing AGENTS.md files for projects that already started. Skill is auto-discovered by the CLI from the `skills/` directory — no `bin/ba-toolkit.js` registration needed.
+- **`/brief` consumes `00_discovery_*.md` if present.** `skills/brief/SKILL.md` Pipeline check phase now loads any existing discovery artifact, extracts the problem space, audience hypotheses, recommended domain, MVP feature hypotheses, and scope hint, and uses them to pre-fill the structured interview per protocol rule 9 — skipping any required topic the discovery already answered. The handoff is real, not a hint to copy-paste context manually.
+- **`example/lumen-goods/00_discovery_lumen-goods.md`** — full concept-discovery walkthrough for the Lumen Goods example project. 8 sections matching the new template, length comparable to `00_principles_lumen-goods.md`. Keeps the lumen-goods example end-to-end consistent with the new pipeline entry point.
+
+### Changed
+
+- **Skill count bumped from 22 to 23** in every place that enumerated skills: `package.json` description, `README.md` (badge, intro, install sections, utility table, minimum-viable-pipeline section), `COMMANDS.md` Utility skills table, `CLAUDE.md` §1 and §4, `docs/USAGE.md` (interview-phase skill list, time-estimate appendix, new "Sharing artifacts with stakeholders" section), `docs/FAQ.md` (new Q/A: "How do I share the artifacts with non-developer stakeholders?"), `bin/ba-toolkit.js` stale comment, `skills/references/templates/agents-template.md` Cross-cutting Tools table (new `/publish [format]` row), `skills/references/closing-message.md` Cross-cutting commands list, and the `test/cli.test.js` skill-folder-count assertion (raised from `>= 22` to `>= 23`).
+- **Skill count bumped from 21 to 22** in every place that enumerated skills: `package.json` description, `README.md` (badge, intro, install sections, example table, pipeline table, minimum-viable-pipeline section now lists three paths instead of two), `COMMANDS.md`, `CLAUDE.md` §1 and §4, `docs/USAGE.md` (interview-phase skill list, AGENTS.md sample, time-estimate appendix), `docs/FAQ.md` (new Q/A: "What if I don't know what to build yet?"), `bin/ba-toolkit.js` two stale comments, and the `test/cli.test.js` skill-folder-count assertion (raised from `>= 20` with stale "~21" comment to `>= 22`).
+
+---
+
 ## [3.1.1] — 2026-04-09
 
 ### Changed
@@ -451,7 +475,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.1...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.2.0...HEAD
+[3.2.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.1...v3.2.0
 [3.1.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.1.0...v3.1.1
 [3.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.0.0...v3.1.0
 [3.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v2.0.0...v3.0.0

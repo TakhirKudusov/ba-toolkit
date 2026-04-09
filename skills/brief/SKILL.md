@@ -22,6 +22,8 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 No prior artifacts required. If `01_brief_*.md` already exists, warn the user and offer to overwrite or create a new project.
 
+If `00_discovery_*.md` exists in the output directory, load it as concept context. Extract the problem space (section 1), target audience hypotheses (section 2), recommended domain (section 3), MVP feature hypotheses (section 5), and the scope hint from section 8, and use them to pre-fill the structured interview questions per protocol rule 9. Skip any required topic that the discovery artifact already answers — only ask the user about gaps and open validation questions. Acknowledge the discovery hand-off in one line at the start of the interview so the user knows their concept work was loaded.
+
 If `00_principles_*.md` exists in the output directory, load it and apply its conventions for this and all subsequent pipeline steps (artifact language, ID format, traceability requirements, Definition of Ready, quality gate threshold).
 
 ### 3. Domain selection
