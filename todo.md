@@ -50,6 +50,9 @@ Improvements batch 7:
 2. Build a GitHub-hosted website for the project. The site must surface the documentation, the roadmap, and links (npm, GitHub, my LinkedIn). It must be responsive and look good on both desktop and mobile. (priority 2)
 3. Review and rework the README and the documentation once more if the website work surfaces inconsistencies. (priority 3)
 
+Найденные баги:
+1. ✅ Если в /discovery переопределить домен, то в AGENTS все равно остается тот, который был введен при инициализации. Done in v3.8.1 — `skills/discovery/SKILL.md` §6 gains a targeted "Domain field exception" that allows `/discovery` to surgically update only the `**Domain:**` line inside the managed block. Every other managed-block field stays owned by `ba-toolkit init`. Content fix only.
+
 ---
 
 ## Removed from the backlog (with rationale)

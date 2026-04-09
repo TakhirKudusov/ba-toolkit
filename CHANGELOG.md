@@ -11,6 +11,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.8.1] — 2026-04-10
+
+### Fixed
+
+- **`/discovery` now updates the `**Domain:**` field inside the `AGENTS.md` managed block.** Reported as "if you change the domain in `/discovery`, the AGENTS.md keeps the original init domain". Root cause: the v3.4.0+ instructions in `skills/discovery/SKILL.md` §6 said *"do not touch the managed block"* with no exception, so the AI dutifully left the domain stale even though the discovery artifact §8 recommended a different one. The fix is a targeted exception in the SKILL.md text — `/discovery` is the canonical source of truth for the project domain after `init`, and the `**Domain:**` line is the only managed-block field it may surgically update (every other managed-block field — Project, Slug, Language, Output folder, the auto-generated date comment — stays owned by `ba-toolkit init`). The reply now also mentions the domain change explicitly so the user sees that AGENTS.md was synced. Content fix only — no changes to `bin/ba-toolkit.js`, no changes to tests, no changes to skill behaviour beyond the targeted exception.
+
+---
+
 ## [3.8.0] — 2026-04-10
 
 ### Highlights
@@ -698,7 +706,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.1...HEAD
+[3.8.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.0...v3.8.1
 [3.8.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.7.0...v3.8.0
 [3.7.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.6.0...v3.7.0
 [3.6.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.5.0...v3.6.0
