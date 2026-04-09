@@ -5,6 +5,9 @@ on:
     paths:
       - 'output/**'
       - 'skills/**'
+      - 'bin/**'
+      - 'test/**'
+      - 'package.json'
 
 jobs:
   validate-artifacts:
@@ -52,6 +55,28 @@ jobs:
           fi
           echo "All skill files valid."
 
+      - name: Check interview skills reference the Interview Protocol
+        # Every SKILL.md that has an Interview section must link to
+        # references/interview-protocol.md so the AI assistant follows
+        # the one-question-at-a-time + 3–5 options + free-text rule.
+        # Catches the regression of a new skill shipping a raw
+        # questionnaire dump instead of the conversational flow.
+        run: |
+          set -e
+          FAIL=0
+          for skill_file in skills/*/SKILL.md; do
+            if grep -qE '^(## |### [0-9]+\. )Interview' "$skill_file"; then
+              if ! grep -qF "interview-protocol.md" "$skill_file"; then
+                echo "::error file=$skill_file::SKILL.md has an Interview section but does not link to references/interview-protocol.md"
+                FAIL=1
+              fi
+            fi
+          done
+          if [ "$FAIL" -eq 1 ]; then
+            exit 1
+          fi
+          echo "All interview skills reference the protocol."
+
       - name: Check domain reference files have required sections
         run: |
           set -e
@@ -66,3 +91,22 @@ jobs:
             echo "  ✓ $domain_file"
           done
           echo "Domain reference check complete."
+
+  run-tests:
+    name: Run CLI tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run tests
+        # Zero-dep test suite (node:test + node:assert) — no install step
+        # needed. Mirrors the test gate in release.yml so regressions are
+        # caught at PR time, not at tag push.
+        run: npm test

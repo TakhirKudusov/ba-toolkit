@@ -34,7 +34,9 @@ The domain is written into the brief metadata and passed to all subsequent pipel
 
 ### 4. Interview
 
-3–7 questions per round, 2–4 rounds. Do not generate the artifact until sufficient information is collected.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, offer 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question.
+
+Cover 3–7 topics per round, 2–4 rounds. Do not generate the artifact until sufficient information is collected.
 
 **Required topics (all domains):**
 1. Product type — what exactly is being built?

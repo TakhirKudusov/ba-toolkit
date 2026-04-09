@@ -13,8 +13,8 @@ Structured BA pipeline for AI coding agents — brief to handoff, 21 skills, 9 d
 <img src="https://img.shields.io/badge/Claude_Code-✓-6C5CE7" alt="Claude Code">
 <img src="https://img.shields.io/badge/Codex_CLI-✓-00D26A" alt="Codex CLI">
 <img src="https://img.shields.io/badge/Gemini_CLI-✓-4285F4" alt="Gemini CLI">
-<img src="https://img.shields.io/badge/Cursor-convert-F5A623" alt="Cursor">
-<img src="https://img.shields.io/badge/Windsurf-convert-1ABCFE" alt="Windsurf">
+<img src="https://img.shields.io/badge/Cursor-✓-F5A623" alt="Cursor">
+<img src="https://img.shields.io/badge/Windsurf-✓-1ABCFE" alt="Windsurf">
 
 </div>
 
@@ -46,7 +46,7 @@ npm install -g @kudusov.takhir/ba-toolkit
 ba-toolkit init
 ```
 
-Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. Cursor and Windsurf installs auto-convert `SKILL.md` into the `.mdc` rule format. Pass `--dry-run` to preview the install step without writing files, or `--no-install` to create only the project structure and install skills later with `ba-toolkit install --for <agent>`.
+Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. All five use the native Agent Skills format (folder-per-skill with `SKILL.md`) — Claude Code at `.claude/skills/`, Codex at `~/.codex/skills/`, Gemini at `.gemini/skills/`, Cursor at `.cursor/skills/`, Windsurf at `.windsurf/skills/`. Pass `--dry-run` to preview the install step without writing files, or `--no-install` to create only the project structure and install skills later with `ba-toolkit install --for <agent>`.
 
 `ba-toolkit --help` shows the full CLI reference. Zero runtime dependencies — only Node.js ≥ 18.
 
@@ -98,21 +98,17 @@ cp -R ba-toolkit/skills/. /path/to/project/.gemini/skills/
 
 Reload the CLI after copying.
 
-### Cursor, Windsurf, Aider
+### Cursor
 
-These use their own rules format instead of `SKILL.md`. Convert first, then copy:
+Cursor has two separate features — Rules (`.cursor/rules/*.mdc`) and [Agent Skills](https://cursor.com/docs/skills) (`.cursor/skills/<skill>/SKILL.md`). BA Toolkit is a set of skills, not rules, so `ba-toolkit install --for cursor` drops the 21 skills directly into `.cursor/skills/` using the native folder-per-skill `SKILL.md` format — no conversion needed. Reload the Cursor window to pick them up.
 
-```bash
-# Option 1: community converter
-# https://github.com/alirezarezvani/claude-skills/blob/main/scripts/convert.sh
-./convert.sh --tool cursor --target /path/to/project
-./convert.sh --tool windsurf --target /path/to/project
+### Windsurf
 
-# Option 2: ask your AI agent
-# "Convert all SKILL.md files in skills/ to Cursor .mdc rule format"
-```
+Windsurf's [Agent Skills](https://docs.windsurf.com/windsurf/cascade/skills) feature loads skills from `.windsurf/skills/<skill>/SKILL.md`, the same folder-per-skill layout as Claude Code and Cursor. `ba-toolkit install --for windsurf` writes the 21 skills there natively. Reload the Windsurf window to pick them up.
 
-Cursor rules live in [`.cursor/rules/`](https://cursor.com/docs/rules) as `.mdc` files with YAML frontmatter (`description`, optional `globs`, `alwaysApply`). A plain rename of `SKILL.md` to `.mdc` is not enough — the metadata block is required. [Cursor CLI](https://cursor.com/docs/cli/using) reads the same `.cursor/rules` setup and may also pick up `AGENTS.md` / `CLAUDE.md` at repo root.
+### Aider
+
+Aider has no native skills feature. Convert manually with the community script at <https://github.com/alirezarezvani/claude-skills/blob/main/scripts/convert.sh> or ask your AI agent to convert `SKILL.md` files to the target format.
 
 ### Starting a new project (shell scripts)
 
@@ -205,11 +201,11 @@ BA Toolkit uses the open Agent Skills specification (`SKILL.md` format) publishe
 | **Claude Code** | Native | `cp -R skills/. .claude/skills/` |
 | **OpenAI Codex CLI** | Native | `cp -R skills/. ~/.codex/skills/` |
 | **Gemini CLI** | Native | Copy `skills/.` contents to `~/.gemini/skills/` (user) or `.gemini/skills/` (workspace) |
-| **Cursor** | Convert | `SKILL.md` → `.mdc` rules in `.cursor/rules/` |
-| **Windsurf** | Convert | `SKILL.md` → rules in `.windsurf/rules/` |
+| **Cursor** | Native | Copy `skills/.` contents to `.cursor/skills/` |
+| **Windsurf** | Native | Copy `skills/.` contents to `.windsurf/skills/` |
 | **Aider** | Convert | `SKILL.md` → conventions file |
 
-Native platforms read `SKILL.md` as-is. Convert platforms need a one-time format conversion — the content is the same, only the file format differs. `ba-toolkit install --for cursor|windsurf` does this automatically.
+All five officially supported platforms read `SKILL.md` as-is — no conversion. `ba-toolkit install --for <agent>` lands skills directly in the agent's native skills root.
 
 Skills do not hardcode platform paths — they reference `skills/references/environment.md`, which contains the output directory logic for each platform. Edit that file to customize; all skills pick up the change automatically.
 

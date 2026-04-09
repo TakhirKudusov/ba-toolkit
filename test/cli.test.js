@@ -20,10 +20,12 @@ const {
   levenshtein,
   closestMatch,
   parseSkillFrontmatter,
-  skillToMdcContent,
   readManifest,
   detectLegacyInstall,
   renderAgentsMd,
+  mergeAgentsMd,
+  menuStep,
+  renderMenu,
   KNOWN_FLAGS,
   DOMAINS,
   AGENTS,
@@ -517,6 +519,32 @@ test('closestMatch: empty input → null', () => {
   assert.equal(closestMatch('', [...KNOWN_FLAGS]), null);
 });
 
+test('interview protocol: every SKILL.md with an Interview section references the protocol file', () => {
+  // Regression guard for the "ask one question at a time + 3–5 options"
+  // rule. Walks every shipped SKILL.md, checks whether it has an
+  // Interview heading, and if so asserts it links to
+  // ../references/interview-protocol.md. Catches a new skill shipping
+  // a raw questionnaire dump instead of the conversational flow.
+  const skillsDir = path.join(__dirname, '..', 'skills');
+  const protocolPath = path.join(skillsDir, 'references', 'interview-protocol.md');
+  assert.ok(fs.existsSync(protocolPath), 'interview-protocol.md must exist in skills/references/');
+
+  const skillFolders = fs.readdirSync(skillsDir, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && e.name !== 'references')
+    .map((e) => e.name);
+  const interviewHeadingRe = /^(## |### \d+\. )Interview$/m;
+  const offenders = [];
+  for (const folder of skillFolders) {
+    const skillPath = path.join(skillsDir, folder, 'SKILL.md');
+    if (!fs.existsSync(skillPath)) continue;
+    const content = fs.readFileSync(skillPath, 'utf8');
+    if (interviewHeadingRe.test(content) && !content.includes('interview-protocol.md')) {
+      offenders.push(folder);
+    }
+  }
+  assert.deepEqual(offenders, [], `skills with an Interview section but no protocol link: ${offenders.join(', ')}`);
+});
+
 test('parseSkillFrontmatter: parses every shipped SKILL.md without losing the description', () => {
   // Integration check: every skill in the package's skills/ directory
   // must produce a non-empty name and description through the parser.
@@ -548,11 +576,31 @@ test('readManifest: directory with valid manifest returns parsed JSON', () => {
     const payload = {
       version: '2.0.0',
       installedAt: '2026-04-09T00:00:00.000Z',
-      format: 'skill',
       items: ['brief', 'srs', 'references'],
     };
     fs.writeFileSync(path.join(dir, '.ba-toolkit-manifest.json'), JSON.stringify(payload));
     assert.deepEqual(readManifest(dir), payload);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('readManifest: legacy manifest with format field still parses (forward-compat)', () => {
+  // Older versions of the toolkit wrote `format: 'skill'` (or `'mdc'`).
+  // The field is gone now, but read should still accept it so users
+  // who installed before the cleanup don't see a broken status/uninstall.
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ba-manifest-'));
+  try {
+    const legacy = {
+      version: '2.0.0',
+      installedAt: '2026-04-09T00:00:00.000Z',
+      format: 'skill',
+      items: ['brief', 'srs', 'references'],
+    };
+    fs.writeFileSync(path.join(dir, '.ba-toolkit-manifest.json'), JSON.stringify(legacy));
+    const parsed = readManifest(dir);
+    assert.equal(parsed.version, '2.0.0');
+    assert.deepEqual(parsed.items, ['brief', 'srs', 'references']);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -613,36 +661,138 @@ test('detectLegacyInstall: finds wrapper directory when it exists', () => {
 });
 
 // --------------------------------------------------------------------
-// skillToMdcContent
+// menuStep — pure state machine for arrow-key menu
 // --------------------------------------------------------------------
 
-test('skillToMdcContent: produces .mdc frontmatter and preserves the body', () => {
-  const skill = `---
-name: brief
-description: >
-  A short description with multiple
-  lines that should be flattened.
----
+const SAMPLE_ITEMS = [
+  { id: 'saas', label: 'SaaS', desc: 'B2B' },
+  { id: 'fintech', label: 'Fintech', desc: 'Payments' },
+  { id: 'ecommerce', label: 'E-commerce', desc: 'Stores' },
+];
 
-# /brief — Project Brief
+function freshState() {
+  return { items: SAMPLE_ITEMS, index: 0, done: false, choice: null };
+}
 
-Body text here.
-`;
-  const out = skillToMdcContent(skill);
-  assert.match(out, /^---\ndescription: A short description with multiple lines that should be flattened\.\nalwaysApply: false\n---\n/);
-  assert.match(out, /# \/brief — Project Brief/);
-  assert.match(out, /Body text here\./);
+test('menuStep: down moves index forward by one', () => {
+  const r = menuStep(freshState(), 'down');
+  assert.equal(r.index, 1);
+  assert.equal(r.done, false);
 });
 
-test('skillToMdcContent: empty description still produces valid frontmatter', () => {
-  const skill = `---
-name: foo
----
+test('menuStep: up from index 0 wraps to last item', () => {
+  const r = menuStep(freshState(), 'up');
+  assert.equal(r.index, SAMPLE_ITEMS.length - 1);
+});
 
-Body.
-`;
-  const out = skillToMdcContent(skill);
-  assert.match(out, /^---\ndescription: \nalwaysApply: false\n---\n/);
+test('menuStep: down from last index wraps to 0', () => {
+  const last = { ...freshState(), index: SAMPLE_ITEMS.length - 1 };
+  const r = menuStep(last, 'down');
+  assert.equal(r.index, 0);
+});
+
+test('menuStep: enter sets done=true and choice to current item', () => {
+  const at1 = { ...freshState(), index: 1 };
+  const r = menuStep(at1, 'enter');
+  assert.equal(r.done, true);
+  assert.deepEqual(r.choice, SAMPLE_ITEMS[1]);
+});
+
+test('menuStep: cancel sets done=true and choice=null', () => {
+  const r = menuStep(freshState(), 'cancel');
+  assert.equal(r.done, true);
+  assert.equal(r.choice, null);
+});
+
+test('menuStep: digit jumps to that 1-based position', () => {
+  const r = menuStep(freshState(), '3');
+  assert.equal(r.index, 2);
+});
+
+test('menuStep: digit out of range is a no-op', () => {
+  const before = freshState();
+  const r = menuStep(before, '9');
+  assert.equal(r.index, before.index);
+  assert.equal(r.done, false);
+});
+
+test('menuStep: digit "0" is a no-op (1-based menu)', () => {
+  const r = menuStep(freshState(), '0');
+  assert.equal(r.index, 0);
+});
+
+test('menuStep: unknown key is a no-op', () => {
+  const before = freshState();
+  const r = menuStep(before, 'left');
+  assert.deepEqual(r, before);
+});
+
+test('menuStep: once done, further keys do nothing', () => {
+  const finished = { ...freshState(), done: true, choice: SAMPLE_ITEMS[0] };
+  const r = menuStep(finished, 'down');
+  assert.deepEqual(r, finished);
+});
+
+test('menuStep: empty items list is a no-op for any key', () => {
+  const empty = { items: [], index: 0, done: false, choice: null };
+  assert.deepEqual(menuStep(empty, 'down'), empty);
+  assert.deepEqual(menuStep(empty, 'enter'), empty);
+});
+
+// --------------------------------------------------------------------
+// renderMenu — pure renderer
+// --------------------------------------------------------------------
+
+test('renderMenu: contains the title when provided', () => {
+  const out = renderMenu(freshState(), { title: 'Pick a domain:' });
+  assert.match(out, /Pick a domain:/);
+});
+
+test('renderMenu: lists every item with a 1-based index', () => {
+  const out = renderMenu(freshState(), { title: 'Pick:' });
+  assert.match(out, / 1\) SaaS/);
+  assert.match(out, / 2\) Fintech/);
+  assert.match(out, / 3\) E-commerce/);
+});
+
+test('renderMenu: marks the selected item with > and unselected with space', () => {
+  const at1 = { ...freshState(), index: 1 };
+  const out = renderMenu(at1, { title: 'Pick:' });
+  // The format per item line is: 2-space prefix, marker (`>` for
+  // selected or ` ` for unselected), 1-space gap, 2-char padded index,
+  // `)`, label, ...
+  // Selected line — `>` followed by space + " 2)" (idx is padStart(2)).
+  assert.match(out, /^ {2}> {2}2\) Fintech/m);
+  // Unselected lines — 5 leading spaces (2 prefix + 1 placeholder + 1 gap + 1 from padStart of single-digit idx).
+  assert.match(out, /^ {5}1\) SaaS/m);
+  assert.match(out, /^ {5}3\) E-commerce/m);
+});
+
+test('renderMenu: includes item descriptions', () => {
+  const out = renderMenu(freshState(), { title: 'Pick:' });
+  assert.match(out, /B2B/);
+  assert.match(out, /Payments/);
+});
+
+test('renderMenu: shows the keyboard help line', () => {
+  const out = renderMenu(freshState(), { title: 'Pick:' });
+  assert.match(out, /↑\/↓ navigate/);
+  assert.match(out, /Enter select/);
+  assert.match(out, /Esc cancel/);
+});
+
+test('renderMenu: ends with a trailing newline', () => {
+  const out = renderMenu(freshState(), { title: 'Pick:' });
+  assert.equal(out[out.length - 1], '\n');
+});
+
+test('renderMenu: works without a title', () => {
+  const out = renderMenu(freshState(), {});
+  // No title section, but items still rendered.
+  assert.match(out, / 1\) SaaS/);
+  // First non-empty content line is an item, not a title.
+  const firstLine = out.split('\n').find((l) => l.trim().length > 0);
+  assert.match(firstLine, /SaaS/);
 });
 
 // --------------------------------------------------------------------
@@ -689,6 +839,71 @@ test('renderAgentsMd: no leftover [NAME] [SLUG] [DOMAIN] [DATE] placeholders', (
   assert.doesNotMatch(out, /\[SLUG\]/);
   assert.doesNotMatch(out, /\[DOMAIN\]/);
   assert.doesNotMatch(out, /\[DATE\]/);
+});
+
+// --------------------------------------------------------------------
+// mergeAgentsMd
+// --------------------------------------------------------------------
+
+test('mergeAgentsMd: no existing file → returns fresh content with action "created"', () => {
+  const result = mergeAgentsMd(null, { name: 'My App', slug: 'my-app', domain: 'saas' });
+  assert.equal(result.action, 'created');
+  assert.match(result.content, /\*\*Project:\*\* My App/);
+  assert.match(result.content, /ba-toolkit:begin managed/);
+  assert.match(result.content, /ba-toolkit:end managed/);
+});
+
+test('mergeAgentsMd: existing file with anchors → replaces only managed block, preserves the rest', () => {
+  // Step 1: create an initial file (as if after a first `init`).
+  const initial = mergeAgentsMd(null, { name: 'Old Name', slug: 'old-slug', domain: 'saas' }).content;
+  // Step 2: simulate the user editing sections OUTSIDE the managed block
+  // — mark the Pipeline Status row for /brief as done, and add a note
+  // at the bottom.
+  const userEdited = initial
+    .replace('| 1 | /brief | ⬜ Not started | — |', '| 1 | /brief | ✅ Done | 01_brief_old-slug.md |')
+    + '\n## User notes\n\nInterview with CEO scheduled for Monday.\n';
+  // Step 3: run mergeAgentsMd with the user-edited content and a new
+  // name/slug/domain (as if the user re-ran `ba-toolkit init`).
+  const result = mergeAgentsMd(userEdited, { name: 'New Name', slug: 'new-slug', domain: 'fintech' });
+  assert.equal(result.action, 'merged');
+  // Managed block now reflects the NEW values.
+  assert.match(result.content, /\*\*Project:\*\* New Name/);
+  assert.match(result.content, /\*\*Slug:\*\* new-slug/);
+  assert.match(result.content, /\*\*Domain:\*\* fintech/);
+  assert.doesNotMatch(result.content, /\*\*Project:\*\* Old Name/);
+  // User edits OUTSIDE the managed block are still present.
+  assert.match(result.content, /\/brief \| ✅ Done \| 01_brief_old-slug\.md/);
+  assert.match(result.content, /## User notes/);
+  assert.match(result.content, /Interview with CEO scheduled for Monday/);
+});
+
+test('mergeAgentsMd: existing file without anchors → returns existing unchanged with action "preserved"', () => {
+  const userFile = '# My custom AGENTS.md\n\nThis is a file I wrote by hand, no ba-toolkit here.\n';
+  const result = mergeAgentsMd(userFile, { name: 'X', slug: 'x', domain: 'saas' });
+  assert.equal(result.action, 'preserved');
+  assert.equal(result.content, userFile);
+});
+
+test('mergeAgentsMd: existing file with begin anchor but no end anchor → preserved (malformed)', () => {
+  const malformed = '# Header\n\n<!-- ba-toolkit:begin managed -->\n\nBut no end marker.\n';
+  const result = mergeAgentsMd(malformed, { name: 'X', slug: 'x', domain: 'saas' });
+  assert.equal(result.action, 'preserved');
+  assert.equal(result.content, malformed);
+});
+
+test('mergeAgentsMd: existing file with end anchor before begin → preserved (malformed)', () => {
+  const malformed = '# Header\n\n<!-- ba-toolkit:end managed -->\n\n<!-- ba-toolkit:begin managed -->\n';
+  const result = mergeAgentsMd(malformed, { name: 'X', slug: 'x', domain: 'saas' });
+  assert.equal(result.action, 'preserved');
+});
+
+test('mergeAgentsMd: rendered template always contains both anchor markers', () => {
+  // Regression guard — if someone removes the anchors from
+  // agents-template.md, the merge flow silently degrades to overwrite.
+  // This test fails loudly if that ever happens.
+  const rendered = renderAgentsMd({ name: 'X', slug: 'x', domain: 'saas' });
+  assert.ok(rendered.includes('<!-- ba-toolkit:begin managed -->'));
+  assert.ok(rendered.includes('<!-- ba-toolkit:end managed -->'));
 });
 
 test('renderAgentsMd: preserves [focus] and [format] in the cross-cutting table', () => {

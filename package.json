@@ -43,6 +43,6 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node --test test/cli.test.js"
+    "test": "node --test test/cli.test.js test/cli.integration.test.js"
   }
 }

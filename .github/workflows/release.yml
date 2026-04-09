@@ -110,6 +110,13 @@ jobs:
       - name: Smoke test CLI
         run: node bin/ba-toolkit.js --version
 
+      - name: Run tests
+        # Test gate: if any test fails, this step exits non-zero and the
+        # job stops before `Publish to npm` runs. No `npm install` needed
+        # — the suite uses only Node built-ins (node:test, node:assert),
+        # in line with the package's zero-runtime-deps policy.
+        run: npm test
+
       - name: Strip classic auth from .npmrc (enable OIDC flow)
         # actions/setup-node with `registry-url` writes an .npmrc containing
         # `//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}` and

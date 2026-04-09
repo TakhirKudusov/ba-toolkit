@@ -23,7 +23,9 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 ## Interview
 
-1 round, 3–5 questions.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, offer 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question.
+
+1 round, 3–5 topics.
 
 **Required topics:**
 1. Coverage priority — generate scenarios for Must-priority US only, or include Should as well?

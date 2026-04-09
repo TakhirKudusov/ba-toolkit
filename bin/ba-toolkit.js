@@ -18,57 +18,55 @@ const PACKAGE_ROOT = path.resolve(__dirname, '..');
 const SKILLS_DIR = path.join(PACKAGE_ROOT, 'skills');
 const PKG = JSON.parse(fs.readFileSync(path.join(PACKAGE_ROOT, 'package.json'), 'utf8'));
 
-// In v2.0 the install paths dropped the previous `ba-toolkit/` wrapper
-// directory. Claude Code, Codex CLI, and Gemini CLI all expect skills
-// to be discoverable as direct subfolders of their skills root —
-// `.claude/skills/<skill-name>/SKILL.md`, not nested one level deeper.
-// The wrapper made all 21 skills invisible to every agent.
+// All five supported agents — Claude Code, Codex CLI, Gemini CLI,
+// Cursor, and Windsurf — load Agent Skills as direct subfolders of
+// their skills root: `<skills-root>/<skill-name>/SKILL.md`. The toolkit
+// installs the 21 skills natively in this layout for every agent. No
+// .mdc conversion. Confirmed against the Agent Skills documentation
+// for each platform via ctx7 MCP / official docs.
 //
-// Cursor and Windsurf load `.mdc` rule files directly from their rules
-// root, so v2.0 also flattens that layout: the per-skill subfolders
-// produced by the previous version are gone, and rules sit at
-// `.cursor/rules/<skill-name>.mdc`.
+// Earlier versions tried to install Cursor and Windsurf via `.mdc`
+// rules under `.cursor/rules/` and `.windsurf/rules/` — but Rules and
+// Agent Skills are two separate features in both editors, and the
+// toolkit is a pipeline of skills, not rules. The wrong-feature install
+// silently failed: skills loaded as rules never surfaced as `/brief`,
+// `/srs`, … slash commands. v2.x corrects this for Cursor, and the
+// Windsurf cleanup in this changelog entry finishes the job.
 //
-// To stay safe sharing the skills root with the user's other skills /
-// rules, every install also drops a `.ba-toolkit-manifest.json` next to
-// the installed items. uninstall and upgrade read this manifest to
-// remove only what the toolkit owns; without it they refuse to touch
-// anything.
+// To stay safe sharing the skills root with the user's other skills,
+// every install also drops a `.ba-toolkit-manifest.json` next to the
+// installed items. uninstall and upgrade read this manifest to remove
+// only what the toolkit owns; without it they refuse to touch anything.
 const AGENTS = {
   'claude-code': {
     name: 'Claude Code',
     projectPath: '.claude/skills',
     globalPath: path.join(os.homedir(), '.claude', 'skills'),
-    format: 'skill',
     restartHint: 'Restart Claude Code to load the new skills.',
   },
   codex: {
     name: 'OpenAI Codex CLI',
     projectPath: null, // Codex uses only global
     globalPath: path.join(process.env.CODEX_HOME || path.join(os.homedir(), '.codex'), 'skills'),
-    format: 'skill',
     restartHint: 'Restart the Codex CLI to load the new skills.',
   },
   gemini: {
     name: 'Google Gemini CLI',
     projectPath: '.gemini/skills',
     globalPath: path.join(os.homedir(), '.gemini', 'skills'),
-    format: 'skill',
     restartHint: 'Reload Gemini CLI to pick up the new skills.',
   },
   cursor: {
     name: 'Cursor',
-    projectPath: '.cursor/rules',
-    globalPath: null, // Cursor rules are project-scoped
-    format: 'mdc',
-    restartHint: 'Reload the Cursor window to apply new rules.',
+    projectPath: '.cursor/skills',
+    globalPath: null, // Cursor skills are project-scoped for now
+    restartHint: 'Reload the Cursor window to apply new skills.',
   },
   windsurf: {
     name: 'Windsurf',
-    projectPath: '.windsurf/rules',
-    globalPath: null,
-    format: 'mdc',
-    restartHint: 'Reload the Windsurf window to apply new rules.',
+    projectPath: '.windsurf/skills',
+    globalPath: null, // Windsurf skills are project-scoped for now
+    restartHint: 'Reload the Windsurf window to apply new skills.',
   },
 };
 
@@ -85,6 +83,21 @@ const DOMAINS = [
   { id: 'custom',       name: 'Custom',       desc: 'Any other domain — general interview questions' },
 ];
 
+// ASCII banner shown at the top of `ba-toolkit init`. Suppressed on
+// non-TTY stdout so it doesn't end up in CI logs or piped output.
+// Stored as an array of literal lines (not a template literal) so the
+// `$` characters stay out of any interpolation path.
+const BANNER = [
+  ' /$$                           /$$                         /$$ /$$       /$$   /$$    ',
+  '| $$                          | $$                        | $$| $$      |__/  | $$    ',
+  '| $$$$$$$   /$$$$$$          /$$$$$$    /$$$$$$   /$$$$$$ | $$| $$   /$$ /$$ /$$$$$$  ',
+  '| $$__  $$ |____  $$ /$$$$$$|_  $$_/   /$$__  $$ /$$__  $$| $$| $$  /$$/| $$|_  $$_/  ',
+  '| $$  \\ $$  /$$$$$$$|______/  | $$    | $$  \\ $$| $$  \\ $$| $$| $$$$$$/ | $$  | $$    ',
+  '| $$  | $$ /$$__  $$          | $$ /$$| $$  | $$| $$  | $$| $$| $$_  $$ | $$  | $$ /$$',
+  '| $$$$$$$/|  $$$$$$$          |  $$$$/|  $$$$$$/|  $$$$$$/| $$| $$ \\  $$| $$  |  $$$$/',
+  '|_______/  \\_______/           \\___/   \\______/  \\______/ |__/|__/  \\__/|__/   \\___/  ',
+];
+
 // --- Terminal helpers --------------------------------------------------
 
 const NO_COLOR = !!process.env.NO_COLOR || !process.stdout.isTTY;
@@ -98,6 +111,17 @@ const bold = colour(1);
 
 function log(...args) { console.log(...args); }
 function logError(...args) { console.error(red('error:'), ...args); }
+
+// Print the BANNER to stdout if — and only if — stdout is a real TTY.
+// Piped / redirected runs (CI, test spawn, `ba-toolkit init | tee ...`)
+// get a clean log without the 8-line block. The banner is decorative,
+// not load-bearing, so suppressing it in non-interactive contexts is
+// the right default.
+function printBanner() {
+  if (!process.stdout.isTTY) return;
+  for (const line of BANNER) log(cyan(line));
+  log('');
+}
 
 // --- Arg parsing -------------------------------------------------------
 
@@ -140,30 +164,66 @@ function parseArgs(argv) {
 // --- Prompt helper -----------------------------------------------------
 
 // Shared across all prompts in a single CLI invocation. Creating a new
-// readline.Interface for every question (the previous approach) made Ctrl+C
+// readline.Interface for every question (the earlier approach) made Ctrl+C
 // handling unreliable, leaked listeners on stdin, and broke when stdin was
-// piped (EOF on the second create). One interface per process, closed by
-// closeReadline() once main() finishes (or by the SIGINT handler).
+// piped. One interface per process, closed by closeReadline() once main()
+// finishes (or by the SIGINT handler).
+//
+// prompt() does NOT use `rl.question(...)` — that method races with
+// readline's internal line buffering when stdin is piped. If input arrives
+// faster than prompts are issued (the common piped case: the user pipes a
+// here-doc with multiple answers, or a test feeds the entire stdin buffer
+// upfront), readline emits 'line' events before the question listener is
+// attached and those lines are silently dropped. The second prompt then
+// sees EOF and errors with INPUT_CLOSED despite the answer actually being
+// in the buffer.
+//
+// Instead we own the 'line' event ourselves and keep a line queue: every
+// line that arrives is pushed onto `lineQueue` if no one is waiting, or
+// delivered directly to the oldest waiter. A prompt() call takes the head
+// of the queue if non-empty, otherwise parks a waiter. The 'close' event
+// drains all waiting waiters with INPUT_CLOSED.
 let sharedRl = null;
+const lineQueue = [];
+const waiters = [];
+let inputClosed = false;
+
+function ensureReadline() {
+  if (sharedRl) return;
+  sharedRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  sharedRl.on('line', (line) => {
+    if (waiters.length > 0) {
+      waiters.shift().resolve(line);
+    } else {
+      lineQueue.push(line);
+    }
+  });
+  sharedRl.on('close', () => {
+    inputClosed = true;
+    while (waiters.length > 0) {
+      const err = new Error('input stream closed before answer');
+      err.code = 'INPUT_CLOSED';
+      waiters.shift().reject(err);
+    }
+  });
+}
 
 function prompt(question) {
-  if (!sharedRl) {
-    sharedRl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  ensureReadline();
+  // Render the question ourselves — we're not using rl.question().
+  process.stdout.write(question);
+  if (lineQueue.length > 0) {
+    return Promise.resolve(String(lineQueue.shift()).trim());
+  }
+  if (inputClosed) {
+    const err = new Error('input stream closed before answer');
+    err.code = 'INPUT_CLOSED';
+    return Promise.reject(err);
   }
   return new Promise((resolve, reject) => {
-    let answered = false;
-    const onClose = () => {
-      if (!answered) {
-        const err = new Error('input stream closed before answer');
-        err.code = 'INPUT_CLOSED';
-        reject(err);
-      }
-    };
-    sharedRl.once('close', onClose);
-    sharedRl.question(question, (answer) => {
-      answered = true;
-      sharedRl.removeListener('close', onClose);
-      resolve(answer.trim());
+    waiters.push({
+      resolve: (line) => resolve(String(line).trim()),
+      reject,
     });
   });
 }
@@ -173,6 +233,213 @@ function closeReadline() {
     sharedRl.close();
     sharedRl = null;
   }
+}
+
+// --- Arrow-key menus -----------------------------------------------------
+//
+// Three layers, separated for testability:
+//
+//   1. menuStep(state, key) — pure state machine. Given the current
+//      menu state and a normalised key action, returns the new state.
+//      Unit-tested directly. No dependencies, no I/O.
+//
+//   2. renderMenu(state, opts) — pure renderer. Returns the frame to
+//      print as a string. Unit-tested too — uses the colour helpers,
+//      which collapse to identity strings under NO_COLOR (i.e., in
+//      tests), so the assertions are stable.
+//
+//   3. runMenuTty(items, opts) / selectMenu(items, opts) — the I/O
+//      glue. Detects TTY, sets raw mode, listens for keypress events,
+//      drives the loop, falls back to a numbered prompt under
+//      promptUntilValid when the terminal is non-interactive (CI,
+//      piped input, TERM=dumb). Not unit-tested — covered by manual
+//      smoke and the existing fallback-path integration tests.
+//
+// Cross-platform note: Node's `readline.emitKeypressEvents` decodes
+// arrow-key escape sequences uniformly across bash/zsh/fish on
+// Linux/macOS, Windows Terminal (PowerShell, cmd, WSL), Git Bash /
+// MSYS2, and VSCode's integrated terminal. Modern Node also enables VT
+// mode automatically on Windows when raw mode is requested, so legacy
+// cmd.exe on Win10+ works too. The only environment we explicitly bail
+// out of is `TERM=dumb` (emacs M-x shell, some IDE shells) — keypress
+// decoding is unreliable there.
+
+function menuStep(state, key) {
+  if (state.done) return state;
+  const len = state.items.length;
+  if (len === 0) return state;
+  switch (key) {
+    case 'up':
+      return { ...state, index: (state.index - 1 + len) % len };
+    case 'down':
+      return { ...state, index: (state.index + 1) % len };
+    case 'enter':
+      return { ...state, done: true, choice: state.items[state.index] };
+    case 'cancel':
+      return { ...state, done: true, choice: null };
+    default:
+      if (/^[0-9]$/.test(key)) {
+        const n = parseInt(key, 10);
+        if (n >= 1 && n <= len) {
+          return { ...state, index: n - 1 };
+        }
+      }
+      return state;
+  }
+}
+
+function renderMenu(state, { title } = {}) {
+  const lines = [];
+  if (title) {
+    lines.push('  ' + yellow(title));
+    lines.push('');
+  }
+  const labelWidth = Math.max(...state.items.map((it) => it.label.length));
+  state.items.forEach((item, i) => {
+    const selected = i === state.index;
+    const marker = selected ? cyan('>') : ' ';
+    const idx = String(i + 1).padStart(2);
+    const label = selected ? bold(item.label.padEnd(labelWidth)) : item.label.padEnd(labelWidth);
+    const desc = item.desc ? '  ' + gray('— ' + item.desc) : '';
+    lines.push(`  ${marker} ${idx}) ${label}${desc}`);
+  });
+  lines.push('');
+  lines.push('  ' + gray('↑/↓ navigate · Enter select · 1-9 jump · Esc cancel'));
+  return lines.join('\n') + '\n';
+}
+
+// True when arrow-key menus are usable in this process. False under
+// piped stdin/stdout, dumb terminals, or when raw mode is unavailable.
+function isInteractiveTerminal() {
+  if (!process.stdin.isTTY) return false;
+  if (!process.stdout.isTTY) return false;
+  if (process.env.TERM === 'dumb') return false;
+  if (typeof process.stdin.setRawMode !== 'function') return false;
+  return true;
+}
+
+// TTY runner: drive the menu state machine via raw-mode keypress
+// events. Returns the chosen item or null if the user cancelled.
+// The caller is responsible for not invoking this when
+// isInteractiveTerminal() is false.
+function runMenuTty(items, { title } = {}) {
+  // The shared line-mode readline (used by `prompt()`) and a raw-mode
+  // keypress reader can't both own stdin at the same time. Close any
+  // line-mode interface before we take over; the next prompt() call
+  // will lazily recreate it via ensureReadline().
+  closeReadline();
+
+  return new Promise((resolve) => {
+    let state = { items, index: 0, done: false, choice: null };
+    let lastFrameLineCount = 0;
+
+    const render = () => {
+      // Erase the previous frame in place: move the cursor up over its
+      // line count, then clear from cursor to end of screen. First
+      // render has nothing to erase.
+      if (lastFrameLineCount > 0) {
+        process.stdout.write(`\x1b[${lastFrameLineCount}A\x1b[J`);
+      }
+      const frame = renderMenu(state, { title });
+      process.stdout.write(frame);
+      // Count lines actually printed (frame ends with a trailing \n).
+      lastFrameLineCount = frame.split('\n').length - 1;
+    };
+
+    const cleanup = () => {
+      process.stdin.removeListener('keypress', onKey);
+      try {
+        process.stdin.setRawMode(false);
+      } catch { /* setRawMode can throw if stdin is not a TTY anymore */ }
+      process.stdin.pause();
+    };
+
+    const onKey = (_str, key) => {
+      if (!key) return;
+      let action = null;
+      if (key.ctrl && key.name === 'c') action = 'cancel';
+      else if (key.name === 'escape') action = 'cancel';
+      else if (key.name === 'up' || key.name === 'k') action = 'up';
+      else if (key.name === 'down' || key.name === 'j') action = 'down';
+      else if (key.name === 'return') action = 'enter';
+      else if (key.sequence && /^[0-9]$/.test(key.sequence)) action = key.sequence;
+      if (!action) return;
+      state = menuStep(state, action);
+      if (state.done) {
+        cleanup();
+        resolve(state.choice);
+      } else {
+        render();
+      }
+    };
+
+    readline.emitKeypressEvents(process.stdin);
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+    process.stdin.on('keypress', onKey);
+    render();
+  });
+}
+
+// Top-level selector: interactive arrow-key menu in real terminals,
+// numbered prompt fallback everywhere else (CI, piped input, dumb
+// TERM, EditorIDE shells). Always returns either an item from `items`
+// or null on cancel.
+async function selectMenu(items, { title, fallbackPrompt }) {
+  if (isInteractiveTerminal()) {
+    return await runMenuTty(items, { title });
+  }
+  // Non-TTY fallback: print the numbered list once, then prompt with
+  // promptUntilValid so a single typo doesn't kill the wizard.
+  log('');
+  if (title) log('  ' + yellow(title));
+  const labelWidth = Math.max(...items.map((it) => it.label.length));
+  items.forEach((item, i) => {
+    const idx = String(i + 1).padStart(2);
+    const desc = item.desc ? '  ' + gray('— ' + item.desc) : '';
+    log(`    ${idx}) ${bold(item.label.padEnd(labelWidth))}${desc}`);
+  });
+  log('');
+  return await promptUntilValid(
+    fallbackPrompt,
+    (raw) => {
+      const trimmed = String(raw || '').toLowerCase().trim();
+      if (!trimmed) return null;
+      if (/^\d+$/.test(trimmed)) {
+        const n = parseInt(trimmed, 10);
+        return n >= 1 && n <= items.length ? items[n - 1] : null;
+      }
+      return items.find((it) => it.id === trimmed) || null;
+    },
+    { invalidMessage: `Invalid selection — pick a number between 1 and ${items.length} or an id.` },
+  );
+}
+
+// Ask the user `question`, run `resolver` on the trimmed answer, and
+// loop while the resolver returns null/undefined. Prints a yellow
+// "try again" message between attempts. Aborts with process.exit(1)
+// after `maxAttempts` consecutive invalid answers so a piped input
+// can't infinite-loop us.
+//
+// Previously, cmdInit called `resolveDomain` / `resolveAgent` /
+// `sanitiseSlug` once and hard-failed on the first typo — users who
+// mistyped "saass" lost the whole wizard and had to start over. With
+// the retry loop, they just read the error and try again.
+async function promptUntilValid(question, resolver, {
+  maxAttempts = 3,
+  invalidMessage = 'Invalid selection — try again.',
+} = {}) {
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const raw = await prompt(question);
+    const result = resolver(raw);
+    if (result != null && result !== '') return result;
+    const remaining = maxAttempts - attempt;
+    if (remaining > 0) {
+      log('  ' + yellow(`${invalidMessage} (${remaining} attempt${remaining === 1 ? '' : 's'} left)`));
+    }
+  }
+  logError(`Too many invalid attempts — aborting.`);
+  process.exit(1);
 }
 
 // --- Utilities ---------------------------------------------------------
@@ -352,8 +619,10 @@ function copyDirRecursive(src, dest, { dryRun, copied }) {
 //   - Quoted scalars (single or double quoted) — names would keep quotes
 //
 // Returns { name, description, body }. `description` is always
-// flattened to a single line (whitespace collapsed) because the .mdc
-// rule format expects a one-line description.
+// flattened to a single line (whitespace collapsed) — keeps the
+// downstream consumers (manifest summary, status output, agent skill
+// loaders that expect a single-line description) free of multi-line
+// surprises.
 function parseSkillFrontmatter(content) {
   const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!fmMatch) {
@@ -402,26 +671,10 @@ function parseSkillFrontmatter(content) {
   };
 }
 
-// Transform a SKILL.md file's contents to the Cursor/Windsurf .mdc rule
-// format: replace the YAML frontmatter with the two fields the rule
-// loader expects (description, alwaysApply), keep the body unchanged.
-function skillToMdcContent(content) {
-  const { description, body } = parseSkillFrontmatter(content);
-  return `---\ndescription: ${description}\nalwaysApply: false\n---\n\n` + body;
-}
-
-// Install the package's skills/ tree into the given destination, picking
-// the layout the target agent expects.
-//
-// For 'skill' format (Claude Code, Codex, Gemini): each source skill
-// folder lands as `<destRoot>/<skillName>/SKILL.md`. The references/
+// Install the package's skills/ tree into the given destination. Every
+// supported agent uses the same Agent Skills layout: each source skill
+// folder lands as `<destRoot>/<skillName>/SKILL.md`. The `references/`
 // folder is copied as-is to `<destRoot>/references/`.
-//
-// For 'mdc' format (Cursor, Windsurf): each source skill folder is
-// flattened to a single `<destRoot>/<skillName>.mdc` file containing
-// the transformed content. References still go to `<destRoot>/references/`
-// — non-.mdc files there are ignored by the rule loaders, but the LLM
-// can still find them at runtime via the Read tool.
 //
 // Skill names come from the SKILL.md `name:` frontmatter field, falling
 // back to the source folder name. Returns:
@@ -429,7 +682,7 @@ function skillToMdcContent(content) {
 // where `copied` is the list of absolute file paths written and `items`
 // is the list of top-level entries in destRoot that the toolkit owns
 // (used to write the manifest).
-function copySkills(srcRoot, destRoot, { format, dryRun = false }) {
+function copySkills(srcRoot, destRoot, { dryRun = false } = {}) {
   if (!fs.existsSync(srcRoot)) {
     throw new Error(`Source directory not found: ${srcRoot}`);
   }
@@ -456,17 +709,9 @@ function copySkills(srcRoot, destRoot, { format, dryRun = false }) {
     const { name } = parseSkillFrontmatter(content);
     const skillName = name || entry.name;
 
-    if (format === 'mdc') {
-      const transformed = skillToMdcContent(content);
-      const destFile = path.join(destRoot, `${skillName}.mdc`);
-      if (!dryRun) fs.writeFileSync(destFile, transformed);
-      copied.push(destFile);
-      items.push(`${skillName}.mdc`);
-    } else {
-      const skillDestDir = path.join(destRoot, skillName);
-      copyDirRecursive(srcPath, skillDestDir, { dryRun, copied });
-      items.push(skillName);
-    }
+    const skillDestDir = path.join(destRoot, skillName);
+    copyDirRecursive(srcPath, skillDestDir, { dryRun, copied });
+    items.push(skillName);
   }
 
   return { copied, items };
@@ -486,6 +731,13 @@ function copySkills(srcRoot, destRoot, { format, dryRun = false }) {
 // 21-skill list and ordering; keep that template in sync with it.
 const AGENTS_TEMPLATE_PATH = path.join(SKILLS_DIR, 'references', 'templates', 'agents-template.md');
 
+// Anchor markers delimit the block inside AGENTS.md that `ba-toolkit
+// init` owns and is allowed to rewrite on re-init. Everything outside
+// the anchors (Pipeline Status, Key Constraints, Open Questions, user
+// notes) is preserved untouched. See agents-template.md.
+const AGENTS_MANAGED_BEGIN = '<!-- ba-toolkit:begin managed -->';
+const AGENTS_MANAGED_END = '<!-- ba-toolkit:end managed -->';
+
 function renderAgentsMd({ name, slug, domain }) {
   let template;
   try {
@@ -500,9 +752,50 @@ function renderAgentsMd({ name, slug, domain }) {
     .replace(/\[DATE\]/g, today());
 }
 
+// Merge the fresh AGENTS.md content into whatever already exists at
+// the project root. Three branches:
+//
+//   1. No existing file (existing == null) — return the fresh template,
+//      action 'created'.
+//   2. Existing file has both anchor markers — replace only the managed
+//      block content between the anchors, leave the rest of the file
+//      (Pipeline Status, Key Constraints, user notes) untouched. Action
+//      'merged'.
+//   3. Existing file has no anchors — it's either a legacy AGENTS.md
+//      from a pre-merge version of the toolkit or a fully user-authored
+//      file. Leave it untouched and return { action: 'preserved' } so
+//      the caller can print a note. We never silently overwrite
+//      user content.
+//
+// Pure function for easy testing. Exported so test/cli.test.js can
+// cover all three branches without spawning a process.
+function mergeAgentsMd(existing, ctx) {
+  const fresh = renderAgentsMd(ctx);
+  if (existing == null) {
+    return { content: fresh, action: 'created' };
+  }
+  const beginIdx = existing.indexOf(AGENTS_MANAGED_BEGIN);
+  const endIdx = existing.indexOf(AGENTS_MANAGED_END);
+  if (beginIdx === -1 || endIdx === -1 || endIdx < beginIdx) {
+    return { content: existing, action: 'preserved' };
+  }
+  const freshBeginIdx = fresh.indexOf(AGENTS_MANAGED_BEGIN);
+  const freshEndIdx = fresh.indexOf(AGENTS_MANAGED_END);
+  if (freshBeginIdx === -1 || freshEndIdx === -1) {
+    // Template is broken — fall back to returning fresh. Should be
+    // caught in unit tests if the template file ever loses its anchors.
+    return { content: fresh, action: 'created' };
+  }
+  const freshManaged = fresh.slice(freshBeginIdx, freshEndIdx + AGENTS_MANAGED_END.length);
+  const before = existing.slice(0, beginIdx);
+  const after = existing.slice(endIdx + AGENTS_MANAGED_END.length);
+  return { content: before + freshManaged + after, action: 'merged' };
+}
+
 // --- Commands ----------------------------------------------------------
 
 async function cmdInit(args) {
+  printBanner();
   log('');
   log('  ' + cyan('BA Toolkit — New Project Setup'));
   log('  ' + cyan('================================'));
@@ -537,20 +830,43 @@ async function cmdInit(args) {
       }
       slug = derived;
     } else if (derived) {
-      const custom = await prompt(`  Project slug [${cyan(derived)}]: `);
-      slug = custom || derived;
+      // Default branch: the derived slug is offered as the suggested
+      // answer. Empty input accepts the suggestion; anything the user
+      // types is run through sanitiseSlug and must produce something
+      // non-empty — otherwise re-prompt.
+      slug = await promptUntilValid(
+        `  Project slug [${cyan(derived)}]: `,
+        (raw) => {
+          const typed = String(raw || '').trim();
+          if (!typed) return derived;
+          const cleaned = sanitiseSlug(typed);
+          return cleaned || null;
+        },
+        { invalidMessage: 'Invalid slug — must produce at least one ASCII letter/digit after sanitisation.' },
+      );
     } else {
       log('  ' + gray(`(could not derive a slug from "${name}" — please type one manually)`));
-      slug = await prompt('  Project slug (lowercase, hyphens only): ');
+      slug = await promptUntilValid(
+        '  Project slug (lowercase, hyphens only): ',
+        (raw) => {
+          const cleaned = sanitiseSlug(String(raw || '').trim());
+          return cleaned || null;
+        },
+        { invalidMessage: 'Invalid slug — must contain at least one ASCII letter or digit.' },
+      );
     }
   }
+  // At this point `slug` is already a sanitised, non-empty string from
+  // one of the branches above. The final sanitiseSlug call is a
+  // defensive no-op for the flag path (--slug) where we haven't
+  // cleaned it yet.
   slug = sanitiseSlug(slug);
   if (!slug) {
     logError('Invalid or empty slug.');
     process.exit(1);
   }
 
-  // --- 3. Domain (numbered menu) ---
+  // --- 3. Domain (arrow menu in TTY, numbered fallback elsewhere) ---
   const domainFlag = stringFlag(args, 'domain');
   let domain;
   if (domainFlag) {
@@ -561,20 +877,18 @@ async function cmdInit(args) {
       process.exit(1);
     }
   } else {
-    log('');
-    log('  ' + yellow('Pick a domain:'));
-    const domainNameWidth = Math.max(...DOMAINS.map((d) => d.name.length));
-    DOMAINS.forEach((d, i) => {
-      const idx = String(i + 1).padStart(2);
-      log(`    ${idx}) ${bold(d.name.padEnd(domainNameWidth))} ${gray('— ' + d.desc)}`);
-    });
-    log('');
-    const raw = await prompt(`  Select [1-${DOMAINS.length}]: `);
-    domain = resolveDomain(raw);
-    if (!domain) {
-      logError(`Invalid selection: ${raw || '(empty)'}`);
-      process.exit(1);
+    const chosen = await selectMenu(
+      DOMAINS.map((d) => ({ id: d.id, label: d.name, desc: d.desc })),
+      {
+        title: 'Pick a domain:',
+        fallbackPrompt: `  Select [1-${DOMAINS.length}]: `,
+      },
+    );
+    if (chosen == null) {
+      log('  ' + yellow('Cancelled.'));
+      process.exit(130);
     }
+    domain = chosen.id;
   }
 
   // --- 4. Agent (numbered menu), unless --no-install ---
@@ -590,21 +904,19 @@ async function cmdInit(args) {
         process.exit(1);
       }
     } else {
-      log('');
-      log('  ' + yellow('Pick your AI agent:'));
       const agentEntries = Object.entries(AGENTS);
-      const agentNameWidth = Math.max(...agentEntries.map(([, a]) => a.name.length));
-      agentEntries.forEach(([id, a], i) => {
-        const idx = String(i + 1).padStart(2);
-        log(`    ${idx}) ${bold(a.name.padEnd(agentNameWidth))} ${gray('(' + id + ')')}`);
-      });
-      log('');
-      const raw = await prompt(`  Select [1-${agentEntries.length}]: `);
-      agentId = resolveAgent(raw);
-      if (!agentId) {
-        logError(`Invalid selection: ${raw || '(empty)'}`);
-        process.exit(1);
+      const chosen = await selectMenu(
+        agentEntries.map(([id, a]) => ({ id, label: a.name, desc: '(' + id + ')' })),
+        {
+          title: 'Pick your AI agent:',
+          fallbackPrompt: `  Select [1-${agentEntries.length}]: `,
+        },
+      );
+      if (chosen == null) {
+        log('  ' + yellow('Cancelled.'));
+        process.exit(130);
       }
+      agentId = chosen.id;
     }
   }
 
@@ -620,18 +932,23 @@ async function cmdInit(args) {
     log(`    exists   ${outputDir}`);
   }
 
+  // AGENTS.md: merge-on-reinit instead of overwrite. Everything outside
+  // the managed block (Pipeline Status, Key Constraints, user notes) is
+  // preserved. See mergeAgentsMd for the three branches (created,
+  // merged, preserved).
   const agentsPath = 'AGENTS.md';
-  let writeAgents = true;
-  if (fs.existsSync(agentsPath)) {
-    const answer = await prompt('  AGENTS.md already exists. Overwrite? (y/N): ');
-    if (answer.toLowerCase() !== 'y') {
-      writeAgents = false;
-      log('    skipped  AGENTS.md');
-    }
-  }
-  if (writeAgents) {
-    fs.writeFileSync(agentsPath, renderAgentsMd({ name, slug, domain }));
-    log('    created  AGENTS.md');
+  const existingAgents = fs.existsSync(agentsPath)
+    ? fs.readFileSync(agentsPath, 'utf8')
+    : null;
+  const { content: agentsContent, action: agentsAction } = mergeAgentsMd(
+    existingAgents,
+    { name, slug, domain },
+  );
+  if (agentsAction === 'preserved') {
+    log('    ' + gray('preserved AGENTS.md (no ba-toolkit managed block — left untouched)'));
+  } else {
+    fs.writeFileSync(agentsPath, agentsContent);
+    log(`    ${agentsAction === 'merged' ? 'updated ' : 'created '} AGENTS.md`);
   }
 
   // --- 6. Install skills for the selected agent ---
@@ -683,8 +1000,8 @@ async function cmdInit(args) {
 // only what we own without touching the user's other skills sitting in
 // the same directory.
 //
-// Hidden filename with no `.md` / `.mdc` extension so the skill loader
-// of every supported agent ignores it.
+// Hidden filename with no `.md` extension so the skill loader of every
+// supported agent ignores it.
 const MANIFEST_FILENAME = '.ba-toolkit-manifest.json';
 
 function readManifest(destDir) {
@@ -697,11 +1014,10 @@ function readManifest(destDir) {
   }
 }
 
-function writeManifest(destDir, format, items) {
+function writeManifest(destDir, items) {
   const payload = {
     version: PKG.version,
     installedAt: new Date().toISOString(),
-    format,
     items,
   };
   fs.writeFileSync(
@@ -755,7 +1071,7 @@ async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = t
   log(`    source:       ${SKILLS_DIR}`);
   log(`    destination:  ${destDir}`);
   log(`    scope:        ${effectiveGlobal ? 'global (user-wide)' : 'project-level'}`);
-  log(`    format:       ${agent.format === 'mdc' ? '.mdc (converted from SKILL.md)' : 'SKILL.md (native)'}`);
+  log(`    format:       SKILL.md (native)`);
   if (dryRun) log('    ' + yellow('mode:         dry-run (no files will be written)'));
 
   // Warn about a v1.x wrapper folder if one is sitting in the same
@@ -784,29 +1100,25 @@ async function runInstall({ agentId, isGlobal, isProject, dryRun, showHeader = t
 
   let result;
   try {
-    result = copySkills(SKILLS_DIR, destDir, { format: agent.format, dryRun });
+    result = copySkills(SKILLS_DIR, destDir, { dryRun });
   } catch (err) {
     logError(err.message);
     process.exit(1);
   }
 
   if (!dryRun) {
-    writeManifest(destDir, agent.format, result.items);
+    writeManifest(destDir, result.items);
   }
 
   log('    ' + green(`${dryRun ? 'would copy' : 'copied'} ${result.copied.length} files (${result.items.length} items).`));
-  if (!dryRun && agent.format === 'mdc') {
-    log('    ' + gray('SKILL.md files converted to .mdc rule format.'));
-  }
   return true;
 }
 
 // Remove every item listed in the given manifest from destDir, then
-// remove the manifest file itself. Items are paths relative to destDir
-// — for 'skill' format they're folder names (`brief`, `srs`, ...,
-// `references`), for 'mdc' they're file names (`brief.mdc`, ...,
-// plus the `references` folder). Anything not in the manifest is left
-// alone, including the user's other skills/rules in the same directory.
+// remove the manifest file itself. Items are top-level entries
+// relative to destDir — folder names like `brief`, `srs`, …,
+// `references`. Anything not in the manifest is left alone, including
+// the user's other skills sitting in the same directory.
 function removeManifestItems(destDir, manifest) {
   for (const item of manifest.items) {
     const p = path.join(destDir, item);
@@ -1264,10 +1576,12 @@ module.exports = {
   levenshtein,
   closestMatch,
   parseSkillFrontmatter,
-  skillToMdcContent,
   readManifest,
   detectLegacyInstall,
   renderAgentsMd,
+  mergeAgentsMd,
+  menuStep,
+  renderMenu,
   KNOWN_FLAGS,
   DOMAINS,
   AGENTS,

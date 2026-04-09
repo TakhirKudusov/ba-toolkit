@@ -9,6 +9,7 @@ Items marked ✅ are complete and kept here for reference.
 
 | # | Item | Version |
 |---|------|---------|
+| ✅ | Integration test suite for CLI subcommands + test gate in release/validate workflows (blocks npm publish on test failure) | Unreleased |
 | ✅ | Templates for all 16 artifacts (`skills/references/templates/`) | v1.1.0 |
 | ✅ | 6 new domain references (ecommerce, healthcare, logistics, on-demand, social-media, real-estate) | v1.1.0 |
 | ✅ | `/estimate` skill — Story Points / T-shirt sizing with split recommendations | v1.1.0 |
@@ -208,3 +209,13 @@ Items noted for future consideration but not yet assessed:
 - **`/changelog`** — track changes between artifact versions: diff `v1` vs `v2` of an artifact and generate a human-readable delta.
 - **OpenAI Assistants API config** — `assistant.json` config files for each skill, enabling use via the Assistants API without file installation.
 - **Linter config** — `ba-toolkit.config.json` to customise validation rules (e.g. required NFR categories per domain, minimum AC scenarios per story). Becomes meaningful once the user base is large enough to have divergent conventions.
+
+Bugs and improvements:
+1. ✅ `init` now merges `AGENTS.md` via `mergeAgentsMd` + managed-block anchors. Legacy files without anchors are preserved untouched. Done in Unreleased.
+2. Invalid input during interactive init crashes the script. Split into:
+   - **2a.** ✅ Non-flag interactive path re-prompts on invalid input via `promptUntilValid(question, resolver, { maxAttempts = 3 })`. Applied to domain menu, agent menu, and manual slug entry. Done in Unreleased. Also uncovered and fixed a piped-input race in `prompt()` (readline `'line'` events were being dropped between consecutive `rl.question()` calls) — prompt now owns the `'line'` event and buffers lines in an internal queue.
+   - **2b.** ✅ Arrow-key menu navigation for domain/agent selection. `↑/↓` + `j/k`, `1-9` jump, `Enter`, `Esc`/`Ctrl+C`. TTY-only, automatic numbered fallback under non-TTY/`TERM=dumb`. Three-layer design: `menuStep` (pure state machine), `renderMenu` (pure renderer), `runMenuTty` (I/O glue). 18 new unit tests cover the pure layers; the I/O glue is manually smoke-tested. Done in Unreleased.
+3. ✅ Print the ASCII `ba-toolkit` banner at the start of `init`. Done in Unreleased: `printBanner()` gated on `process.stdout.isTTY`, not shown in CI/piped output.
+4. ✅ AI interview skills follow the new `skills/references/interview-protocol.md`: one question at a time, 3–5 domain-appropriate options, free-text "Other" option, wait for answer. Applied to all 12 interview-phase skills. Guarded by unit test (`test/cli.test.js`) and CI validation step (`.github/workflows/validate.yml`). Done in Unreleased.
+5. ✅ Cursor install now targets `.cursor/skills/` with native folder-per-skill `SKILL.md` layout (`format: 'skill'`). Was writing to `.cursor/rules/` as flat `.mdc` files — wrong Cursor feature. Done in Unreleased.
+6. ✅ Windsurf install now targets `.windsurf/skills/` natively. Mirror of the Cursor fix in pt.5. Done in Unreleased — also removed all dead `.mdc` conversion code (`skillToMdcContent`, `mdc` branch of `copySkills`, `format` field across the AGENTS map and the manifest payload). All 5 supported agents now use a single uniform install path.

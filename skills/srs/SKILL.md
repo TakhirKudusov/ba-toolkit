@@ -23,7 +23,9 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 ## Interview
 
-3–7 questions per round, 2–4 rounds. Do not re-ask information already known from the brief.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, offer 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question.
+
+3–7 topics per round, 2–4 rounds. Do not re-ask information already known from the brief.
 
 **Required topics:**
 1. User roles — which roles interact with the system?

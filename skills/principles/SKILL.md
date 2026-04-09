@@ -27,7 +27,9 @@ If `01_brief_*.md` already exists, extract the slug and domain from it. Otherwis
 
 ### 3. Interview
 
-1–2 rounds, 3–5 questions each. Do not ask about topics the user can accept as defaults.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, offer 3–5 domain-appropriate options (load `references/domains/{domain}.md` for the ones that fit), always include a free-text "Other" option as the last choice, and wait for an answer before asking the next question.
+
+1–2 rounds, 3–5 topics each. Do not ask about topics the user can accept as defaults.
 
 **Required topics:**
 1. Artifact language — which language should all artifacts be generated in? (default: the language of the user's first message)
