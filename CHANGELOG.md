@@ -11,6 +11,36 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.5.0] — 2026-04-09
+
+### Highlights
+
+- **Pilot skill audit pass on `/brief`, `/srs`, `/stories`** — 14 senior-BA findings (6 Critical + 8 High) applied. Three skills now match the rigour a 25-year BA from a top-tier consultancy would expect: `/brief` separates Constraints from Assumptions and forces an explicit Out of Scope section, `/srs` adds Source / Verification / Rationale per FR plus a Brief-Goal → FR traceability matrix, `/stories` makes INVEST a quality gate and adds Persona / Business Value / Dependencies fields.
+
+### Changed
+
+- **`skills/brief/SKILL.md` and `skills/references/templates/brief-template.md`** — six findings applied:
+  - **Section numbering bug fixed** — workflow steps no longer jump from §6 to §8 (renumbered §8 → §7, §9 → §8). Was a sloppiness flag for any reviewer opening the file.
+  - **Out of Scope section is now mandatory** — added §4.2 to the artifact template. A brief is a contract; what is excluded matters as much as what is included. Without this, scope creep starts on the first standup.
+  - **Constraints and Assumptions split into two sections** (§6 and §7 in the new template). They have different change-management implications and BABOK v3 separates them. Constraints carry `Type / Source / Implication`; Assumptions carry `Statement / Owner / Validate by / Risk if false`.
+  - **Required-topics list extended from 7 to 11.** Added the four canonical brief inquiries every senior BA asks: buyer-vs-user separation, decision-making authority (who can sign off, by name and role), regulatory pre-screening (yes/no per regime: GDPR, HIPAA, FDA SaMD, SOC 2, PCI DSS, SOX, KYC/AML, FERPA, COPPA, EU AI Act, accessibility), and explicit failure criteria (asymmetric to success criteria — flushes out red lines).
+  - **Document control metadata added to the template** — `Version`, `Status` (Draft / In Review / Approved / Superseded), and an `Approvals` table at the bottom. A brief is a controlled document and needs to answer "which version did we agree to?" three months in.
+  - **Stakeholder table gains a "Sign-off authority" column** so the brief records not just who is interested but who has veto power.
+- **`skills/srs/SKILL.md` and `skills/references/templates/srs-template.md`** — four findings applied:
+  - **FR template gains three IEEE 830-mandated fields:** `Source` (which stakeholder, brief goal, regulatory requirement, or parent FR drove this requirement — required for traceability), `Verification` (Test / Demo / Inspection / Analysis — without it an FR is a wish, not a contract), `Rationale` (*why* this requirement exists, not just *what* — helps future maintainers know what is safe to push back on).
+  - **New §7 "Traceability — Brief Goal → FR" table.** Forward traceability from `01_brief_<slug>.md` §2 business goals to the FRs that satisfy them. Every Brief goal must have at least one linked FR; uncovered goals are flagged so they cannot silently disappear from the project.
+  - **§3 Functional Requirements is now grouped by feature area** as `### 3.N [Area name]` subsections, each with a reserved FR-ID range (FR-001..099 for area 1, FR-100..199 for area 2, …). New FRs inserted later go into their area's free numbers, not the global tail — IDs stay stable. Was a flat list, which became unreadable for any non-trivial system.
+  - **Required-topics list extended from 6 to 11.** Added the five universal SRS inquiries that downstream skills (`/datadict`, `/nfr`, `/apicontract`) inherit gaps from when they're missing: authentication and authorisation model (SSO / SAML / OIDC / RBAC / ABAC / MFA), data ownership and stewardship, audit and logging requirements, data retention and deletion (GDPR right-to-erasure), reporting needs.
+- **`skills/stories/SKILL.md` and `skills/references/templates/stories-template.md`** — five findings applied:
+  - **SKILL.md inline template removed in favour of a single source of truth at `references/templates/stories-template.md`.** Previously the inline template and the standalone file had drifted apart (the inline version had no `Size:` field and an inline AC reference; the standalone had `Size:` and a file-path AC reference). Two agents reading different parts produced different outputs. The SKILL.md now lists the field set and points at the standalone template; the standalone template is the only place that carries the per-story block layout.
+  - **INVEST is now an explicit quality gate.** The template has an `INVEST self-check:` line per story (Independent · Negotiable · Valuable · Estimable · Small · Testable). The `/validate` command description now requires every story to pass INVEST. The `/split` guidance references INVEST's "Small" / "Independent" criteria and Mike Cohn's nine story-splitting patterns instead of the previous arbitrary "more than 3 scenarios" rule.
+  - **Persona field replaces bare role.** Stories now use `**As** [Maria, ops supervisor at a 50-warehouse 3PL handling 200 returns/week]` instead of `**As an** admin`. Personas carry goals, frustrations, and context that drive UX decisions; bare job titles do not.
+  - **Business Value Score field added** (1–5 or High / Med / Low). Captures relative ranking *within* the same MoSCoW priority tier so a PM can sequence among 30 Must stories instead of treating them as interchangeable.
+  - **Depends on field added** so story-to-story dependencies are visible to `/sprint` and `/implement-plan`. A story that can't start until US-007 is done now says so in the template and won't get planned in the wrong sprint.
+  - **New "FR → Story coverage matrix" sub-table in the Coverage Summary.** Forward traceability from FR to US, with `(uncovered)` flag for any FR missing a linked story. Was previously a manual cross-reference task.
+
+---
+
 ## [3.4.1] — 2026-04-09
 
 ### Fixed
@@ -511,7 +541,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.1...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.5.0...HEAD
+[3.5.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.1...v3.5.0
 [3.4.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.0...v3.4.1
 [3.4.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.3.0...v3.4.0
 [3.3.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.2.0...v3.3.0

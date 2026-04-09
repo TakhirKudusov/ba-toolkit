@@ -48,10 +48,14 @@ Cover 3–7 topics per round, 2–4 rounds. Do not generate the artifact until s
 1. Product type — what exactly is being built?
 2. Business goal — what problem does the product solve?
 3. Target audience and geography.
-4. Key stakeholders — who is interested, who makes decisions?
-5. Known constraints — deadlines, budget, regulatory requirements, mandatory integrations.
-6. Competitive products or references.
-7. Success criteria — specific metrics or qualitative goals.
+4. **Buyer vs. user separation** — who pays for the product vs. who uses it day-to-day? In B2B SaaS, EdTech, healthcare and many other domains these are different people with different priorities. If they coincide, record "buyer = user".
+5. Key stakeholders — who is interested, who makes decisions?
+6. **Decision-making authority** — who can sign off on the brief now, and who can sign off on changes later? Capture by name and role, not just by team.
+7. **Regulatory pre-screening** — which of the following regimes apply: GDPR / UK GDPR, HIPAA, FDA SaMD, SOC 2, PCI DSS, SOX, KYC / AML, FERPA / COPPA, EU AI Act, accessibility (Section 508 / WCAG / EN 301 549)? Single yes/no per regime — gates the rest of the pipeline.
+8. Known constraints — deadlines, budget, technology mandates, mandatory integrations.
+9. Reference products and analogues — products in this space the user admires (and why), products that failed (and why). Anchors the project to real-world references and surfaces unstated requirements.
+10. Success criteria — specific metrics or qualitative goals.
+11. **Failure criteria** — what would make us call this project a failure? Asymmetric to success criteria; flushes out red lines that "what's success" never reveals.
 
 If a domain reference is loaded, supplement general questions with domain-specific ones. Formulate questions concretely, with example answers in parentheses.
 
@@ -62,17 +66,37 @@ If a domain reference is loaded, supplement general questions with domain-specif
 ```markdown
 # Project Brief: {Project Name}
 
+**Version:** 0.1
+**Status:** Draft | In Review | Approved | Superseded
 **Domain:** {saas | fintech | ecommerce | healthcare | logistics | on-demand | social-media | real-estate | igaming | edtech | govtech | ai-ml | custom:{name}}
 **Date:** {date}
+**Slug:** {slug}
 
 ## 1. Project Summary
 ## 2. Business Goals and Success Metrics
 ## 3. Target Audience
+   ### 3.1 Buyer
+   ### 3.2 User (if different from Buyer)
 ## 4. High-Level Functionality Overview
-## 5. Stakeholders and Roles
-## 6. Constraints and Assumptions
-## 7. Risks
-## 8. Glossary
+   ### 4.1 In Scope
+   ### 4.2 Out of Scope
+## 5. Stakeholders and Decision-Making Authority
+## 6. Constraints
+## 7. Assumptions
+## 8. Risks
+## 9. Success and Failure Criteria
+   ### 9.1 Success Criteria
+   ### 9.2 Failure Criteria
+## 10. Reference Products and Analogues
+## 11. Glossary
+
+---
+
+## Approvals
+
+| Name | Role | Approval Date | Notes |
+|------|------|---------------|-------|
+| {name} | {role} | {date} | {notes} |
 ```
 
 ### 6. AGENTS.md update
@@ -83,7 +107,7 @@ If a domain reference is loaded, supplement general questions with domain-specif
 
 If you find no `AGENTS.md` at all (neither in cwd nor up the tree), warn the user that the project was likely set up before v3.1 and tell them to run `ba-toolkit init --name "..." --slug {slug}` to scaffold the per-project `AGENTS.md`. Do not create one yourself with arbitrary structure.
 
-### 8. Iterative refinement
+### 7. Iterative refinement
 
 - `/revise [section]` — rewrite a section.
 - `/expand [section]` — add detail.
@@ -91,7 +115,7 @@ If you find no `AGENTS.md` at all (neither in cwd nor up the tree), warn the use
 - `/validate` — check completeness and consistency.
 - `/done` — finalize and update `AGENTS.md`. Next step: `/srs`.
 
-### 9. Closing message
+### 8. Closing message
 
 After saving the artifact, present the following summary to the user (see `references/closing-message.md` for format):
 

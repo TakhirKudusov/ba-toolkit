@@ -31,11 +31,16 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 **Required topics:**
 1. User roles — which roles interact with the system?
-2. External integrations — which systems require connection?
-3. Multi-language and multi-currency support — if applicable.
-4. Regulatory requirements — which standards and laws apply?
-5. Prioritization method — MoSCoW (Must, Should, Could, Won't) or other.
-6. Key business rules — limits, thresholds, calculation formulas.
+2. **Authentication and authorisation model** — how do users authenticate (password / SSO / SAML / OIDC / passwordless)? RBAC or ABAC? Preset roles or custom? Multi-factor for which roles?
+3. External integrations — which systems require connection?
+4. Multi-language and multi-currency support — if applicable.
+5. Regulatory requirements — which standards and laws apply?
+6. **Data ownership and stewardship** — who owns each data class? Who can read it? Who can correct it? Who is liable if it leaks?
+7. **Audit and logging** — which events must be logged for SOC 2 / SOX / regulatory audit? What is the log retention period?
+8. **Data retention and deletion** — how long is each data class retained? What is the deletion policy under GDPR right-to-erasure (and equivalent local laws)?
+9. **Reporting needs** — which reports must the system produce, for whom, on what cadence, in what format?
+10. Prioritization method — MoSCoW (Must, Should, Could, Won't) or other.
+11. Key business rules — limits, thresholds, calculation formulas.
 
 Supplement with domain-specific questions and typical functional areas from the reference.
 
@@ -45,6 +50,13 @@ Supplement with domain-specific questions and typical functional areas from the 
 
 ```markdown
 # Software Requirements Specification (SRS): {Name}
+
+**Version:** 0.1
+**Status:** Draft | In Review | Approved
+**Domain:** {domain}
+**Date:** {date}
+**Slug:** {slug}
+**Reference:** 01_brief_{slug}.md
 
 ## 1. Introduction
 ### 1.1 Purpose
@@ -59,12 +71,20 @@ Supplement with domain-specific questions and typical functional areas from the 
 ### 2.4 Assumptions and Dependencies
 
 ## 3. Functional Requirements
-### FR-{NNN}: {Title}
-- **Description:** ...
-- **Actor:** ...
-- **Input:** ...
-- **Output / Result:** ...
-- **Business Rules:** ...
+
+**Grouping rule:** FRs are grouped by feature area as `### 3.N [Area name]` subsections (e.g. `### 3.1 Authentication`, `### 3.2 Catalog`, `### 3.3 Checkout`). Each area gets a reserved numeric range (FR-001..099 for area 1, FR-100..199 for area 2, FR-200..299 for area 3, …). New FRs added later go into their area's free numbers, not the global tail — IDs stay stable.
+
+### 3.1 [Feature area]
+
+#### FR-{NNN}: {Title}
+- **Description:** [What the system must do.]
+- **Actor:** [Role that triggers or benefits from this requirement.]
+- **Input:** [What data or event initiates this.]
+- **Output / Result:** [What the system produces or changes.]
+- **Business Rules:** [Formulas, limits, conditions.]
+- **Source:** [Which stakeholder, brief goal, regulatory requirement, or parent FR-NNN drove this requirement. Required for traceability.]
+- **Verification:** Test | Demo | Inspection | Analysis
+- **Rationale:** [Why this requirement exists. Not what — why. Helps future maintainers know what is safe to push back on.]
 - **Priority:** Must | Should | Could | Won't
 
 ## 4. Interface Requirements
@@ -76,9 +96,25 @@ Supplement with domain-specific questions and typical functional areas from the 
 _(detailed in /nfr artifact)_
 
 ## 6. Priority Matrix (MoSCoW)
+
+| Priority | FR Count | FR IDs |
+|----------|----------|--------|
+| Must     | [n]      | …      |
+| Should   | [n]      | …      |
+| Could    | [n]      | …      |
+| Won't    | [n]      | …      |
+
+## 7. Traceability — Brief Goal → FR
+
+Forward traceability from the Project Brief's business goals to the FRs that satisfy them. Every Brief goal must have at least one linked FR; uncovered goals are flagged.
+
+| Goal ID | Goal Description (from 01_brief) | Linked FRs |
+|---------|----------------------------------|------------|
+| G1      | [goal from brief §2]             | FR-001, FR-007, FR-014 |
+| G2      | [goal from brief §2]             | FR-003 |
 ```
 
-FR numbering: sequential, three-digit (FR-001, FR-002, ...).
+FR numbering: sequential within each feature area, three-digit, with reserved ranges per area (FR-001..099 for area 1, FR-100..199 for area 2, …). New FRs inserted later use the next free number in their area's range, not the global tail — IDs stay stable.
 
 ## AGENTS.md update
 

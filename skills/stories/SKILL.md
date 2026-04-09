@@ -40,27 +40,26 @@ Supplement with domain-specific questions and typical epics from the reference.
 
 **File:** `03_stories_{slug}.md`
 
-```markdown
-# User Stories: {Name}
+The full template lives at `references/templates/stories-template.md` and is the single source of truth for the per-story field set. The fields are:
 
-## Epic: {Epic Name}
-Brief description and business value.
-
-### US-{NNN}: {Short Description}
-- **Role:** {role from SRS}
-- **Action:** {what they want to do}
-- **Value:** {why, business outcome}
-- **Priority:** {Must | Should | Could | Won't}
-- **Linked FR:** FR-{NNN}
-- **Acceptance Criteria:** _(filled at /ac stage)_
-- **Notes:** {edge cases, additional context}
-```
+- **Persona** — named persona with role and one-line context (e.g. "Maria, ops supervisor at a 50-warehouse 3PL handling 200 returns/week"). Personas, not bare job titles.
+- **Action** — the atomic capability the persona wants.
+- **Value** — the business outcome the persona gets.
+- **Business Value Score** — 1–5 (or High / Med / Low). Captures relative ranking *within* the same MoSCoW priority tier so PMs can sequence inside a tier.
+- **Priority** — MoSCoW (Must | Should | Could | Won't).
+- **Size** — XS | S | M | L | XL.
+- **Linked FR** — FR-NNN (cross-reference to `02_srs_{slug}.md`).
+- **Depends on** — US-NNN list of stories that must complete before this one can start, or `—` if independent. Critical for sprint planning.
+- **Acceptance Criteria** — `→ 05_ac_{slug}.md → US-NNN` (detailed in `/ac`).
+- **Definition of Ready** — checklist or "see `00_principles_{slug}.md`".
+- **INVEST self-check** — one line confirming the story passes Independent / Negotiable / Valuable / Estimable / Small / Testable.
+- **Notes** — edge cases, out-of-scope clarifications.
 
 **Rules:**
 - Sequential numbering: US-001, US-002, ...
-- One story = one atomic action by one role.
+- One story = one atomic action by one persona.
 - All Must-priority FR from SRS must have at least one US.
-- Story covering > 3 scenarios — suggest `/split`.
+- **INVEST is the quality gate.** A story that fails any of the six INVEST criteria must be revised or split. `/split` should be used when a story violates **Small** or **Independent**, or when it matches one of Mike Cohn's nine story-splitting patterns (workflow steps, business-rule variations, happy / unhappy paths, data variations, simple-vs-complex, deferred performance, CRUD operations, input options, or break-out a spike).
 
 ## Iterative refinement
 
@@ -68,7 +67,7 @@ Brief description and business value.
 - `/expand [US-NNN]` — add detail.
 - `/split [US-NNN]` — split into smaller stories.
 - `/clarify [focus]` — targeted ambiguity pass.
-- `/validate` — all FR covered; no orphan stories; numbering correct; roles consistent.
+- `/validate` — all FR covered; no orphan stories; numbering correct; personas consistent; **every story passes the INVEST checklist** (Independent, Negotiable, Valuable, Estimable, Small, Testable).
 - `/done` — finalize. Next step: `/usecases`.
 
 ## Closing message
