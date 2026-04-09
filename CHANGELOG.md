@@ -9,6 +9,10 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- **Replaced `example/dragon-fortune/` with `example/lumen-goods/`**, a sustainable home-goods D2C e-commerce walkthrough. The new example is more universally relatable than the iGaming-themed predecessor: 15 cross-referenced artifacts (Brief, Principles, SRS, Stories, Use Cases, AC, NFRs, Data Dictionary, Tech Research, API Contract, Wireframes, Scenarios, Risk Register, Sprint Plan, Handoff) for a fictional D2C online store selling lighting, kitchenware, and textiles to eco-conscious EU/UK buyers. Stack covers Next.js storefront, Stripe (cards / Apple Pay / Klarna / SEPA), Stripe Tax for destination-based VAT, hybrid stock sync between an NL warehouse and a UK 3PL, GDPR/DSAR/cookie consent flows, and a paid Lumen Circle loyalty tier. CLAUDE.md "Do NOT touch" entry, the placeholder warning, the repo-layout block, and the README example table all updated to reference `lumen-goods`. The old `example/dragon-fortune/` folder has been removed.
+
 ---
 
 ## [3.1.0] — 2026-04-09

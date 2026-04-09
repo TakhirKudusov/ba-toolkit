@@ -1,9 +1,9 @@
-# Project Principles: Dragon Fortune
+# Project Principles: Lumen Goods
 
 **Version:** 1.0
-**Date:** 2026-04-08
-**Domain:** iGaming
-**Slug:** dragon-fortune
+**Date:** 2026-04-09
+**Domain:** ecommerce
+**Slug:** lumen-goods
 
 ## 1. Artifact Language
 
@@ -19,8 +19,8 @@ All artifacts are generated in: **English**
 | Acceptance Criteria | AC-NNN-NN | AC-001-01 |
 | Non-functional Requirements | NFR-NNN | NFR-001 |
 | Architecture Decisions | ADR-NNN | ADR-001 |
-| Data Entities | PascalCase (English) | GameSession |
-| API Endpoints | REST path | POST /games/spins |
+| Data Entities | PascalCase (English) | OrderLine |
+| API Endpoints | REST path | POST /orders |
 | Wireframes | WF-NNN | WF-001 |
 | Validation Scenarios | SC-NNN | SC-001 |
 | Risks | RISK-NN | RISK-01 |
@@ -93,11 +93,12 @@ An artifact is ready to `/done` when all of the following are true:
 
 The following NFR categories are required for this project:
 
-- **Performance:** spin response time, API latency targets.
-- **Scalability:** concurrent user capacity, transaction throughput.
+- **Performance:** product page TTFB, checkout API latency targets.
+- **Scalability:** concurrent shopper capacity during sale peaks.
 - **Availability:** uptime SLA with numeric target.
-- **Security:** authentication, encryption, fraud detection.
-- **Compliance:** iGaming licensing, AML/KYC, GDPR, responsible gambling.
+- **Security:** authentication, payment data isolation, fraud detection.
+- **Compliance:** GDPR / UK GDPR, PCI DSS scope minimisation, EU consumer protection law.
+- **Accessibility:** WCAG 2.1 AA on the customer storefront.
 
 ## 6. Quality Gates
 
@@ -112,11 +113,12 @@ For `/analyze` findings:
 
 **Mode:** subfolder
 
-All artifacts are saved under `example/dragon-fortune/`.
+All artifacts are saved under `example/lumen-goods/`.
 
 ## 8. Project-Specific Notes
 
-- RTP must remain within the certified range (94–97%) at all times. Any FR or change touching spin logic must be reviewed by the Compliance Officer.
-- Payment flows must comply with AML requirements; KYC must be completed before withdrawals above 50 USD equivalent are processed.
-- Telegram Mini App SDK calls must be abstracted behind an adapter layer to isolate breaking API changes.
-- All monetary values are stored in the smallest currency unit (e.g., cents, satoshi) and displayed with formatting applied at the presentation layer.
+- The platform must never store raw card data — Stripe handles all card collection via Stripe Elements; only the Stripe `paymentIntentId` is persisted.
+- All monetary values are stored in the smallest currency unit (cents) and displayed with formatting applied at the presentation layer.
+- VAT is destination-based and calculated by a managed tax service; the calculated VAT is stored on every OrderLine for audit.
+- Stock reservation must be atomic at checkout — overselling is unacceptable and is treated as a CRITICAL bug.
+- All customer PII (name, email, address) is encrypted at rest. The audit log captures who accessed which customer record from the admin panel.

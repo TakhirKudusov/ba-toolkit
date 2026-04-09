@@ -1,138 +1,4 @@
-# BA Toolkit — Future Improvements
-
-Backlog of planned improvements, ordered by execution sequence.
-Items marked ✅ are complete and kept here for reference.
-
----
-
-## Recently completed
-
-| # | Item | Version |
-|---|------|---------|
-| ✅ | Integration test suite for CLI subcommands + test gate in release/validate workflows (blocks npm publish on test failure) | Unreleased |
-| ✅ | Templates for all 16 artifacts (`skills/references/templates/`) | v1.1.0 |
-| ✅ | 6 new domain references (ecommerce, healthcare, logistics, on-demand, social-media, real-estate) | v1.1.0 |
-| ✅ | `/estimate` skill — Story Points / T-shirt sizing with split recommendations | v1.1.0 |
-| ✅ | `/glossary` skill — unified project glossary with terminology drift detection | v1.1.0 |
-| ✅ | `/export` skill — Jira / GitHub Issues / Linear / CSV export | v1.1.0 |
-| ✅ | `init.ps1` / `init.sh` — project initialiser scripts | v1.1.0 |
-| ✅ | GitHub Actions CI workflow — artifact and skill validation on PR | v1.1.0 |
-| ✅ | `CHANGELOG.md` — Keep a Changelog + SemVer format | v1.1.0 |
-
----
-
-## High priority
-
-Items are sequential — each unblocks the next.
-
-### ✅ 1. Quick fixes
-
-| # | Item | Effort |
-|---|------|--------|
-| ✅ | Fix README intro: says "16 interconnected skills" — should be 19 | 5 min |
-| ✅ | `skills/references/templates/export-template.md` — missing template for `/export` output | ~1 h |
-| ✅ | `COMMANDS.md` — one-page cheat sheet: all 19 skills + subcommands with syntax and one-liners | ~1 h |
-
----
-
-### ✅ 2. GitHub release workflow
-
-**What:** `.github/workflows/release.yml` that triggers on version tags (`v*.*.*`) and creates a GitHub Release with release notes auto-generated from `CHANGELOG.md`.
-
-**Why:** Gives users a clear versioned release to reference when they install or update the toolkit. Also required to trigger `npm publish` automatically (item 5). v1.1.0 exists in CHANGELOG but has no GitHub Release yet.
-
-**Effort:** Low.
-
----
-
-### ✅ 3. `/risk` skill
-
-**What:** Dedicated risk register artifact: extract risks from Brief, SRS, and Research, generate `00_risks_{slug}.md` with a probability × impact matrix, risk owner, and mitigation strategy per item.
-
-**Why:** Risk management is a core BA deliverable. Currently risks are buried inside Brief and SRS with no dedicated tracking or prioritisation. A standalone artifact makes them reviewable and actionable.
-
-**Structure:**
-- Risk ID (RISK-01, RISK-02, …)
-- Category (technical / business / compliance / external)
-- Probability (1–5) × Impact (1–5) = Score
-- Status (open / mitigated / accepted / closed)
-- Mitigation and contingency
-
-**Effort:** Low–Medium (~1 day, follows the same skill pattern as `/glossary`).
-
----
-
-### ✅ 4. `/sprint` skill
-
-**What:** Generate a sprint plan from estimated User Stories: group by priority and team capacity, output sprint goal, velocity, and story list per sprint. Generates `00_sprint_{slug}.md`.
-
-**Why:** Natural continuation after `/estimate` — closes the loop from "idea → spec → estimate → sprint". Without this step the user has to manually organise stories into sprints.
-
-**Dependencies:** Requires `/estimate` output. Works best after `/risk` is done (risk-weighted prioritisation).
-
-**Effort:** Low–Medium (~1 day, same pattern as `/glossary` and `/risk`).
-
----
-
-## Medium priority
-
-### 8. More domain references
-
-**Candidates (in order of demand):**
-- `edtech.md` — online courses, LMS, adaptive learning, assessment tools.
-- `hrtech.md` — ATS, HRIS, performance management, employee portals.
-- `govtech.md` — citizen portals, e-government services, public procurement.
-- `gaming.md` — video games (not iGaming): game backend, leaderboards, matchmaking, in-game economy.
-- `proptech.md` — property valuation tools, construction project management (distinct from real-estate portal).
-- `cybersecurity.md` — security products: SIEM, vulnerability management, identity platforms.
-
-**Effort per domain:** Low (~180 lines each, following existing template). Can be done incrementally — one domain between larger tasks.
-
----
-
-## Low priority / Deferred
-
-### 9. MCP server
-
-**What:** A Model Context Protocol server that exposes BA Toolkit skills as native MCP tools, allowing Claude Desktop (without an IDE) to use the toolkit via `mcp_ba_brief`, `mcp_ba_srs`, etc.
-
-**Why deferred:** MCP adds a separate Node.js/Python project (~500 lines of code) that needs installation, running, and maintenance. Current users (Claude Code, Cursor, Windsurf) already have native file access — MCP would only add value for Claude Desktop users and CI/automation scenarios.
-
-**Revisit when:** The Claude Desktop user base grows significantly, or when a CI/automation use case becomes concrete.
-
-**Effort:** High.
-
----
-
-### 10. Notion / Confluence export format
-
-**What:** Add `notion` and `confluence` as export targets in `/export`. Notion uses a block-based JSON API; Confluence uses Atlassian's storage format (XHTML-based).
-
-**Why deferred:** Both require platform-specific API knowledge and auth setup. Lower demand than Jira/GitHub/Linear.
-
-**Effort:** Medium.
-
----
-
-### 11. Video walkthrough / GIF demo
-
-**What:** A short screen recording (2–3 min) showing the full pipeline from `/brief` to `/handoff` for the Dragon Fortune example project. Linked from the README hero section.
-
-**Why deferred:** Requires a finished example project (item 5) first.
-
-**Effort:** Medium (after item 5 is done).
-
----
-
-## Ideas parking lot
-
-Items noted for future consideration but not yet assessed:
-
-- **`/changelog`** — track changes between artifact versions: diff `v1` vs `v2` of an artifact and generate a human-readable delta.
-- **OpenAI Assistants API config** — `assistant.json` config files for each skill, enabling use via the Assistants API without file installation.
-- **Linter config** — `ba-toolkit.config.json` to customise validation rules (e.g. required NFR categories per domain, minimum AC scenarios per story). Becomes meaningful once the user base is large enough to have divergent conventions.
-
-Bugs and improvements:
+Bugs and improvements batch 1:
 1. ✅ `init` now merges `AGENTS.md` via `mergeAgentsMd` + managed-block anchors. Legacy files without anchors are preserved untouched. Done in Unreleased.
 2. Invalid input during interactive init crashes the script. Split into:
    - **2a.** ✅ Non-flag interactive path re-prompts on invalid input via `promptUntilValid(question, resolver, { maxAttempts = 3 })`. Applied to domain menu, agent menu, and manual slug entry. Done in Unreleased. Also uncovered and fixed a piped-input race in `prompt()` (readline `'line'` events were being dropped between consecutive `rl.question()` calls) — prompt now owns the `'line'` event and buffers lines in an internal queue.
@@ -142,18 +8,44 @@ Bugs and improvements:
 5. ✅ Cursor install now targets `.cursor/skills/` with native folder-per-skill `SKILL.md` layout (`format: 'skill'`). Was writing to `.cursor/rules/` as flat `.mdc` files — wrong Cursor feature. Done in Unreleased.
 6. ✅ Windsurf install now targets `.windsurf/skills/` natively. Mirror of the Cursor fix in pt.5. Done in Unreleased — also removed all dead `.mdc` conversion code (`skillToMdcContent`, `mdc` branch of `copySkills`, `format` field across the AGENTS map and the manifest payload). All 5 supported agents now use a single uniform install path.
 
-Улучшения 2:
-1. ✅ Вопросы и ответы к ним сделать в виде таблицы. Done in Unreleased — interview-protocol rule 2 теперь требует `| ID | Variant |` markdown-таблицу под каждым вопросом.
-2. Улучшить пользовательский опыт при работе с командами:
-- Сделать более user-friendly
-- ✅ Вместо чисел - буквы вариантов. Done in Unreleased — буквенные ID `a-z` в interview-protocol и в CLI menu (TTY arrow-key и non-TTY fallback). Цифры остаются как backward-compat fallback.
-- ✅ Сделать инструмент приспособленным к работе одновременно над артефактами для нескольких проектов. Done in Unreleased — `init` теперь пишет `output/<slug>/AGENTS.md`, не корневой. Два окна агентов делают `cd output/<slug-A> && claude` и `cd output/<slug-B> && claude` — полная изоляция. Скиллы ищут AGENTS.md в cwd, fallback на walking up для legacy v3.0 layouts.
-- ✅ Сделать более подробное описание того, как продолжить работу после завершения работы с очередной командой. Done in Unreleased — closing-message.md теперь содержит lookup-таблицу из 13 строк (Current → Next → output → time → after that), и каждый pipeline скилл копирует свою строку оттуда вместо хардкода. Плюс 2 regression-теста ловят будущие SKILL.md, которые попытаются захардкодить `Next step:`.
-- ✅ Добавить возможность того, чтобы можно было вводить текст после `/команды`. Done in Unreleased — interview-protocol rule 9 (inline context). Применено ко всем 12 интервью-скиллам. `/brief I want to build...`, `/srs focus on payments`, `/nfr emphasise security` — все понимают inline-текст как scope hint и пропускают повторные вопросы про то, что уже сказано.
-- ✅ Сделай так, чтобы /brief уточнял в первую очередь, что именно за проект будет, если текст не введен. Done in Unreleased — interview-protocol rule 8 (open-ended lead-in). Применено к /brief и /principles (entry-point скиллы). Если inline-text есть — лид-ин пропускается, скилл уходит сразу к структурным вопросам.
+Improvements batch 2:
+1. ✅ Present interview questions and their answer options as a markdown table. Done in v3.1.0 — interview-protocol rule 2 now requires a `| ID | Variant |` markdown table under each question.
+2. Improve the user experience of slash commands:
+- Make the overall experience more user-friendly.
+- ✅ Use letters instead of numbers for answer options. Done in v3.1.0 — letter IDs `a-z` in interview-protocol and in the CLI menu (TTY arrow-key path and non-TTY fallback). Digit IDs are kept as a backward-compat fallback.
+- ✅ Make the toolkit usable for working on several projects in parallel — for example, two agent windows open in the same repo. Previously, starting a new project just overwrote `AGENTS.md`. Done in v3.1.0 — `init` now writes `output/<slug>/AGENTS.md`, not the repo-root file. Two agent windows do `cd output/<slug-A> && claude` and `cd output/<slug-B> && claude` for full isolation. Skills look for `AGENTS.md` in cwd first, falling back to walking up the tree for legacy v3.0 layouts.
+- ✅ Provide a more detailed description of how to continue after finishing work with each command. Done in v3.1.0 — `closing-message.md` now contains a 13-row lookup table (Current → Next → output → time → after that), and every pipeline skill copies its row from there instead of hardcoding `Next step:`. Plus two regression tests catch any future SKILL.md that tries to hardcode a `Next step:` line.
+- ✅ Allow inline text after a slash command — for example, `/brief I want to build an online store for construction materials...`. Done in v3.1.0 — interview-protocol rule 9 (inline context). Applied to all 12 interview-phase skills. `/brief I want to build...`, `/srs focus on payments`, `/nfr emphasise security` — every skill parses inline text as a scope hint and skips repeat questions about anything the inline text already covered.
+- ✅ Make `/brief` clarify what kind of project it is and the necessary details first when no inline text was provided, then start the structured interview. Done in v3.1.0 — interview-protocol rule 8 (open-ended lead-in question). Applied to `/brief` and `/principles` (entry-point skills). If inline text is present, the lead-in is skipped and the skill jumps straight to the structured questions.
 
-Улучшения 3:
-1. Выделять один из вариантов как recommended
-2. Вариантов всегда не более 5, включая кастомный ответ (например, 4 предложенных готовых вариант + 1 кастомный)
-3. Варианты всегда на языке запроса для /brief
-4. Заменить существующие примеры артефактов в example на артефакты для более универсального проекта, а не из сферы IGaming.
+Improvements batch 3:
+1. Highlight one of the answer options as `Recommended` — the option the AI judges most likely to fit the user's project context, based on the domain reference and prior interview answers.
+2. Cap the number of options at 5 total, including the free-text custom answer (so: 4 predefined variants + 1 free-text "Other" row).
+3. Variant text in `/brief` is always written in the language of the user's first request — domain references should be translated on the fly when the interview language is not English.
+4. ✅ Replaced `example/dragon-fortune/` with `example/lumen-goods/` — a sustainable home-goods D2C e-commerce walkthrough. All 15 artifacts rewritten end-to-end; CLAUDE.md and README updated. Done in Unreleased.
+
+Улучшения 4:
+1. Добавить команду для брейн-шторма с ИИ, чтобы создать первоначальный концепт на тот случай, если пользователь не определился с доменом проекта и тем, какие функции должны быть у него (приоритет 1)
+2. Дополнить примеры при необходимости (приоритет 2)
+3. Обновить CLAUDE.md, чтобы он соответствовал проекту (приоритет 3)
+4. Синхронизировать с проектом документацию и ридми (приоритет 4)
+
+Улучшения 5:
+1. Прочесть каждый из скиллов. Составить план улучшения для каждого с точки зрения профессионализма того, что описано в скилле и шаблоне для артефакта и UX. ИИ-агент при применении скиллов должен действовать как профессиональный бизнес-аналитик с опытом не менее 25 лет в крупнейших американских компаниях. 
+2. Команда для подготовки экспорта файлов в notion ли confluence.
+3. MCP-сервер.
+4. Расширить количество доменов в референсах.
+5. Обновить CLAUDE.md, чтобы он соответствовал проекту
+6. Синхронизировать с проектом документацию и ридми
+
+Улучшения 6:
+1. Изменить формат команд для скиллов: например, вместо /brief сделать /ba-toolkit.brief и т.д.
+2. Создать скилл, который будет генерировать последовательный план для ИИ-агента по реализации проекта на основе сгенерированных артефактов другими скиллами.
+3. Создать скилл, который будет генерировать необходимые тесты на основе созданных артефактов для TDD.
+4. Создать скилл, который будет валидировать проект на предмет соответствия сгенерированным артефактам (use cases и т.п.)
+5. Обновить CLAUDE.md, чтобы он соответствовал проекту. Дополнить пайплайн с учетом возможности создания проекта на основе TDD.
+6. Синхронизировать с проектом документацию и ридми
+
+Улучшения 7:
+1. Создать гиф с примером работы с тулкитом.
+2. Создать дальнейший план развития/улучшения проекта и исправления проблем. Возможно, будут полезные еще какие-либо скиллы, например.

@@ -39,7 +39,7 @@ skills/                   # 21 SKILL.md files + references/
     environment.md        # Output directory detection logic
     closing-message.md    # Shared closing message for all skills
     prerequisites.md      # Per-step prerequisite checklists
-example/dragon-fortune/   # Real end-to-end example project (iGaming) — do NOT edit
+example/lumen-goods/      # Real end-to-end example project (e-commerce D2C) — do NOT edit
 docs/                     # Extracted from README in v1.2.5
   USAGE.md · TROUBLESHOOTING.md · FAQ.md · DOMAINS.md
 CONTRIBUTING.md           # Extracted from README in v1.2.5
@@ -55,7 +55,7 @@ todo.md                   # Planning backlog — keep in sync after task complet
 
 ### Style
 - **README + docs:** sentence case in H2+ headings (`## What is this`, not `## What Is This`). No emojis in H2+. H1 may keep a single logo emoji (`# 📋 BA Toolkit`). Emojis are allowed in bullets, tables, and blockquotes.
-- **Placeholder names:** `My App` / `my-app` in CLI prompts and `AGENTS.md` template. `Nova Analytics` / `nova-analytics` in reference templates that need a concrete fictional project. Never use `Dragon Fortune` as a placeholder outside `example/dragon-fortune/` — that's a real example project, not a stand-in.
+- **Placeholder names:** `My App` / `my-app` in CLI prompts and `AGENTS.md` template. `Nova Analytics` / `nova-analytics` in reference templates that need a concrete fictional project. Never use `Lumen Goods` as a placeholder outside `example/lumen-goods/` — that's a real example project, not a stand-in.
 - **Domain order:** SaaS-first everywhere. Canonical order from `bin/ba-toolkit.js` `DOMAINS` array: `saas → fintech → ecommerce → healthcare → logistics → on-demand → social-media → real-estate → igaming → custom`. iGaming remains a first-class supported domain but is listed last. Any doc enumeration that lists domains must follow this order.
 
 ### Commits
@@ -137,7 +137,7 @@ If CI fails with `ENEEDAUTH` on a new package, check this first.
 
 ## 8. Do NOT touch
 
-- `example/dragon-fortune/*` — the real end-to-end example project referenced from README. iGaming-themed on purpose.
+- `example/lumen-goods/*` — the real end-to-end example project referenced from README. E-commerce D2C themed.
 - `skills/references/domains/igaming.md` — the legitimate iGaming domain reference. iGaming is a supported domain.
 - `CHANGELOG.md` historical sections — only add new `[X.Y.Z]` blocks above existing ones. Never edit released versions retroactively (except for stale-anchor fixes that are cosmetic).
 - The two CI hacks in `.github/workflows/release.yml` (see section 7).
