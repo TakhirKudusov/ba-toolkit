@@ -11,6 +11,60 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.6.0] — 2026-04-10
+
+### Highlights
+
+- **Group A skill audit pass on `/usecases`, `/ac`, `/nfr`, `/datadict`, `/apicontract`, `/wireframes`, `/scenarios`** — 7 pipeline-core skills brought to the same senior-BA rigour as the v3.5.0 pilot. ~32 Critical + High findings applied. The same six systemic patterns surfaced in the pilot are now fixed across the entire pipeline core: full standards conformance (Cockburn for use cases, ISO 25010 for NFRs, OpenAPI shape for the API contract), explicit "why" fields (Source / Owner / Sensitivity / Verification) on every artifact element, cross-artifact forward-traceability matrices on every shipped artifact, document-control metadata, single-source-of-truth templates with no inline drift, and required-topics lists extended with universal BA inquiries.
+
+### Changed
+
+- **`skills/usecases/SKILL.md` and `skills/references/templates/usecases-template.md`** — full Cockburn alignment:
+  - Inline template removed from SKILL.md; the standalone `usecases-template.md` is now the single source of truth (mirror of the same drift fix applied to `/stories` in v3.5.0).
+  - Cockburn-mandated fields added to every UC: **Goal in Context** (which Brief goal G-N this UC serves), **Stakeholders and Interests** table (Cockburn discipline — surfaces non-obvious requirements that the primary actor alone misses), **Scope** (system / subsystem / component, distinct from Level), **Source** (which US/FR drove this UC into existence), **Success Guarantees** vs **Minimal Guarantees** (post-conditions split per Cockburn — what's true after success vs what's true after *any* termination including failure).
+  - Required-topics list extended from 5 to 8: Goal in Context, Stakeholders and Interests, Scope level added.
+  - New US → UC coverage matrix at the bottom of the artifact for forward traceability with `(uncovered)` flagging.
+- **`skills/ac/SKILL.md` and `skills/references/templates/ac-template.md`** — explicit AC-NNN-NN ID scheme (drift fix), provenance fields, US → AC coverage matrix:
+  - Inline template removed; standalone is the single source of truth. Inline used `### AC-NNN-NN` IDs while standalone used `### Scenario N` without numeric IDs — different ID schemes between the two templates.
+  - Every AC carries **Type** (Positive / Negative / Boundary / Performance / Security), **Source** (which business rule from `02_srs_*.md` drove the AC — required, no AC without provenance), **Verification** (Automated test / Manual test / Observed in production), **Linked FR**, and **Linked NFR** (for performance and security ACs).
+  - Required-topics list extended from 5 to 9: performance bounds per scenario, idempotency, observability (audit log requirements), state transitions linking AC to entity state machines.
+  - New US → AC coverage matrix at the bottom — forward traceability with column per AC type so `Must` stories with no negative or no boundary AC are flagged at glance.
+- **`skills/nfr/SKILL.md` and `skills/references/templates/nfr-template.md`** — full ISO/IEC 25010 alignment, FR → NFR matrix:
+  - **Standard alignment with ISO/IEC 25010:2011** Software Quality Model — every NFR maps to one of the 8 ISO 25010 characteristics: Functional Suitability, Performance Efficiency, Compatibility, Usability, Reliability, Security, Maintainability, Portability. Project-specific extensions (Compliance, Localisation, Observability) explicitly note their parent ISO characteristic so the audit trail is consistent. Previous version named ad-hoc categories without standard backing.
+  - Each NFR template gains an **Acceptance threshold** field separate from the metric — "metric: p95 latency in ms" + "acceptance threshold: < 300ms" — so verification is unambiguous.
+  - Required-topics list extended from 6 to 13: ISO 25010 characteristic-by-characteristic walk plus SLO/SLI commitment, observability, disaster recovery runbook, data sovereignty, deprecation policy.
+  - New FR → NFR coverage matrix flags Must FRs with no linked Performance / Reliability / Security NFR.
+  - New per-characteristic priority summary table at the bottom.
+- **`skills/datadict/SKILL.md` and `skills/references/templates/datadict-template.md`** — logical model only, provenance, state machines, FR → Entity matrix:
+  - **Scope boundary made explicit:** `/datadict` is the **logical** data model (entities, attributes, conceptual types, relationships, state transitions). Physical schema (specific DBMS, indexes, sharding, partitioning) belongs in `/research` (step 7a) as ADRs. Previous version mixed the two by asking "DBMS choice" as a required topic.
+  - Each entity carries **Source** (which FR/US introduced it — required, no entity without provenance), **Owner** (which team curates it), **Sensitivity** (Public / Internal / Confidential / PII / PCI / PHI / Financial — feeds /nfr Security NFRs and GDPR compliance), and a **State Machine** section listing states + legal transitions for any entity with more than two distinct lifecycle states.
+  - Required-topics list extended from 6 to 10: PII inventory and retention policy, audit/history requirements, state machines, referential integrity cascade rules, time-zone handling, data ownership.
+  - Logical types replace DBMS-specific types (`String / Integer / Decimal / Boolean / Timestamp / UUID / Enum / FK / JSON / Binary` instead of `ObjectId / VARCHAR / NUMERIC`). Physical type mapping happens in `/research`.
+  - New FR → Entity coverage matrix at the bottom flags data-touching FRs with no linked entity.
+- **`skills/apicontract/SKILL.md` and `skills/references/templates/apicontract-template.md`** — OpenAPI 3.x shape, idempotency, FR → Endpoint matrix:
+  - **Standard alignment with OpenAPI 3.x** structure (servers, paths, parameters with `in` location, request body, responses keyed by HTTP status, components/schemas, security schemes). Markdown is the format, OpenAPI is the shape.
+  - Per-endpoint metadata table now carries **Source** (FR/US — required), **Required scope** (OAuth2 / JWT scope), **Idempotency** (Idempotent / Not idempotent / Idempotent via `Idempotency-Key` header), per-endpoint **Rate limit**, per-endpoint **SLO** (latency target linked to NFR), and **Verification** method (contract test / consumer-driven contract test / integration test).
+  - Required-topics list extended from 7 to 12: idempotency keys, content negotiation, CORS policy, API deprecation policy with `Sunset` header (RFC 8594), per-endpoint SLO.
+  - New "Idempotency, CORS, and Deprecation" section in the template documents the cross-cutting policies.
+  - New FR → Endpoint coverage matrix flags FRs with no linked endpoint.
+- **`skills/wireframes/SKILL.md` and `skills/references/templates/wireframes-template.md`** — canonical 8-state list, accessibility-first, US → WF matrix:
+  - **Mandatory state list expanded from 4 to 8** canonical states: Default, Loading, Empty, Loaded, Partial, Success, Error, Disabled. The previous 4-state minimum (default / loading / empty / error) missed half of the states a senior UX BA would catch in review.
+  - Each screen carries **Source** (US — required), **Linked AC** (scenarios this screen verifies), **Linked NFR** (performance and accessibility NFRs that apply to UI), and an **Internationalisation** flag (LTR / RTL / both, long-string accommodation).
+  - Required-topics list extended from 6 to 8: explicit accessibility level (WCAG 2.1 A / AA / AAA — affects design decisions at wireframe stage, not just NFR time), internationalisation (RTL, long-string accommodation, locale-aware formatting).
+  - New US → WF coverage matrix flags Must stories with no linked screen.
+- **`skills/scenarios/SKILL.md` and `skills/references/templates/scenarios-template.md`** — drift fix, FR/NFR linking, expanded coverage matrix:
+  - Inline template fields and table columns no longer drift from the standalone template. Both now carry the same per-scenario field set.
+  - Each scenario carries **Source — Linked FR**, **Source — Linked NFR**, **Frequency** (how often the scenario runs in production — drives test investment), and **Stakes** (cost of failure — data loss, lost revenue, regulatory breach, reputation).
+  - Required-topics list extended from 5 to 8: frequency, stakes / blast radius, recovery scenarios.
+  - Coverage Summary expanded from 4 columns to 6: User Stories, FRs, NFRs, ACs, API Endpoints, Wireframes — with `(uncovered)` flagging on each axis.
+- **Document-control metadata (`Version`, `Status`) added to all 7 templates** — same `Draft / In Review / Approved / Superseded` lifecycle introduced for `/brief` and `/srs` in v3.5.0. Pipeline-core artifacts are controlled documents and need to answer "which version did we agree to?" three months in.
+
+### Cross-pattern impact
+
+After Group A and the pilot, **all 9 currently-shipped pipeline-stage skills** (`/discovery`, `/principles`, `/brief`, `/srs`, `/stories`, `/usecases`, `/ac`, `/nfr`, `/datadict`, `/apicontract`, `/wireframes`, `/scenarios`) carry the six systemic improvements: standards conformance, "why" fields, cross-artifact forward traceability, document control, single-source-of-truth templates, and BA-grade required-topics coverage. Group B (cross-cutting utilities: `/trace`, `/analyze`, `/clarify`, `/estimate`, `/glossary`, `/risk`, `/sprint`) and Group C (bookend skills: `/handoff`, `/implement-plan`, `/export`, `/publish`) remain at their current rigour and may receive a lighter sweep in a future session if patterns repeat.
+
+---
+
 ## [3.5.0] — 2026-04-09
 
 ### Highlights
@@ -541,7 +595,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.5.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.6.0...HEAD
+[3.6.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.5.0...v3.6.0
 [3.5.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.1...v3.5.0
 [3.4.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.4.0...v3.4.1
 [3.4.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.3.0...v3.4.0

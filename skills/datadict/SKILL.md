@@ -27,13 +27,19 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 3–7 topics per round, 2–4 rounds.
 
+**Scope boundary:** `/datadict` describes the **logical** data model — entities, attributes, conceptual types, relationships, state transitions. It does **not** prescribe the physical model (specific DBMS, indexes, sharding, partitioning). Physical-model decisions (PostgreSQL vs MongoDB, schema-per-tenant vs shared, index strategy) belong in `/research` (step 7a) as ADRs. If the user mentions a specific DBMS, note it as an existing constraint or as input to `/research`, not as a mandatory topic here.
+
 **Required topics:**
-1. DBMS — MongoDB, PostgreSQL, MySQL, other?
-2. Existing schema — is there one to account for or extend?
-3. Audit entities — which require full audit trail?
-4. Soft delete — is soft deletion used?
-5. Amount storage — in minor units (cents) or major currency units?
-6. Versioning — is change history needed for any entities?
+1. **Existing schema or system of record** — is there a legacy schema to account for or extend? Migration path?
+2. **PII inventory** — which fields are PII / PCI / PHI / financial? What is the retention policy per class? Which fields must be encrypted at rest? Which masked in UI?
+3. **Audit and history** — which entities require a full audit trail (every change logged with actor + timestamp)? Which need temporal / bitemporal storage (point-in-time queries)?
+4. **Soft delete** — which entities support soft deletion (`deleted_at`) vs hard delete? Cascade rules on parent deletion?
+5. **State machines** — which entities are stateful (Order, Subscription, Application, Case)? List the states and the legal transitions for each. **Mandatory question for any entity that has more than two distinct lifecycle states.**
+6. **Referential integrity** — cascade rules on parent deletion (cascade / restrict / set null / prevent). Required for every FK.
+7. **Time-zone handling** — are timestamps stored in UTC and converted at the presentation layer, or stored in local time with a TZ field?
+8. **Amount storage** — financial amounts in minor units (cents) or major units? Currency code stored alongside?
+9. **Versioning** — is change history needed for any entities (e.g. price history, terms-of-service version)?
+10. **Data ownership** — which team / role owns each entity for ongoing curation, schema changes, and incident response?
 
 Supplement with domain-specific questions and mandatory entities from the reference.
 
@@ -41,39 +47,16 @@ Supplement with domain-specific questions and mandatory entities from the refere
 
 **File:** `07_datadict_{slug}.md`
 
-```markdown
-# Data Dictionary: {Name}
-
-## General Information
-- **DBMS:** {type}
-- **Naming Conventions:** {camelCase | snake_case}
-- **Common Fields:** {createdAt, updatedAt, deletedAt}
-
-## Entity: {Name} ({English collection/table name})
-
-**Description:** {purpose in the system.}
-**Linked FR/US:** {references.}
-
-| Attribute | Type | Required | Constraints | Description |
-|-----------|------|----------|-------------|-------------|
-| _id / id | ObjectId / UUID | yes | PK | Unique identifier |
-| {name} | {type} | {yes/no} | {constraints} | {description} |
-
-**Indexes:**
-- {name}: {fields}, {type}
-
----
-
-## Entity Relationships
-
-| Entity A | Relationship | Entity B | Description |
-|----------|-------------|----------|-------------|
-```
+The full per-entity field set lives at `references/templates/datadict-template.md` and is the single source of truth. Each entity carries: name, **Source** (which FR/US introduced this entity), **Owner** (which team / role curates it), **Sensitivity** (Public / Internal / Confidential / PII / PCI / PHI), description, attribute table (with logical types, not DBMS-specific), relationships with cascade rules, **state machine** (if applicable), indexes (logical, not physical), retention policy, and notes. The artifact carries an FR → Entity coverage matrix at the bottom.
 
 **Rules:**
-- Data types match the chosen DBMS.
-- Constraints include: PK, FK, unique, not null, enum, min/max, regex.
-- Attribute and entity names in English; descriptions in the user's language.
+- Data types are **logical** (String, Integer, Decimal, Boolean, Timestamp, UUID, Enum, FK, JSON, Binary), not DBMS-specific. Physical type mapping happens in `/research` ADRs.
+- Constraints include: PK, FK with cascade rule, unique, not null, enum, min/max, regex, default.
+- Attribute and entity names in English (or per the project ID convention from `00_principles_*.md`); descriptions in the user's language.
+- Every entity has a **Source** field (FR-NNN or US-NNN) — no entity without provenance.
+- Every entity has an **Owner** field — accountability for schema changes and data quality.
+- Every entity has a **Sensitivity** classification — feeds /nfr Security NFRs and GDPR compliance.
+- Stateful entities (Order, Subscription, Application, Case, Account, …) **must** include a state machine section listing states and legal transitions.
 
 ## Iterative refinement
 

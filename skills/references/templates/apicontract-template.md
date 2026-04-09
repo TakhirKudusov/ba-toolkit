@@ -1,12 +1,16 @@
 # API Contract: [PROJECT_NAME]
 
+**Version:** 0.1
+**Status:** Draft
 **Domain:** [DOMAIN]
 **Date:** [DATE]
 **Slug:** [SLUG]
 **API Style:** REST | GraphQL | gRPC
 **Base URL:** `https://api.[domain].com/v1`
 **Auth:** Bearer JWT | API Key | OAuth 2.0
-**References:** `02_srs_[SLUG].md`, `07_datadict_[SLUG].md`
+**Versioning:** URI (`/v1/`) | Header (`Accept-Version`) | Media-type
+**Standard:** Approximates OpenAPI 3.x structure
+**References:** `02_srs_[SLUG].md`, `07_datadict_[SLUG].md`, `06_nfr_[SLUG].md`
 
 ---
 
@@ -34,9 +38,16 @@ Token obtained via `POST /auth/token`. Expires in [N] minutes. Refresh via `POST
 
 ### POST /[resource]
 
-**Description:** [What this endpoint does.]
-**Auth required:** Yes | No
-**Linked FR:** FR-[NNN] | **Linked Story:** US-[NNN]
+| Field | Value |
+|-------|-------|
+| **Description** | [What this endpoint does] |
+| **Source** | FR-[NNN], US-[NNN]  *(Required — what drove this endpoint)* |
+| **Auth required** | Yes / No |
+| **Required scope** | `resource:write` / public |
+| **Idempotency** | Idempotent / Not idempotent / Idempotent via `Idempotency-Key` header |
+| **Rate limit** | [N requests / minute / IP] or "global default" |
+| **SLO** | p95 < 300ms (NFR-[NNN]) |
+| **Verification** | Contract test / consumer-driven contract test / integration test |
 
 **Request body:**
 
@@ -175,9 +186,31 @@ Token obtained via `POST /auth/token`. Expires in [N] minutes. Refresh via `POST
 |-----------|-----------|---------|
 | 400 | VALIDATION_ERROR | Request body or params fail validation |
 | 401 | UNAUTHORIZED | Missing, expired, or invalid token |
-| 403 | FORBIDDEN | Authenticated but insufficient permissions |
+| 403 | FORBIDDEN | Authenticated but insufficient permissions / scope |
 | 404 | NOT_FOUND | Resource does not exist |
 | 409 | CONFLICT | State conflict (duplicate, wrong status) |
 | 422 | BUSINESS_RULE_ERROR | Request is valid but violates a business rule |
 | 429 | RATE_LIMITED | Too many requests |
 | 500 | INTERNAL_ERROR | Unexpected server error |
+
+---
+
+## Idempotency, CORS, and Deprecation
+
+**Idempotency:** POST endpoints marked "Idempotent via header" accept an `Idempotency-Key` header (UUID v4 recommended). The server stores the request fingerprint + response for [N] hours. A retried request with the same key returns the cached response without re-executing the side effect.
+
+**CORS policy:** Allowed origins listed in `[config file]`. Browsers from allowed origins may use the API directly with JWT in `Authorization` header. `OPTIONS` preflight responses cache for [N] seconds (`Access-Control-Max-Age`).
+
+**API deprecation policy:** Breaking changes are announced via the `Sunset` HTTP response header (RFC 8594) at least [N] months in advance. The `Deprecation` header is set on every response from a deprecated endpoint. A deprecated endpoint continues to function for the entire grace period; only after the sunset date does it return `410 Gone`.
+
+---
+
+## FR → Endpoint Coverage Matrix
+
+Forward traceability from each Functional Requirement in `02_srs_[SLUG].md` §3 to the API endpoints that implement it. An FR with no linked endpoint is flagged — every customer- or system-facing FR should have at least one linked endpoint.
+
+| FR ID | FR Title | Linked Endpoints | Coverage Status |
+|-------|----------|------------------|-----------------|
+| FR-001 | [title] | `POST /auth/login`, `POST /auth/refresh` | ✓ |
+| FR-002 | [title] | `GET /catalog`, `GET /catalog/:id` | ✓ |
+| FR-003 | [title] | (uncovered) | ✗ |

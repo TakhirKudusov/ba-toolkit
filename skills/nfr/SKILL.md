@@ -27,13 +27,22 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 3–7 topics per round, 2–4 rounds.
 
+**Standard alignment:** NFR categories follow **ISO/IEC 25010** Software Quality Model (the international standard for software quality characteristics). Every NFR maps to one of the 8 ISO 25010 characteristics: **Functional Suitability**, **Performance Efficiency**, **Compatibility**, **Usability**, **Reliability**, **Security**, **Maintainability**, **Portability**. Project-specific categories (Compliance, Localisation, Observability) can be added but each must be marked as an extension and explain which ISO 25010 characteristic it derives from.
+
 **Required topics:**
-1. Performance — target CCU (Concurrent Users), RPS (Requests Per Second), acceptable response time?
-2. Availability — required SLA? Acceptable downtime? Maintenance windows?
-3. Security — encryption, authentication, access audit?
-4. Compliance — applicable standards and laws? Data retention?
-5. Scalability — expected growth, horizontal scaling?
-6. Compatibility — browsers, OS, devices?
+1. **Performance Efficiency (ISO 25010)** — time behaviour (response time, throughput), resource utilisation (CPU, memory, network), capacity (CCU, RPS).
+2. **Reliability (ISO 25010)** — availability SLA, maturity (defect rate), fault tolerance, recoverability (RTO/RPO).
+3. **Security (ISO 25010)** — confidentiality (encryption at rest and in transit), integrity, non-repudiation (audit trail), accountability (per-user attribution), authenticity (authentication strength).
+4. **Compatibility (ISO 25010)** — co-existence (with other systems), interoperability (data exchange formats), browser/OS/device support.
+5. **Usability (ISO 25010)** — learnability, operability, accessibility (WCAG level), user error protection.
+6. **Maintainability (ISO 25010)** — modularity, reusability, analysability, modifiability, testability (code coverage target).
+7. **Portability (ISO 25010)** — adaptability (different environments), installability, replaceability.
+8. **Functional Suitability (ISO 25010)** — completeness, correctness, appropriateness — usually covered by FRs but worth a sanity check at NFR time.
+9. **SLO and SLI** — what service-level objectives do we commit to externally, and which service-level indicators do we measure internally to track them?
+10. **Observability** — what metrics, logs, and traces are mandatory? Retention period for each?
+11. **Disaster recovery** — RTO and RPO are not just numbers; what is the *runbook* and how often is it tested?
+12. **Data sovereignty** — where can each data class be stored and processed? Cloud regions allowed?
+13. **Deprecation policy** — how are NFR thresholds tightened over time, and how is breaking change communicated?
 
 Supplement with domain-specific questions and mandatory categories from the reference.
 
@@ -41,23 +50,13 @@ Supplement with domain-specific questions and mandatory categories from the refe
 
 **File:** `06_nfr_{slug}.md`
 
-```markdown
-# Non-functional Requirements: {Name}
-
-## NFR-{NNN}: {Category} — {Short Description}
-- **Category:** {performance | security | availability | scalability | compatibility | localization | compliance | audit | ...}
-- **Description:** {detailed description}
-- **Metric:** {measurable criterion}
-- **Verification Method:** {how it will be tested}
-- **Priority:** {Must | Should | Could | Won't}
-- **Linked FR/US:** {references}
-```
+The full per-NFR field set lives at `references/templates/nfr-template.md` and is the single source of truth. Each NFR carries: ID (`NFR-NNN`), ISO 25010 characteristic, sub-characteristic, description, measurable metric, **acceptance threshold** (the bar that says "we passed"), verification method, source (which stakeholder, regulation, or FR drove this NFR), rationale, priority, and linked FRs / USs / Brief constraints. The artifact carries an FR → NFR coverage matrix and a per-characteristic priority summary at the bottom.
 
 **Rules:**
 - Numbering: NFR-001, NFR-002, ...
-- Every NFR must have a measurable metric. Avoid "the system should be fast."
-- Group by category.
-- Domain-specific mandatory categories from the reference.
+- Every NFR must have a measurable metric **and** an acceptance threshold. Avoid "the system should be fast."
+- Group by ISO 25010 characteristic.
+- Domain-specific mandatory categories from the reference are also mapped to ISO 25010 characteristics so the audit trail is consistent.
 
 ## Back-reference update
 

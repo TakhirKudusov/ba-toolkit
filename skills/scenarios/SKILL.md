@@ -35,60 +35,24 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 3. Persona depth — use generic role names (e.g., "Player") or named personas with context (e.g., "Andrei, a new player from Germany")?
 4. Platform — which platform does the primary scenario run on (web / mobile / Telegram Mini App)?
 5. Demo focus — are any scenarios intended for a stakeholder demo? If so, which flows should be highlighted?
+6. **Frequency** — how often does this scenario run in production? Rare = lower test priority; common = higher test investment.
+7. **Stakes / blast radius** — what's the cost of failure for this scenario? Data loss? Lost revenue? Reputation damage? Drives test frequency and recovery investment.
+8. **Recovery scenarios** — what happens after a system crash or network drop mid-scenario? Are there scenarios that test the recovery path itself?
 
 ## Generation
 
 **File:** `10_scenarios_{slug}.md`
 
-```markdown
-# Validation Scenarios: {Project Name}
-
-**Date:** {date}
-**Coverage:** {Must / Must + Should} priority user stories
-**Platform:** {web | mobile | Telegram Mini App | all}
-
----
-
-## SC-{NNN}: {Scenario Title}
-
-**Persona:** {Role or named persona with brief context}
-**Entry point:** {Where the journey starts — screen, URL, or trigger}
-**Goal:** {What the user is trying to achieve}
-**Linked US:** US-{NNN}, US-{NNN}
-**Type:** {happy path | negative | edge case}
-
-### Steps
-
-| # | User action | System response | Screen (WF) | API call | AC verified |
-|---|-------------|-----------------|-------------|----------|-------------|
-| 1 | {what the user does} | {what the system shows/does} | WF-{NNN} | {METHOD /path} | AC-{NNN}-{NN} |
-| 2 | … | … | … | … | … |
-
-### Expected outcome
-{Specific, observable result — what the user sees or receives at the end of the scenario.}
-
-### Failure conditions
-{Conditions under which this scenario fails and what the user should see instead.}
-
----
-
-_(Repeat SC block for each scenario.)_
-
-## Coverage Summary
-
-| US | Scenario(s) | Happy path | Negative path |
-|----|-------------|------------|---------------|
-| US-001 | SC-001, SC-002 | ✓ | ✓ |
-| US-002 | SC-003 | ✓ | — |
-```
+The full per-scenario field set lives at `references/templates/scenarios-template.md` and is the single source of truth. Each scenario carries: ID (`SC-NNN`), Title, Persona (named with context), Type (happy / negative / edge / performance / security), Priority (P1 / P2 / P3), Entry point, Platform, **Source** (Linked US, Linked FR, Linked NFR), Linked AC, Steps table, Expected Outcome, Failure Conditions. The artifact carries a coverage matrix at the bottom showing US, AC scenario, FR, NFR, and WF coverage.
 
 **Rules:**
 - Numbering: SC-001, SC-002, ...
-- Every Must-priority US must have at least one happy-path scenario.
+- Every Must-priority US must have at least one happy-path scenario AND at least one negative scenario.
 - Each step must reference a WF screen if wireframes were generated.
 - Each step must reference the AC it verifies (if applicable).
 - API calls reference endpoints from `08_apicontract_{slug}.md` using the exact method and path.
-- Failure conditions are mandatory for each scenario.
+- Failure conditions are mandatory for each scenario — what the user sees if the scenario fails, and what recovery action exists.
+- Every scenario carries an explicit **Linked FR** and (if applicable) **Linked NFR** so a scenario validates both functional and quality concerns.
 
 ## Iterative refinement
 

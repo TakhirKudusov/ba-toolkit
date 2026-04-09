@@ -31,9 +31,11 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 1. Platform — web (desktop, mobile responsive), native app, Telegram Mini App?
 2. Design system — existing UI Kit or brand book?
 3. Key screens — which to describe first?
-4. Responsiveness — multiple breakpoints needed?
-5. Specific states — beyond standard (loading, empty, error)?
-6. Navigation model — tab bar, sidebar, burger menu?
+4. Responsiveness — specific breakpoints (px) or fluid? Mobile-first or desktop-first?
+5. Navigation model — tab bar, sidebar, burger menu?
+6. **Accessibility level** — WCAG 2.1 A / AA / AAA? Affects design decisions (contrast, focus rings, hit targets, screen-reader semantics) at the wireframe stage, not just NFR time.
+7. **Internationalisation** — multi-language at launch? RTL languages (Arabic, Hebrew)? Long-string accommodation (German labels can be 30%+ longer than English)? Locale-aware date / number / currency formatting?
+8. **Specific states beyond the canonical 8** — see Rules below for the canonical state list. Are there feature-specific states (e.g. "trial expired", "plan limit reached", "account suspended", "offline mode")?
 
 Supplement with domain-specific questions and typical screens from the reference.
 
@@ -80,9 +82,10 @@ Overall navigation structure: sections, hierarchy, transitions.
 
 **Rules:**
 - Numbering: WF-001, WF-002, ...
-- Each WF linked to at least one US.
-- Mandatory states: default, loading, empty, error.
-- If API contract available, link elements to endpoints.
+- Each WF linked to at least one US (in **Source**), at least one AC (in **Linked AC**), and — for performance- or accessibility-sensitive screens — at least one NFR (in **Linked NFR**).
+- **Mandatory states (canonical 8):** loading (skeleton or spinner), empty (no data yet), loaded (data shown), partial (some data, more coming), success (after action completion), error (failure with recovery action), disabled (action not available with reason), and default (initial state if different from any of the above). Four-state minimum from earlier versions was insufficient.
+- If API contract available, link interface elements to specific endpoints from `08_apicontract_*.md`.
+- The artifact carries a US → WF coverage matrix at the bottom.
 
 ## Iterative refinement
 

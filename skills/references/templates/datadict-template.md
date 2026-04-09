@@ -1,55 +1,98 @@
 # Data Dictionary: [PROJECT_NAME]
 
+**Version:** 0.1
+**Status:** Draft
 **Domain:** [DOMAIN]
 **Date:** [DATE]
 **Slug:** [SLUG]
 **References:** `02_srs_[SLUG].md`, `03_stories_[SLUG].md`
+**Scope:** Logical data model only. Physical schema (DBMS choice, indexes, sharding) lives in `07a_research_[SLUG].md` ADRs.
 
 ---
 
 ## Entity: [EntityName]
 
-**Description:** [What this entity represents in the domain.]
-**Table / Collection:** `[table_name]`
-**Linked FR:** FR-[NNN]
+| Field | Value |
+|-------|-------|
+| **Source** | FR-[NNN], US-[NNN]  *(Required — what introduced this entity)* |
+| **Owner** | [Team or role accountable for schema changes and data quality] |
+| **Sensitivity** | Public / Internal / Confidential / PII / PCI / PHI / Financial |
+| **Description** | [What this entity represents in the domain] |
+| **Logical name** | `[entity_name]`  *(physical table / collection name decided in /research)* |
 
-| Field | Type | Required | Default | Description | Constraints |
-|-------|------|----------|---------|-------------|------------|
+### Attributes
+
+| Field | Logical Type | Required | Default | Description | Constraints |
+|-------|--------------|----------|---------|-------------|-------------|
 | id | UUID | Yes | auto | Primary key | Unique |
-| [field] | [String \| Int \| Boolean \| Timestamp \| Decimal \| Enum \| FK] | Yes/No | [value or —] | [description] | [constraints, e.g. max 255, ≥ 0] |
-| created_at | Timestamp | Yes | now() | Record creation time | |
-| updated_at | Timestamp | Yes | now() | Last update time | |
+| [field] | String / Integer / Decimal / Boolean / Timestamp / UUID / Enum / FK / JSON / Binary | Yes/No | [value or —] | [description] | [PK, FK, unique, not null, enum values, min/max, regex] |
+| created_at | Timestamp | Yes | now() | Record creation time (UTC) | |
+| updated_at | Timestamp | Yes | now() | Last update time (UTC) | |
 
-**Relationships:**
-- `[EntityName]` belongs to `[OtherEntity]` via `[field]` (many-to-one)
-- `[EntityName]` has many `[OtherEntity]` (one-to-many)
+### Relationships
 
-**Indexes:**
-- `[field]` — for [reason, e.g. lookup by email]
+| Related Entity | Cardinality | FK Field | Cascade on Parent Delete |
+|----------------|-------------|----------|--------------------------|
+| [OtherEntity] | many-to-one | `[other_entity]_id` | Cascade / Restrict / Set null / Prevent |
 
-**Soft delete:** Yes — `deleted_at` field / No — hard delete
-**Notes:** [Business rules, state machine, or special handling.]
+### State Machine *(required if entity has more than two distinct lifecycle states)*
+
+**States:** Draft → Pending → Confirmed → InProgress → Completed → Archived
+**Terminal states:** Completed, Cancelled, Failed
+
+| From → To | Trigger | Allowed actor | Side effects |
+|-----------|---------|---------------|--------------|
+| Draft → Pending | submit() | Owner | Notification, audit log |
+| Pending → Confirmed | approve() | Reviewer | Status email, FK lock |
+| Confirmed → InProgress | start() | Owner | Timer starts |
+| InProgress → Completed | finish() | Owner | Final notification, FK unlock |
+| Any → Cancelled | cancel() | Owner / Admin | Reservation released, audit log |
+
+### Indexes *(logical — physical indexes decided by /research)*
+
+- `[field]` — for [reason, e.g. "frequent lookup by email during login"]
+- `(field_a, field_b)` — composite, for [reason]
+
+### Retention
+
+**Retention class:** [duration in years, or "indefinite", or "until consent withdrawn"]
+**Reason:** [legal / regulatory / operational]
+**Soft delete:** Yes (`deleted_at` timestamp) | No (hard delete only)
+
+### Notes
+
+[Business rules, validation logic, special handling, edge cases.]
 
 ---
 
 ## Entity: [EntityName2]
 
-**Description:** [What this entity represents in the domain.]
-**Table / Collection:** `[table_name]`
-**Linked FR:** FR-[NNN]
+| Field | Value |
+|-------|-------|
+| **Source** | FR-[NNN] |
+| **Owner** | [team] |
+| **Sensitivity** | [class] |
+| **Description** | [...] |
+| **Logical name** | `[entity_name_2]` |
 
-| Field | Type | Required | Default | Description | Constraints |
-|-------|------|----------|---------|-------------|------------|
+### Attributes
+
+| Field | Logical Type | Required | Default | Description | Constraints |
+|-------|--------------|----------|---------|-------------|-------------|
 | id | UUID | Yes | auto | Primary key | Unique |
 | [field] | [type] | Yes/No | [value] | [description] | [constraints] |
-| created_at | Timestamp | Yes | now() | Record creation time | |
-| updated_at | Timestamp | Yes | now() | Last update time | |
+| created_at | Timestamp | Yes | now() | (UTC) | |
+| updated_at | Timestamp | Yes | now() | (UTC) | |
 
-**Relationships:**
-- [relationship description]
+### Relationships
 
-**Soft delete:** Yes / No
-**Notes:** [Special handling.]
+| Related Entity | Cardinality | FK Field | Cascade on Parent Delete |
+|----------------|-------------|----------|--------------------------|
+| [Entity] | [cardinality] | `[fk_field]` | [cascade rule] |
+
+### Notes
+
+[Notes.]
 
 <!-- Repeat Entity block for each domain entity. -->
 
@@ -65,6 +108,18 @@
 
 ---
 
+## FR → Entity Coverage Matrix
+
+Forward traceability from each Functional Requirement in `02_srs_[SLUG].md` to the entities it reads or writes. An FR with no linked entity is flagged — every data-touching FR must have at least one linked entity.
+
+| FR ID | FR Title | Linked Entities | Read / Write | Coverage Status |
+|-------|----------|-----------------|--------------|-----------------|
+| FR-001 | [title] | User, Session | R/W | ✓ |
+| FR-002 | [title] | Order, OrderLine | R/W | ✓ |
+| FR-003 | [title] | (none) | — | ⚠ Stateless FR — confirm intent |
+
+---
+
 ## Entity Relationship Overview
 
 ```
@@ -72,4 +127,4 @@
 [EntityName2] >── [EntityName3]
 ```
 
-_Full ERD: generated separately by the development team._
+_Full ERD with physical layout: generated by the development team based on this logical model + `07a_research_[SLUG].md` ADRs._

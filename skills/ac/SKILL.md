@@ -33,6 +33,10 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 3. Which boundary values are critical?
 4. Which US need multiple AC (different roles, states)?
 5. Are there data precision requirements (decimal places, formats)?
+6. **Performance bounds per scenario** — does any AC carry a response-time / throughput requirement that must be verified at acceptance?
+7. **Idempotency** — for action-based scenarios, can the action be safely retried? AC must specify whether duplicate requests produce the same result.
+8. **Observability** — what audit log entry, metric, or trace must this scenario produce? Verifiable by inspecting logs, not just the user-facing response.
+9. **State transitions** — which entity state changes during the scenario? Links the AC to the entity state machines defined in `/datadict`.
 
 Supplement with domain-specific questions from the reference.
 
@@ -40,26 +44,15 @@ Supplement with domain-specific questions from the reference.
 
 **File:** `05_ac_{slug}.md`
 
-```markdown
-# Acceptance Criteria: {Name}
-
-## US-{NNN}: {Short description}
-
-### AC-{NNN}-{NN}: {Scenario name}
-**Type:** {positive | negative | boundary}
-- **Given** {initial state}
-- **When** {action}
-- **Then** {expected result}
-
-**Links:** US-{NNN}, UC-{NNN}
-```
+The full per-AC field set lives at `references/templates/ac-template.md` and is the single source of truth. Each AC carries: ID (`AC-NNN-NN`), Type (positive / negative / boundary / performance / security), Given / When / Then, Linked US, Linked UC, Linked FR, Linked NFR (for performance/security ACs), Source (which business rule from `02_srs_{slug}.md` drove this AC), and Verification method (automated test / manual test / observed in production). The artifact also carries a US → AC coverage matrix at the bottom.
 
 **Rules:**
 - Numbering relative to US: AC-001-01 (first AC for US-001).
 - Every US has at least one positive AC.
-- Must-priority US have at least one negative AC.
+- Must-priority US have at least one negative AC AND at least one boundary AC.
 - Given = specific state. When = single action. Then = verifiable result.
-- Avoid vague wording — replace "system handles correctly" with concrete behavior.
+- Avoid vague wording — replace "system handles correctly" with concrete observable behaviour ("response status is 401", "audit log contains entry with action=login_failed", "stock count decremented by exactly the ordered quantity").
+- Every AC must reference its source business rule via the `Source` field — no AC without provenance.
 
 ## Back-reference update
 

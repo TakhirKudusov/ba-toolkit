@@ -28,11 +28,14 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 3–7 topics per round, 2–4 rounds.
 
 **Required topics:**
-1. Detail level — summary, user-goal, subfunction?
-2. Which alternative flows are most critical?
-3. Which exceptional flows (errors) must be formalized?
-4. Which external systems act as actors?
-5. Grouping — which US should be combined into a single UC?
+1. **Goal in context** — what wider goal does this UC serve? Link to a Brief goal (G-N from `01_brief_{slug}.md` §2) so every UC has a traceable purpose.
+2. **Stakeholders and Interests** — beyond the primary actor, who has a stake in this UC and what do they want? (Cockburn-mandated: this is the question that surfaces non-obvious requirements.)
+3. **Scope level** — system scope, subsystem, or component? Different from "level" (user-goal/summary/subfunction).
+4. Detail level — summary, user-goal, or subfunction?
+5. Which alternative flows are most critical?
+6. Which exceptional flows (errors) must be formalised?
+7. Which external systems act as supporting actors?
+8. Grouping — which US should be combined into a single UC, and which need to be split into separate UCs?
 
 Supplement with domain-specific questions and typical exceptional flows from the reference.
 
@@ -40,33 +43,15 @@ Supplement with domain-specific questions and typical exceptional flows from the
 
 **File:** `04_usecases_{slug}.md`
 
-```markdown
-# Use Cases: {Name}
-
-## UC-{NNN}: {Title}
-- **Actor:** {primary actor}
-- **Level:** {user-goal | summary | subfunction}
-- **Linked US:** US-{NNN}
-- **Preconditions:**
-  1. {condition}
-- **Trigger:** {event}
-- **Main Flow:**
-  1. {Actor performs action.}
-  2. {System responds.}
-- **Alternative Flows:**
-  - {N}a: {description}
-- **Exceptional Flows:**
-  - {N}e: {description}
-- **Postconditions:**
-  - Success: {result}
-  - Failure: {result}
-```
+The full per-UC field set lives at `references/templates/usecases-template.md` and is the single source of truth. Each UC carries: Goal in Context, Scope, Level, Primary Actor, Supporting Actors, Stakeholders & Interests, Pre-conditions, Trigger, Main Success Scenario (numbered table), Extensions / Alternative Flows, Exception Flows, Post-conditions (success guarantees + minimal guarantees), Source (linked US/FR), Linked WF, Linked AC. The artifact also carries a US → UC coverage matrix at the bottom.
 
 **Rules:**
 - Numbering: UC-001, UC-002, ...
-- Each UC linked to at least one US.
-- Steps: "Actor does X" / "System does Y".
-- Alternative flows reference main flow step numbers.
+- Each UC linked to at least one US in **Source**, and at least one Brief goal in **Goal in Context**.
+- Cockburn discipline: Stakeholders & Interests is mandatory — at least 2 stakeholders per UC (primary actor + at least one secondary).
+- Steps: "Actor does X" / "System does Y" — explicit subject in every step.
+- Alternative and Exception flows reference Main Scenario step numbers.
+- Post-conditions distinguish **Success Guarantees** (what's true after success) from **Minimal Guarantees** (what's true after any termination, including failure).
 
 ## Iterative refinement
 

@@ -27,14 +27,21 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 3–7 topics per round, 2–4 rounds.
 
+**Standard alignment:** API Contract approximates the **OpenAPI 3.x** structure (servers, paths, parameters with `in` location, request body, responses keyed by HTTP status, components/schemas, security schemes). Markdown is the format, OpenAPI is the shape.
+
 **Required topics:**
-1. Protocol — REST, WebSocket, GraphQL, combination?
-2. API versioning — URI-based, header-based?
-3. Authentication — JWT, API Key, OAuth2?
-4. Webhook contracts — needed for incoming events from external systems?
-5. Error format — standard (RFC 7807) or custom?
-6. Pagination — cursor-based, offset-based? Limits?
-7. Rate limiting — any restrictions? For which endpoints?
+1. Protocol — REST, WebSocket, GraphQL, gRPC, or combination?
+2. API versioning — URI-based (`/v1/`), header-based (`Accept-Version`), or media-type versioning?
+3. Authentication and authorisation — JWT / OAuth2 / API Key / mTLS? Required scopes per endpoint group?
+4. Webhook contracts — incoming events from external systems? Outgoing events to subscribers?
+5. Error format — RFC 7807 Problem Details, or custom? Localised error messages?
+6. Pagination — cursor-based, offset-based, or key-set? Default and max page size?
+7. Rate limiting — global vs per-endpoint vs per-tenant? Headers (RateLimit-*)? 429 response shape?
+8. **Idempotency** — how does the API support safe retries on POST? `Idempotency-Key` header? Server-side dedupe window?
+9. **Content negotiation** — JSON only, or also CSV / XML / Protobuf? Accept header semantics?
+10. **CORS policy** — which origins are allowed for browser callers? Which headers exposed?
+11. **API deprecation policy** — how is breaking change communicated? `Sunset` header? Deprecation grace period?
+12. **Per-endpoint SLO** — latency target per endpoint group, links to NFRs?
 
 Supplement with domain-specific questions from the reference.
 
@@ -89,7 +96,13 @@ Supplement with domain-specific questions from the reference.
 **Rules:**
 - Endpoints grouped by domain (Auth, Users, Core, Admin, etc.).
 - JSON schemas are representative examples with types in comments.
-- Attributes consistent with Data Dictionary.
+- Attributes consistent with Data Dictionary entity field types.
+- Every endpoint has a **Source** field (FR-NNN) — no endpoint without provenance.
+- Every endpoint has an **Idempotency** marker (idempotent / not idempotent / idempotent via Idempotency-Key header).
+- Every endpoint has a **Required scope** (or "public" for unauthenticated paths) when OAuth2 / JWT scopes are in use.
+- Every endpoint has a **Verification** method (contract test / consumer-driven contract test / integration test).
+- Every endpoint has an **SLO** field linking to an NFR (latency target, error budget).
+- The artifact carries an FR → Endpoint coverage matrix at the bottom.
 
 ## Iterative refinement
 
