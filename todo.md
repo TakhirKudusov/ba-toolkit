@@ -48,10 +48,10 @@ Improvements batch 6 — closed:
 Improvements batch 7:
 1. ✅ Build a roadmap for further development / improvements and bug fixes. (priority 1) Done in Unreleased — `ROADMAP.md` published with Mission / Now / Next / Known limitations / Removed-from-backlog / Recently shipped / Versioning policy / Contributing sections. Commitment-only (no Wishlist or Later-aspirational). README gains a "Roadmap" section linking to it.
 2. ✅ Build a GitHub-hosted website for the project. The site must surface the documentation, the roadmap, and links (npm, GitHub, my LinkedIn). It must be responsive and look good on both desktop and mobile. (priority 2) Done in v3.10.0 — Astro Starlight website at https://takhirkudusov.github.io/ba-toolkit/. Content sync'd from repo root via build-time script. GitHub Action auto-deploys on push. Social links to GitHub + npm + LinkedIn. `.npmignore` added to exclude website/ from npm tarball.
-3. Review and rework the README and the documentation once more if the website work surfaces inconsistencies. (priority 3)
+3. ✅ Review and rework the README and the documentation once more if the website work surfaces inconsistencies. (priority 3) Done — website built and deployed in v3.10.0, UI/UX Pro Max design system applied (typography, palette, hero, feature cards, FAQ, CTA, theme fix, reduced-motion). No inconsistencies surfaced that require a separate patch. Batch 7 closed.
 
-Найденные баги:
-1. ✅ Если в /discovery переопределить домен, то в AGENTS все равно остается тот, который был введен при инициализации. Done in v3.8.1 — `skills/discovery/SKILL.md` §6 gains a targeted "Domain field exception" that allows `/discovery` to surgically update only the `**Domain:**` line inside the managed block. Every other managed-block field stays owned by `ba-toolkit init`. Content fix only.
+Reported bugs:
+1. ✅ If `/discovery` redefines the domain, `AGENTS.md` still shows the domain entered at init. Done in v3.8.1 — `skills/discovery/SKILL.md` §6 gains a targeted "Domain field exception" that allows `/discovery` to surgically update only the `**Domain:**` line inside the managed block. Every other managed-block field stays owned by `ba-toolkit init`. Content fix only.
 
 ---
 
