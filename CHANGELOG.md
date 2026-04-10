@@ -11,6 +11,18 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.10.1] — 2026-04-10
+
+### Fixed
+
+- **Website UI/UX polish pass.** Hero section redesign with brand palette and favicon; feature cards layout; inverted light/dark theme bug fixed. Applied UI/UX Pro Max design system recommendations across the site.
+
+### Changed
+
+- **`package.json` `homepage` field** now points to the documentation website (`https://takhirkudusov.github.io/ba-toolkit/`).
+
+---
+
 ## [3.10.0] — 2026-04-10
 
 ### Added
@@ -729,7 +741,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.10.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.0...v3.10.1
 [3.10.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.9.0...v3.10.0
 [3.9.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.1...v3.9.0
 [3.8.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.0...v3.8.1
