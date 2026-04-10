@@ -24,14 +24,12 @@ const DOCS_OUT = resolve(__dirname, '..', 'src', 'content', 'docs');
 
 // Per-source mapping. Each entry: { from, to, title, description }.
 // `from` is relative to REPO_ROOT. `to` is relative to DOCS_OUT.
+// NOTE: index.mdx is hand-written (hero + feature cards) and committed
+// directly under website/src/content/docs/. It is NOT synced from
+// README.md. The README is GitHub-optimised (centered HTML badges, raw
+// <div> wrappers) and doesn't render well in Starlight. The website
+// landing page is a purpose-built product landing instead.
 const SOURCES = [
-  {
-    from: 'README.md',
-    to: 'index.md',
-    title: 'BA Toolkit',
-    description:
-      'AI-powered Business Analyst pipeline — concept to a phase-and-DAG implementation plan an AI coding agent can execute.',
-  },
   {
     from: 'docs/USAGE.md',
     to: 'usage.md',
@@ -80,7 +78,7 @@ const SOURCES = [
 // Hand-written pages that live in the website but are not synced from the
 // repo root. These are not touched by this script — they are committed
 // directly under website/src/content/docs/ and survive the wipe.
-const HAND_WRITTEN = new Set(['getting-started.md']);
+const HAND_WRITTEN = new Set(['getting-started.md', 'index.mdx']);
 
 function escapeYaml(value) {
   // Single-line YAML scalar with double quotes. Escape backslashes and

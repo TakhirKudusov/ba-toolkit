@@ -1,0 +1,64 @@
+---
+title: BA Toolkit
+description: "AI-powered Business Analyst pipeline — from concept to implementation plan. 24 skills, 12 domains, zero runtime dependencies."
+template: splash
+hero:
+  title: BA Toolkit
+  tagline: "Structured BA pipeline for AI coding agents — concept to a phase-and-DAG implementation plan, 24 skills, 12 domains, one-command Notion + Confluence publish."
+  actions:
+    - text: Get started
+      link: /ba-toolkit/getting-started/
+      icon: right-arrow
+    - text: View on GitHub
+      link: https://github.com/TakhirKudusov/ba-toolkit
+      variant: minimal
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Why BA Toolkit?
+
+<CardGrid>
+  <Card title="24 interconnected skills" icon="pencil">
+    From `/discovery` (brainstorm an idea) through `/brief`, `/srs`, `/stories`, `/ac`, `/nfr`, `/datadict`, `/apicontract`, `/wireframes`, `/scenarios`, `/handoff` to `/implement-plan` — a complete BA pipeline inside your AI coding agent.
+  </Card>
+
+  <Card title="12 domain references" icon="open-book">
+    SaaS, Fintech, E-commerce, Healthcare, Logistics, On-demand, Social/Media, Real Estate, iGaming, EdTech, GovTech, AI/ML — each with domain-specific interview questions, typical entities, NFR categories, and glossary terms.
+  </Card>
+
+  <Card title="Zero runtime dependencies" icon="rocket">
+    The CLI is a single Node.js file. `npm install -g @kudusov.takhir/ba-toolkit` and you have the whole pipeline available offline. No build step, no config, no lock-in.
+  </Card>
+
+  <Card title="Works with 5 AI agents" icon="laptop">
+    Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf. All five use native Agent Skills (`SKILL.md`) — no conversion, no `.mdc`, no plugins. Install once, use everywhere.
+  </Card>
+
+  <Card title="Senior-BA rigour" icon="approve-check">
+    Standards conformance: BABOK v3, IEEE 830, ISO 25010, ISO 31000, Cockburn use cases, INVEST, MoSCoW, PMBOK 7, Michael Nygard ADRs. Every artifact carries provenance fields, cross-artifact traceability, and document control.
+  </Card>
+
+  <Card title="Notion + Confluence publish" icon="document">
+    `ba-toolkit publish` bundles every artifact into import-ready folders for Notion (Markdown) and Confluence (HTML). Drag-and-drop, no API tokens, no network.
+  </Card>
+</CardGrid>
+
+## How it works
+
+Most skills follow the same cycle: **Command → Context → Interview → Generate → Refine**. Each skill loads all previous artifacts plus the domain reference, asks targeted questions (one at a time, table of options, one marked **Recommended**), writes a Markdown artifact, and offers refinement subcommands before moving on.
+
+Every artifact links back to its predecessors, forming the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario → Task`. Run `/trace` to verify coverage and `/analyze` for severity-rated findings.
+
+After `/handoff`, run `/implement-plan` to produce a **phase-and-DAG implementation plan** an AI coding agent can execute step by step — every task references the FR / US / AC it implements and carries its own Definition of Done.
+
+## Quick install
+
+```bash
+npx @kudusov.takhir/ba-toolkit init
+```
+
+Prompts for project name, domain, and AI agent, then creates `output/{slug}/`, `AGENTS.md`, and installs the 24 skills into your agent's directory.
+
+**[Read the full getting-started guide →](/ba-toolkit/getting-started/)**

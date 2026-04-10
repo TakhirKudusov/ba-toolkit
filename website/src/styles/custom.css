@@ -1,27 +1,70 @@
 /* BA Toolkit website — custom Starlight overrides.
  *
  * Keep this file small. Starlight already ships a polished default theme;
- * we only override what is needed for branding consistency with the GitHub
- * README. The repo is the source of truth for content.
+ * we only override what is needed for branding. The repo is the source
+ * of truth for content.
  */
+
+/* ── Typography ─────────────────────────────────────────────────────── */
 
 :root {
   --sl-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
-
-/* Slightly tighten the heading rhythm so dense BA documentation reads
- * like a spec, not like a marketing landing page. */
-:root {
   --sl-text-h1: 2.25rem;
   --sl-text-h2: 1.625rem;
   --sl-text-h3: 1.25rem;
 }
 
-/* The BA Toolkit README uses tables heavily. Make sure they wrap on mobile
- * instead of forcing horizontal scroll. */
+/* ── Brand palette: slate-blue + accent ─────────────────────────────── */
+/* Professional BA/DevTools feel: trustworthy, structured, readable.     */
+
+:root {
+  --sl-color-accent-low: #1e3a5f;
+  --sl-color-accent: #3b82f6;
+  --sl-color-accent-high: #93c5fd;
+  --sl-color-white: #ffffff;
+  --sl-color-gray-1: #f8fafc;
+  --sl-color-gray-2: #e2e8f0;
+  --sl-color-gray-3: #cbd5e1;
+  --sl-color-gray-4: #94a3b8;
+  --sl-color-gray-5: #64748b;
+  --sl-color-gray-6: #334155;
+  --sl-color-black: #0f172a;
+}
+:root[data-theme='dark'] {
+  --sl-color-accent-low: #172554;
+  --sl-color-accent: #60a5fa;
+  --sl-color-accent-high: #dbeafe;
+  --sl-color-white: #0f172a;
+  --sl-color-gray-1: #1e293b;
+  --sl-color-gray-2: #334155;
+  --sl-color-gray-3: #475569;
+  --sl-color-gray-4: #94a3b8;
+  --sl-color-gray-5: #cbd5e1;
+  --sl-color-gray-6: #e2e8f0;
+  --sl-color-black: #f8fafc;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────── */
+/* The BA Toolkit README uses tables heavily. Ensure they scroll on
+ * narrow viewports instead of breaking the layout.                      */
+
 .sl-markdown-content table {
   display: block;
   overflow-x: auto;
   max-width: 100%;
+}
+
+/* ── Hero ────────────────────────────────────────────────────────────── */
+/* Give the hero section on the landing page a little breathing room.    */
+
+.hero {
+  padding-block: 3rem;
+}
+
+/* ── Card grid on the landing page ───────────────────────────────────── */
+/* Slightly increase card padding so the feature descriptions read well. */
+
+.card {
+  padding: 1.25rem;
 }
