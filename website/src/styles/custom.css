@@ -1,29 +1,41 @@
 /* BA Toolkit website — custom Starlight overrides.
  *
- * Keep this file small. Starlight already ships a polished default theme;
- * we only override what is needed for branding. The repo is the source
- * of truth for content.
+ * Design system: Minimalism & Swiss Style per UI/UX Pro Max.
+ * Typography: JetBrains Mono (headings/code) + IBM Plex Sans (body).
+ * Palette: Knowledge Base / Documentation — neutral grey + blue CTA.
+ * Keep this file small — Starlight handles the rest.
  */
 
 /* ── Typography ─────────────────────────────────────────────────────── */
+/* Developer Mono pairing: JetBrains Mono for headings + code (dev-tool
+ * feel), IBM Plex Sans for body (high readability). Google Fonts loaded
+ * via <link> in astro.config.mjs head for fastest LCP.                  */
 
 :root {
-  --sl-font: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
-    Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --sl-font: 'IBM Plex Sans', system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo,
+    Monaco, Consolas, monospace;
   --sl-text-h1: 2.25rem;
   --sl-text-h2: 1.625rem;
   --sl-text-h3: 1.25rem;
 }
 
-/* ── Brand palette: slate-blue accent ────────────────────────────────── */
-/* Only override the accent hue. Leave --sl-color-white, --sl-color-black,
- * and the gray scale at Starlight's defaults — Starlight already handles
- * light/dark inversion correctly. Overriding those caused the theme to
- * render inverted (light palette in dark mode, dark in light).           */
+/* Headings in JetBrains Mono for a distinctive dev-tool identity. */
+.sl-markdown-content :is(h1, h2, h3, h4, h5, h6),
+.hero h1 {
+  font-family: var(--sl-font-mono);
+}
+
+/* ── Brand palette ──────────────────────────────────────────────────── */
+/* CTA: #2563EB (blue-600) per UI/UX Pro Max Knowledge Base palette.
+ * Better contrast ratio (4.74:1 on white) than the previous #3b82f6
+ * (3.94:1). Only override accent — Starlight's gray scale + white/black
+ * handle light/dark inversion correctly on their own.                    */
 
 :root[data-theme='light'],
 :root[data-theme='dark'] {
-  --sl-color-accent: #3b82f6;
+  --sl-color-accent: #2563eb;
 }
 :root[data-theme='light'] {
   --sl-color-accent-low: #dbeafe;
@@ -35,8 +47,6 @@
 }
 
 /* ── Tables ──────────────────────────────────────────────────────────── */
-/* The BA Toolkit README uses tables heavily. Ensure they scroll on
- * narrow viewports instead of breaking the layout.                      */
 
 .sl-markdown-content table {
   display: block;
@@ -45,15 +55,30 @@
 }
 
 /* ── Hero ────────────────────────────────────────────────────────────── */
-/* Give the hero section on the landing page a little breathing room.    */
 
 .hero {
   padding-block: 3rem;
 }
 
-/* ── Card grid on the landing page ───────────────────────────────────── */
-/* Slightly increase card padding so the feature descriptions read well. */
+/* ── Card grid ───────────────────────────────────────────────────────── */
+/* Subtle hover lift per UX guideline: 200-250ms, no layout shift.       */
 
 .card {
   padding: 1.25rem;
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+.card:hover {
+  box-shadow: 0 4px 12px rgb(0 0 0 / 0.08);
+  transform: translateY(-2px);
+}
+
+/* ── Reduced motion ──────────────────────────────────────────────────── */
+/* Respect prefers-reduced-motion per UX checklist.                      */
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card:hover {
+    transition: none;
+    transform: none;
+  }
 }

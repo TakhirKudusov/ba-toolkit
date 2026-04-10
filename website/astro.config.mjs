@@ -7,6 +7,33 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
   site: 'https://takhirkudusov.github.io',
   base: '/ba-toolkit',
+  // Google Fonts: JetBrains Mono (headings/code) + IBM Plex Sans (body)
+  // per UI/UX Pro Max "Developer Mono" pairing recommendation.
+  // <link> in head is faster than @import in CSS (no extra round-trip).
+  head: [
+    {
+      tag: 'link',
+      attrs: {
+        rel: 'preconnect',
+        href: 'https://fonts.googleapis.com',
+      },
+    },
+    {
+      tag: 'link',
+      attrs: {
+        rel: 'preconnect',
+        href: 'https://fonts.gstatic.com',
+        crossorigin: '',
+      },
+    },
+    {
+      tag: 'link',
+      attrs: {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap',
+      },
+    },
+  ],
   integrations: [
     starlight({
       title: 'BA Toolkit',
