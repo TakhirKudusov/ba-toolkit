@@ -15,34 +15,23 @@
   --sl-text-h3: 1.25rem;
 }
 
-/* ── Brand palette: slate-blue + accent ─────────────────────────────── */
-/* Professional BA/DevTools feel: trustworthy, structured, readable.     */
+/* ── Brand palette: slate-blue accent ────────────────────────────────── */
+/* Only override the accent hue. Leave --sl-color-white, --sl-color-black,
+ * and the gray scale at Starlight's defaults — Starlight already handles
+ * light/dark inversion correctly. Overriding those caused the theme to
+ * render inverted (light palette in dark mode, dark in light).           */
 
-:root {
-  --sl-color-accent-low: #1e3a5f;
+:root[data-theme='light'],
+:root[data-theme='dark'] {
   --sl-color-accent: #3b82f6;
-  --sl-color-accent-high: #93c5fd;
-  --sl-color-white: #ffffff;
-  --sl-color-gray-1: #f8fafc;
-  --sl-color-gray-2: #e2e8f0;
-  --sl-color-gray-3: #cbd5e1;
-  --sl-color-gray-4: #94a3b8;
-  --sl-color-gray-5: #64748b;
-  --sl-color-gray-6: #334155;
-  --sl-color-black: #0f172a;
+}
+:root[data-theme='light'] {
+  --sl-color-accent-low: #dbeafe;
+  --sl-color-accent-high: #1e3a5f;
 }
 :root[data-theme='dark'] {
   --sl-color-accent-low: #172554;
-  --sl-color-accent: #60a5fa;
-  --sl-color-accent-high: #dbeafe;
-  --sl-color-white: #0f172a;
-  --sl-color-gray-1: #1e293b;
-  --sl-color-gray-2: #334155;
-  --sl-color-gray-3: #475569;
-  --sl-color-gray-4: #94a3b8;
-  --sl-color-gray-5: #cbd5e1;
-  --sl-color-gray-6: #e2e8f0;
-  --sl-color-black: #f8fafc;
+  --sl-color-accent-high: #93c5fd;
 }
 
 /* ── Tables ──────────────────────────────────────────────────────────── */
