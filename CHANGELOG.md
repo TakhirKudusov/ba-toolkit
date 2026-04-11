@@ -11,6 +11,17 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.12.0] — 2026-04-11
+
+### Changed
+
+- **Interview question numbering.** Every interview-phase skill now prefixes questions with `(N/M)` — e.g., `(2/7) Who is the primary user?` — so users see progress through the interview. Interview protocol rule 1 extended; all examples updated. All 21 SKILL.md files inherit the change via protocol reference.
+- **Recommended marker simplified.** `**Recommended**` → `(recommended)`. No bold, no emoji, no translation — always English regardless of the user's language. Updated in interview protocol rules 10–11, 22 skill and reference files, and 2 regression tests.
+- **Language question removed from /principles.** Artifact language is now auto-detected from the user's first message instead of being asked as a required interview topic. Remaining topics renumbered (9 → 8). The generated `## 1. Artifact Language` section is still written — it records what was detected.
+- **`/clarify` one-at-a-time question flow.** Ambiguities are now presented sequentially with `(N/M)` numbering instead of a single bulk table. Binary questions (e.g., "Is Manager the same as Admin?") get a short options table following the interview protocol format; open-ended questions get free-form input. Users can reply `skip` or `defer` to leave a question unresolved.
+
+---
+
 ## [3.11.0] — 2026-04-11
 
 ### Added
@@ -818,6 +829,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.12.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.11.0...v3.12.0
 [3.11.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.6...v3.11.0
 [3.10.6]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.4...v3.10.5
