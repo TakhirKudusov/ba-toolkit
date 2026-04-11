@@ -26,25 +26,49 @@ You can always change your domain later by re-running `ba-toolkit init` with a d
 
 ## Adding a new domain
 
-This section is for contributors who want to add a new industry reference to BA Toolkit.
+This section is for contributors who want to add a new industry reference to BA Toolkit. New domains are the **highest-impact contribution** — one Markdown file, one line of code, one PR.
 
-Domain references live in `skills/references/domains/` — one Markdown file per domain, loaded automatically by interview-phase skills based on the domain you picked at `ba-toolkit init` (which writes it into `AGENTS.md`). Each skill reads **only its own section** from the reference file, keeping context usage efficient.
+### Step-by-step checklist
 
-## File structure
+#### 1. Pick a slug
 
-Create `skills/references/domains/{domain}.md` following this layout:
+Use lowercase with hyphens: `proptech`, `travel`, `food-delivery`. The slug must be unique across the existing domains. Check the current list:
+
+```
+saas · fintech · ecommerce · healthcare · logistics · on-demand
+social-media · real-estate · igaming · edtech · govtech · ai-ml · custom
+```
+
+#### 2. Create the reference file
+
+Create `skills/references/domains/{slug}.md`. The file has **10 sections** — one per interview-phase skill, plus a domain glossary. Use an existing reference as a model (e.g., [`edtech.md`](../skills/references/domains/edtech.md) at ~220 lines, or [`saas.md`](../skills/references/domains/saas.md) at ~185 lines).
+
+Required structure:
 
 ```markdown
 # Domain Reference: {Name}
 
+{One-paragraph description of what this domain covers.}
+
+---
+
 ## 1. /brief — Project Brief
 ### Domain-specific interview questions
+{5–8 bullet points: business model, buyer vs. user, monetization, geography, regulations.}
 ### Typical business goals
+{4–6 bullet points with concrete metrics where possible.}
 ### Typical risks
+{4–6 bullet points: compliance, market, technical, operational.}
+
+---
 
 ## 2. /srs — Requirements Specification
 ### Domain-specific interview questions
+{5–8 bullet points: roles, integrations, compliance, data flows.}
 ### Typical functional areas
+{8–12 bullet points: the major feature groups for this industry.}
+
+---
 
 ## 3. /stories — User Stories
 ### Domain-specific interview questions
@@ -60,12 +84,44 @@ Create `skills/references/domains/{domain}.md` following this layout:
 ## Domain Glossary
 | Term | Definition |
 |------|-----------|
+{10–20 industry-specific terms the agent should use consistently.}
 ```
 
-## Naming
+**Quality bar:**
+- Every section should have real, specific content — not generic filler. The agent uses these bullet points as interview prompts; vague bullets produce vague artifacts.
+- Sections 1–3 should be the most detailed (these drive the early pipeline). Sections 4–9 can be shorter but must not be empty.
+- The glossary should include terms a developer outside your industry would not know (e.g., "KYC" for Fintech, "FERPA" for EdTech, "GGR" for iGaming).
 
-Use a single lowercase slug with hyphens — `igaming`, `fintech`, `on-demand`, `real-estate`. The filename must match the domain id passed to `ba-toolkit init` (or selected from the domain menu) exactly; mismatches cause the reference to silently not load. To register a new domain in the `init` menu, also add it to the `DOMAINS` array in `bin/ba-toolkit.js`.
+#### 3. Register the domain in the CLI
 
-## Contributing
+Open `bin/ba-toolkit.js` and add one line to the `DOMAINS` array (around line 73). Insert your domain **before** the `custom` entry — that slot is always last.
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for the PR workflow. New domains are the highest-impact contribution and do not require any code changes — one file, one PR.
+```javascript
+{ id: '{slug}', name: '{Display Name}', desc: '{Short description for the init menu}' },
+```
+
+#### 4. Test locally
+
+```bash
+# Verify the init menu shows your domain
+node bin/ba-toolkit.js init --name "Test" --domain {slug} --for claude-code --dry-run
+
+# Run the full test suite
+npm test
+```
+
+Both commands should pass without errors. The dry-run confirms the slug is recognized; the test suite confirms no regressions.
+
+#### 5. Open a PR
+
+- **Title:** `feat(domains): add {Name} domain reference`
+- **Body:** one paragraph explaining what industries/products the domain covers and why it is distinct from existing domains.
+- **Files changed:** `skills/references/domains/{slug}.md` (new) + `bin/ba-toolkit.js` (one line in `DOMAINS` array).
+
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for the general PR workflow.
+
+### Naming rules
+
+- Filename must match the `id` in the `DOMAINS` array exactly — mismatches cause the reference to silently not load.
+- Use lowercase with hyphens: `food-delivery`, not `FoodDelivery` or `food_delivery`.
+- Keep it short (1–2 words) — the slug appears in CLI prompts, menu navigation, and `AGENTS.md`.

@@ -56,6 +56,9 @@ Improvements batch 8:
 Improvements batch 9:
 1. ✅ Documentation UX refactoring for non-technical users. (priority 1) Done in Unreleased — full review of all docs from PM/BA/founder perspective. Created `docs/GLOSSARY.md` (core concepts, requirement types, standards in plain English). Added Prerequisites section to `getting-started.md` (Node.js, npm, AI agents). Rewrote README opening (value proposition instead of jargon, added getting-started/example/glossary pointers). Added ASCII pipeline diagram to README. Expanded TROUBLESHOOTING.md with 8 beginner entries (skill not found, init fails, agent timeout, etc.). Created `example.md` page for website (Lumen Goods artifacts table with GitHub links). Rewrote DOMAINS.md intro ("How to choose your domain" decision table). Added 4 beginner FAQ entries (no-code usage, skip steps, AI errors, time estimates). Simplified website landing page (tagline rewrite, "Industry-standard rigour" card, plain English "How it works"). Added GLOSSARY.md to website sync script. 9 files modified/created, 1 new website page.
 
+Improvements batch 10:
+1. ✅ Domain-reference contribution guide. (priority 1) Done in Unreleased — rewrote DOMAINS.md "Adding a new domain" section into a 5-step checklist: pick a slug, create the reference file (with structure template and quality bar), register in CLI DOMAINS array, test locally, open a PR. Cross-referenced from CONTRIBUTING.md.
+
 Reported bugs:
 1. ✅ If `/discovery` redefines the domain, `AGENTS.md` still shows the domain entered at init. Done in v3.8.1 — `skills/discovery/SKILL.md` §6 gains a targeted "Domain field exception" that allows `/discovery` to surgically update only the `**Domain:**` line inside the managed block. Every other managed-block field stays owned by `ba-toolkit init`. Content fix only.
 

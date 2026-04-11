@@ -2,8 +2,8 @@
 
 Contributions are welcome. The most useful additions are:
 
-**New domains** (highest impact, no code required):
-Create `skills/references/domains/{domain}.md` following the template in [docs/DOMAINS.md](docs/DOMAINS.md). Open a PR with the file and a brief description of the domain.
+**New domains** (highest impact, minimal code):
+One Markdown file + one line in `bin/ba-toolkit.js`. Follow the step-by-step checklist in [docs/DOMAINS.md](docs/DOMAINS.md#step-by-step-checklist).
 
 **Skill improvements:**
 Edit the relevant `skills/{name}/SKILL.md`. Keep changes backward-compatible — avoid renaming sections or changing output file names, as other skills depend on them.
