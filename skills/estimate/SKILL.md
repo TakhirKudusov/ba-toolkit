@@ -87,6 +87,8 @@ This skill produces a **single-estimator analytical pass**. A senior BA running 
 
 ## Output
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 ### If scope ≤ 20 stories — update `03_stories_{slug}.md` in-place
 
 Add a `**Estimate:**` field to each US block and append the Estimation Summary table at the end of the file.

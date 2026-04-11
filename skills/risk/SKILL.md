@@ -115,6 +115,8 @@ Assign each risk one of the four canonical treatment strategies (PMBOK 7 / ISO 3
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 Save `00_risks_{slug}.md` to the output directory.
 
 ```markdown

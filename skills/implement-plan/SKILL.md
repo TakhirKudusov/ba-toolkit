@@ -115,6 +115,8 @@ Within a phase, order tasks so each task's `dependsOn` list points only at tasks
 
 ### 7. Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `12_implplan_{slug}.md`
 
 ```markdown

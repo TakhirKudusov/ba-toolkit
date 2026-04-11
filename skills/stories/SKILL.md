@@ -38,6 +38,8 @@ Supplement with domain-specific questions and typical epics from the reference.
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `03_stories_{slug}.md`
 
 The full template lives at `references/templates/stories-template.md` and is the single source of truth for the per-story field set. The fields are:

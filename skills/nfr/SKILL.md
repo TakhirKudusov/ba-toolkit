@@ -48,6 +48,8 @@ Supplement with domain-specific questions and mandatory categories from the refe
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `06_nfr_{slug}.md`
 
 The full per-NFR field set lives at `references/templates/nfr-template.md` and is the single source of truth. Each NFR carries: ID (`NFR-NNN`), ISO 25010 characteristic, sub-characteristic, description, measurable metric, **acceptance threshold** (the bar that says "we passed"), verification method, source (which stakeholder, regulation, or FR drove this NFR), rationale, priority, and linked FRs / USs / Brief constraints. The artifact carries an FR → NFR coverage matrix and a per-characteristic priority summary at the bottom.

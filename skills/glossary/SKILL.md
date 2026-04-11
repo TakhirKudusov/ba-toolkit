@@ -99,6 +99,8 @@ Identify terms used in requirements but not defined anywhere in the glossary or 
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 Save `00_glossary_{slug}.md` to the output directory.
 
 ```markdown

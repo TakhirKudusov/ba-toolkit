@@ -24,6 +24,8 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 No interview. All content is derived from the existing artifacts. The full template lives at `references/templates/handoff-template.md` and is the single source of truth — including the full inventory of pipeline-stage and cross-cutting artifacts (`/discovery`, `/principles`, `/implement-plan`, `/sprint`, `/risk`, `/glossary`, `/trace`, `/analyze`, `/estimate`), the Brief Goal → FR / FR → NFR / FR → API forward-traceability tables, the ADR summary, and the formal Sign-off section.
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `11_handoff_{slug}.md`
 
 ```markdown

@@ -33,6 +33,8 @@ If the user invokes `/trace` with no inline hint, ask the following short calibr
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `00_trace_{slug}.md`
 
 The full per-axis matrix layout lives at `references/templates/trace-template.md` and is the single source of truth. The artifact carries: a Forward Traceability matrix (FR → all downstream artifacts), a Reverse Traceability matrix (US, UC, AC, NFR, Entity, API, WF, SC, Task → FR), Coverage Gaps grouped by severity (Critical / High / Medium / Low per the principles thresholds), Coverage Statistics per artifact pair, and Recommended Actions sorted by severity.

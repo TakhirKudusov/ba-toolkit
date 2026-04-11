@@ -54,7 +54,9 @@ If a topic was already covered by inline context or the lead-in answer, skip it 
 
 ### 5. Generation
 
-**File:** `00_discovery_{slug}.md` (slug — kebab-case, derived from the project name; if the user has not yet picked a name, propose 2–3 candidates and let them choose).
+**Slug:** if `AGENTS.md` exists at the project root with a `**Slug:**` line in its managed block, read that value verbatim and use it as `{slug}` — `ba-toolkit init` is the single source of truth. Do **not** propose a new slug, and do **not** rename the project the user already scaffolded. Only when `AGENTS.md` is absent (the user is brain-storming before running `ba-toolkit init`) may you derive a kebab-case slug from the project name; if the user has not yet picked a name, propose 2–3 candidates and let them choose. See [`../references/slug-source.md`](../references/slug-source.md) for the full rule.
+
+**File:** `00_discovery_{slug}.md`
 
 ```markdown
 # Discovery: {Project Name}

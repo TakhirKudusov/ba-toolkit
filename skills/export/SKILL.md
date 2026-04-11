@@ -197,6 +197,8 @@ Compatible with Jira CSV import, Trello, Asana, Monday.com, and Google Sheets. I
 
 ## Output
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 Save the export file to the output directory alongside the artifacts:
 
 ```

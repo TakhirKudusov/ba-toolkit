@@ -42,6 +42,8 @@ Supplement with domain-specific questions from the reference.
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `05_ac_{slug}.md`
 
 The full per-AC field set lives at `references/templates/ac-template.md` and is the single source of truth. Each AC carries: ID (`AC-NNN-NN`), Type (positive / negative / boundary / performance / security), Given / When / Then, Linked US, Linked UC, Linked FR, Linked NFR (for performance/security ACs), Source (which business rule from `02_srs_{slug}.md` drove this AC), and Verification method (automated test / manual test / observed in production). The artifact also carries a US → AC coverage matrix at the bottom.

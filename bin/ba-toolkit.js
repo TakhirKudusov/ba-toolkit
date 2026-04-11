@@ -193,6 +193,12 @@ let inputClosed = false;
 
 function ensureReadline() {
   if (sharedRl) return;
+  // Reset the sticky close flag — a previous interface may have been
+  // torn down by closeReadline() (e.g. before an arrow-key menu took
+  // over stdin in raw mode). Without this reset, the next prompt()
+  // after a menu would immediately reject with INPUT_CLOSED even
+  // though stdin is still perfectly usable.
+  inputClosed = false;
   sharedRl = readline.createInterface({ input: process.stdin, output: process.stdout });
   sharedRl.on('line', (line) => {
     if (waiters.length > 0) {

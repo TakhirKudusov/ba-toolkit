@@ -61,7 +61,9 @@ If a domain reference is loaded, supplement general questions with domain-specif
 
 ### 5. Generation
 
-**File:** `01_brief_{slug}.md` (slug — kebab-case, fixed here for the entire pipeline).
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` at the project root (look in cwd first; if cwd is `output/`, check `../AGENTS.md`). Use that value verbatim — do not invent or re-derive a slug from the project name. `ba-toolkit init` is the single source of truth; see [`../references/slug-source.md`](../references/slug-source.md) for fallback rules and rationale.
+
+**File:** `01_brief_{slug}.md`
 
 ```markdown
 # Project Brief: {Project Name}

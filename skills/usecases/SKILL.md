@@ -41,6 +41,8 @@ Supplement with domain-specific questions and typical exceptional flows from the
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `04_usecases_{slug}.md`
 
 The full per-UC field set lives at `references/templates/usecases-template.md` and is the single source of truth. Each UC carries: Goal in Context, Scope, Level, Primary Actor, Supporting Actors, Stakeholders & Interests, Pre-conditions, Trigger, Main Success Scenario (numbered table), Extensions / Alternative Flows, Exception Flows, Post-conditions (success guarantees + minimal guarantees), Source (linked US/FR), Linked WF, Linked AC. The artifact also carries a US → UC coverage matrix at the bottom.

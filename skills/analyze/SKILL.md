@@ -86,6 +86,8 @@ The 8 canonical categories cover the IEEE 830 §4.3 SRS quality attributes (corr
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `00_analyze_{slug}.md`
 
 The full report layout lives at `references/templates/analyze-template.md` and is the single source of truth. Each finding carries: ID, Severity, Category (one of the 8 above), Location (artifact + element ID), Description, Recommendation, and **Owner** (which role is accountable for fixing the finding — assigned by `00_principles_*.md` §4 Definition of Ready ownership where applicable, otherwise by domain default).

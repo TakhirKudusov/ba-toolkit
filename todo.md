@@ -62,6 +62,8 @@ Improvements batch 10:
 
 Reported bugs:
 1. ✅ If `/discovery` redefines the domain, `AGENTS.md` still shows the domain entered at init. Done in v3.8.1 — `skills/discovery/SKILL.md` §6 gains a targeted "Domain field exception" that allows `/discovery` to surgically update only the `**Domain:**` line inside the managed block. Every other managed-block field stays owned by `ba-toolkit init`. Content fix only.
+2. ✅ `ba-toolkit init` crashed on the second run with `Input stream closed before all prompts could be answered.` The "Replace existing BA Toolkit install?" prompt (fired only when a manifest already existed after the domain/agent arrow-key menus) rejected immediately. Root cause: `runMenuTty` tears down the shared readline via `closeReadline()`, whose `close` event sets a sticky `inputClosed = true` flag; `ensureReadline()` recreated the interface for the next `prompt()` but never reset the flag. Fixed in Unreleased — `ensureReadline()` clears `inputClosed` on interface recreation.
+3. ✅ Pipeline skills invented their own slug instead of reading the canonical one from `AGENTS.md`. Reproduction: `init --name "New Test App"` wrote `**Slug:** new-test-app` to AGENTS.md, then `/brief` saved `01_brief_knitted-socks.md` (slug pulled from conversation context). Root cause: v3.x-era wording in `/brief` ("fixed here for the entire pipeline"), `/principles` ("extract from brief, otherwise ask"), `/discovery` ("derive from project name") never read the v4.0 scaffold slug. Fixed in Unreleased — added `skills/references/slug-source.md` (canonical rule + fallbacks + rationale) and an explicit "Slug source" directive in 22 SKILL.md files (every pipeline + utility skill that emits a `{slug}` filename). `/discovery` keeps the brain-storm-before-init derivation as the only fallback.
 
 ---
 
@@ -89,4 +91,3 @@ Improvements batch 12:
 Improvements batch 13:
 1. ✅ Remove multi-project support (v4.0.0 breaking change). Done in Unreleased — AGENTS.md at project root, artifacts flat in output/, no output/<slug>/ nesting. cmdInit warns on existing artifacts. Updated CLI, 6 SKILL.md files, environment.md, closing-message.md, agents-template.md, handoff-template.md, init.sh, init.ps1, 2 test files (removed multi-project test, added warning + preserve tests), README, USAGE.md, FAQ, GLOSSARY, TROUBLESHOOTING, CLAUDE.md, ROADMAP, getting-started, index.mdx. Website synced.
 2. ✅ Remove ✅ from recommended answer — already done in batch 11 (changed to plain `(recommended)`).
-3. Make prefixes for all commands ba-toolkit. Should be, e.g., /ba-toolkit.brief — **rejected in ROADMAP.md "Removed from the backlog"** (premature optimization, would break muscle memory, require 4.0.0 bump).

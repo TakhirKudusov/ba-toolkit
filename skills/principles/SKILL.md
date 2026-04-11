@@ -23,7 +23,7 @@ If `00_principles_*.md` already exists, load it and offer to:
 - Amend a specific section (`/revise [section]`).
 - Regenerate from scratch.
 
-If `01_brief_*.md` already exists, extract the slug and domain from it. Otherwise, ask the user for the project name (to derive the slug) and domain.
+**Slug source.** Read the `**Slug:**` line from the managed block of `AGENTS.md` at the project root (cwd, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. `ba-toolkit init` is the single source of truth — do not invent or re-derive a slug. If `AGENTS.md` is missing, warn the user to run `ba-toolkit init` first. See [`../references/slug-source.md`](../references/slug-source.md) for the full rule and fallbacks. The domain comes from the same managed block; if `01_brief_*.md` already exists, prefer the brief's domain over the scaffold default.
 
 ### 3. Interview
 

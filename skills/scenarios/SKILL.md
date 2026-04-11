@@ -41,6 +41,8 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `10_scenarios_{slug}.md`
 
 The full per-scenario field set lives at `references/templates/scenarios-template.md` and is the single source of truth. Each scenario carries: ID (`SC-NNN`), Title, Persona (named with context), Type (happy / negative / edge / performance / security), Priority (P1 / P2 / P3), Entry point, Platform, **Source** (Linked US, Linked FR, Linked NFR), Linked AC, Steps table, Expected Outcome, Failure Conditions. The artifact carries a coverage matrix at the bottom showing US, AC scenario, FR, NFR, and WF coverage.

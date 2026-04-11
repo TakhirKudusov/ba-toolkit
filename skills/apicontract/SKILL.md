@@ -47,6 +47,8 @@ Supplement with domain-specific questions from the reference.
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `08_apicontract_{slug}.md`
 
 ```markdown

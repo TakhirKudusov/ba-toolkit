@@ -45,6 +45,8 @@ Supplement with domain-specific questions and mandatory entities from the refere
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 **File:** `07_datadict_{slug}.md`
 
 The full per-entity field set lives at `references/templates/datadict-template.md` and is the single source of truth. Each entity carries: name, **Source** (which FR/US introduced this entity), **Owner** (which team / role curates it), **Sensitivity** (Public / Internal / Confidential / PII / PCI / PHI), description, attribute table (with logical types, not DBMS-specific), relationships with cascade rules, **state machine** (if applicable), indexes (logical, not physical), retention policy, and notes. The artifact carries an FR → Entity coverage matrix at the bottom.

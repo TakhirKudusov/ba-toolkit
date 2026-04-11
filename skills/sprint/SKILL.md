@@ -92,6 +92,8 @@ For each sprint, derive a one-sentence goal that describes the primary user-faci
 
 ## Generation
 
+**Slug:** read the `**Slug:**` line from the managed block of `AGENTS.md` (project root, or `../AGENTS.md` if cwd is `output/`) and use it verbatim. See [`../references/slug-source.md`](../references/slug-source.md).
+
 Save `00_sprint_{slug}.md` to the output directory. The full layout lives at `references/templates/sprint-template.md` and is the single source of truth — including the per-story Persona column (per v3.5.0+ stories template), the net-velocity header, and the sprint-level Definition of Done.
 
 Sprint IDs are sequential (SP-00, SP-01, SP-02, …). SP-00 is reserved for setup/architecture sprint if requested.
