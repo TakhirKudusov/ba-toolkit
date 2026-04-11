@@ -9,6 +9,10 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+---
+
+## [4.0.2] — 2026-04-12
+
 ### Fixed
 
 - **Skills invented their own project slug instead of reading the one `ba-toolkit init` wrote to `AGENTS.md`.** Reproduction: `ba-toolkit init --name "New Test App"` produced `**Slug:** new-test-app` in `AGENTS.md`, but a follow-up `/brief` saved `01_brief_knitted-socks.md` — slug picked from conversation context, not from the scaffold. Root cause: pipeline skills carried v3.x-era wording (`/brief`: *"slug — kebab-case, fixed here for the entire pipeline"*; `/principles`: *"extract the slug from the brief, otherwise ask the user"*; `/discovery`: *"derive from the project name"*) and never read the canonical slug from the managed block of `AGENTS.md` that v4.0 `init` writes. Downstream skills inherited the wrong slug from the brief filename and the project silently desynchronised. Fixed by adding `skills/references/slug-source.md` (the single rule + fallbacks + rationale) and an explicit "Slug source" directive in every pipeline and utility skill that emits a `{slug}` filename: `/brief`, `/discovery`, `/principles`, `/srs`, `/stories`, `/usecases`, `/ac`, `/nfr`, `/datadict`, `/research`, `/apicontract`, `/wireframes`, `/scenarios`, `/handoff`, `/implement-plan`, `/analyze`, `/trace`, `/risk`, `/sprint`, `/glossary`, `/estimate`, `/export`. Each now reads `**Slug:**` from `AGENTS.md` verbatim and refuses to invent a new one. `/discovery` is the one exception — it may still derive a slug if `AGENTS.md` does not yet exist (the brain-storm-before-init flow), and otherwise honours the scaffold value instead of renaming the project.
@@ -884,7 +888,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.2...HEAD
+[4.0.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.1...v4.0.2
 [4.0.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.13.1...v4.0.0
 [3.13.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.13.0...v3.13.1
