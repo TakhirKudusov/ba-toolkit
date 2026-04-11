@@ -1,12 +1,18 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import rehypeExternalLinks from 'rehype-external-links';
 
 // Site lives at https://takhirkudusov.github.io/ba-toolkit/ on GitHub Pages.
 // `site` is the canonical origin; `base` is the subpath the project is hosted under.
 export default defineConfig({
   site: 'https://takhirkudusov.github.io',
   base: '/ba-toolkit',
+  markdown: {
+    rehypePlugins: [
+      [rehypeExternalLinks, { target: '_blank', rel: ['noopener', 'noreferrer'] }],
+    ],
+  },
   // Google Fonts: JetBrains Mono (headings/code) + IBM Plex Sans (body)
   // per UI/UX Pro Max "Developer Mono" pairing recommendation.
   // <link> in head is faster than @import in CSS (no extra round-trip).
