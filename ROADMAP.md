@@ -39,7 +39,7 @@ Planned for the next handful of releases. Items are ordered by intent to ship, n
 ### Quality and maintenance
 
 - ~~**CHANGELOG hygiene CI check.**~~ Shipped — see v3.11.0.
-- **Skill-template regression tests.** Extend `test/cli.test.js` with three new tests that protect the post-v3.5.0 template discipline from drift: every pipeline-stage template carries a forward traceability matrix; the `/nfr` template aligns with ISO 25010 characteristics; the `/stories` template carries an INVEST self-check line. Auto-fails on any future SKILL.md or template that drifts.
+- ~~**Skill-template regression tests.**~~ Shipped — see v3.13.1.
 - **`ba-toolkit migrate-agents` CLI subcommand.** Detects pre-v3.4 `AGENTS.md` files (no row 12 for `/implement-plan`), pre-v3.2 (no row 0 for `/discovery`, no row 0a for `/principles`), and pre-v3.4.1 (stale domain after `/discovery` ran) and surgically migrates them. Today the toolkit relies on AI-skill instructions to do this case by case in every affected SKILL.md — every migration row is compensation for the absence of this CLI tool. The subcommand turns those instructions into deterministic, testable code.
 
 ### New capabilities

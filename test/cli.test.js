@@ -663,6 +663,44 @@ test('interview-protocol.md: defines rules 10 (Recommended) and 11 (variant lang
   assert.ok(!/3[–-]5 variants per question/.test(content), 'protocol must not carry the legacy "3–5 variants per question" wording');
 });
 
+test('template discipline: pipeline-stage templates carry a forward traceability matrix', () => {
+  const templatesDir = path.join(__dirname, '..', 'skills', 'references', 'templates');
+  const expected = [
+    'srs-template.md', 'stories-template.md', 'usecases-template.md',
+    'ac-template.md', 'nfr-template.md', 'datadict-template.md',
+    'research-template.md', 'apicontract-template.md', 'wireframes-template.md',
+    'discovery-template.md',
+  ];
+  const missing = [];
+  for (const file of expected) {
+    const content = fs.readFileSync(path.join(templatesDir, file), 'utf8');
+    if (!content.includes('Forward traceability')) {
+      missing.push(file);
+    }
+  }
+  assert.deepEqual(missing, [], `templates missing "Forward traceability" section: ${missing.join(', ')}`);
+});
+
+test('template discipline: /nfr template aligns with ISO 25010 characteristics', () => {
+  const content = fs.readFileSync(
+    path.join(__dirname, '..', 'skills', 'references', 'templates', 'nfr-template.md'),
+    'utf8',
+  );
+  assert.ok(content.includes('ISO/IEC 25010'), 'nfr-template must reference ISO/IEC 25010');
+  const sectionCount = (content.match(/\(ISO 25010\)/g) || []).length;
+  assert.ok(sectionCount >= 7, `nfr-template must have at least 7 ISO 25010 section headings, found ${sectionCount}`);
+});
+
+test('template discipline: /stories template carries an INVEST self-check', () => {
+  const content = fs.readFileSync(
+    path.join(__dirname, '..', 'skills', 'references', 'templates', 'stories-template.md'),
+    'utf8',
+  );
+  assert.ok(content.includes('**INVEST self-check:**'), 'stories-template must include INVEST self-check field');
+  assert.ok(content.includes('Independent'), 'INVEST check must include Independent');
+  assert.ok(content.includes('Testable'), 'INVEST check must include Testable');
+});
+
 test('parseSkillFrontmatter: parses every shipped SKILL.md without losing the description', () => {
   // Integration check: every skill in the package's skills/ directory
   // must produce a non-empty name and description through the parser.
