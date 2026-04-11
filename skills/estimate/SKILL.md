@@ -35,7 +35,7 @@ Read `references/environment.md` from the `ba-toolkit` directory to determine th
 
 ## Calibration interview
 
-> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 options plus a free-text "Other" row last (5 rows max), mark exactly one row **Recommended**, render variants in the user's language (rule 11), and wait for an answer.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 options plus a free-text "Other" row last (5 rows max), mark exactly one row (recommended), render variants in the user's language (rule 11), and wait for an answer.
 >
 > **Inline context (protocol rule 9):** if the user wrote text after `/estimate` (e.g., `/estimate t-shirt, post-srs phase, +20% buffer`), parse it and skip the matching questions.
 

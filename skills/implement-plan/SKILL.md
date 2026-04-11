@@ -59,7 +59,7 @@ The plan must record an explicit tech stack so an AI coding agent can pick file 
 
 **Step 2 — calibration interview (fallback).** If `/research` was not run, OR if `/research` left specific decisions as TBD, run a short calibration interview.
 
-> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 domain-appropriate options plus a free-text "Other" row last (5 rows max), mark exactly one row **Recommended** based on the loaded domain reference and prior answers, render variants in the user's language (rule 11), and wait for an answer before asking the next question.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 domain-appropriate options plus a free-text "Other" row last (5 rows max), mark exactly one row (recommended) based on the loaded domain reference and prior answers, render variants in the user's language (rule 11), and wait for an answer before asking the next question.
 >
 > **Inline context (protocol rule 9):** if the user wrote text after `/implement-plan` (e.g., `/implement-plan use Next.js, FastAPI, and Postgres on Fly.io`), parse it as the tech-stack hint and skip whichever interview questions it already answers.
 

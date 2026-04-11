@@ -27,7 +27,7 @@ If `01_brief_*.md` already exists, extract the slug and domain from it. Otherwis
 
 ### 3. Interview
 
-> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 domain-appropriate options plus a free-text "Other" row last (5 rows max), mark exactly one row **Recommended** based on the loaded domain reference and prior answers, render variants in the user's language (rule 11), and wait for an answer before asking the next question.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 domain-appropriate options plus a free-text "Other" row last (5 rows max), mark exactly one row (recommended) based on the loaded domain reference and prior answers, render variants in the user's language (rule 11), and wait for an answer before asking the next question.
 >
 > **Inline context (protocol rule 9):** if the user wrote text after `/principles`, parse it as the lead-in answer and skip directly to the first structured question it doesn't already cover.
 >
@@ -36,15 +36,16 @@ If `01_brief_*.md` already exists, extract the slug and domain from it. Otherwis
 1–2 rounds, 3–5 topics each. Do not ask about topics the user can accept as defaults.
 
 **Required topics:**
-1. Artifact language — which language should all artifacts be generated in? (default: the language of the user's first message)
-2. Traceability strictness — should every Must-priority US require a Use Case, or only US with complex flows? (default: only complex flows)
-3. NFR baseline — which **ISO/IEC 25010** quality characteristics are mandatory beyond the domain defaults? (Performance Efficiency / Reliability / Security / Compatibility / Usability / Maintainability / Portability / Functional Suitability — `/nfr` reads this list verbatim and treats it as a checklist).
-4. Definition of Ready — any project-specific acceptance criteria for finalizing an artifact beyond the `v3.7.0+` baseline DoR per artifact type listed in §4 below? (e.g., stakeholder sign-off, specific review steps).
-5. Quality gate — at what severity level should `/analyze` findings block `/done`? (default: CRITICAL only)
-6. Output folder structure — save all artifacts flat in the output directory (default), or inside a `{slug}/` subfolder? (useful when managing multiple projects side by side)
-7. **Testing strategy** — TDD (tests before implementation), tests-after, integration-only, manual-only, none? Drives whether `/implement-plan` task templates embed "Tests to write first" blocks. **Recommended:** TDD for production-grade systems; tests-after for prototypes; manual-only or none for spike work. *(This is the principles-based approach to the testing-discipline question that batch 6 item 2 surfaced — the right place to declare a testing strategy is here, not as a separate skill.)*
-8. **Stakeholder decision authority** — who has sign-off authority on changes to these principles? Captured by name and role. Without this, principle changes become contentious mid-project.
-9. **Code review and branching policy** — trunk-based / GitFlow / GitHub flow? Required reviewers per PR? `/implement-plan` and downstream skills assume one of these defaults but the principles file is the source of truth.
+1. Traceability strictness — should every Must-priority US require a Use Case, or only US with complex flows? (default: only complex flows)
+2. NFR baseline — which **ISO/IEC 25010** quality characteristics are mandatory beyond the domain defaults? (Performance Efficiency / Reliability / Security / Compatibility / Usability / Maintainability / Portability / Functional Suitability — `/nfr` reads this list verbatim and treats it as a checklist).
+3. Definition of Ready — any project-specific acceptance criteria for finalizing an artifact beyond the `v3.7.0+` baseline DoR per artifact type listed in §4 below? (e.g., stakeholder sign-off, specific review steps).
+4. Quality gate — at what severity level should `/analyze` findings block `/done`? (default: CRITICAL only)
+5. Output folder structure — save all artifacts flat in the output directory (default), or inside a `{slug}/` subfolder? (useful when managing multiple projects side by side)
+6. **Testing strategy** — TDD (tests before implementation), tests-after, integration-only, manual-only, none? Drives whether `/implement-plan` task templates embed "Tests to write first" blocks. **Recommended:** TDD for production-grade systems; tests-after for prototypes; manual-only or none for spike work. *(This is the principles-based approach to the testing-discipline question that batch 6 item 2 surfaced — the right place to declare a testing strategy is here, not as a separate skill.)*
+7. **Stakeholder decision authority** — who has sign-off authority on changes to these principles? Captured by name and role. Without this, principle changes become contentious mid-project.
+8. **Code review and branching policy** — trunk-based / GitFlow / GitHub flow? Required reviewers per PR? `/implement-plan` and downstream skills assume one of these defaults but the principles file is the source of truth.
+
+**Note:** Artifact language is **not** an interview topic — it is detected automatically from the user's first message and recorded in `## 1. Artifact Language` of the generated file. The user can override it later by re-running `/principles`.
 
 ### 4. Generation
 

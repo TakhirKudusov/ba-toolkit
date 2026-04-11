@@ -33,7 +33,7 @@ If none of the 12 fits, record the recommended domain as `custom:{name}` and let
 
 ### 4. Interview
 
-> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 domain-appropriate options plus a free-text "Other" row last (5 rows max), mark exactly one row **Recommended** based on the loaded domain reference and prior answers, render variants in the user's language (rule 11), and wait for an answer before asking the next question.
+> **Follow the [Interview Protocol](../references/interview-protocol.md):** ask one question at a time, present a 2-column `| ID | Variant |` markdown table of up to 4 domain-appropriate options plus a free-text "Other" row last (5 rows max), mark exactly one row (recommended) based on the loaded domain reference and prior answers, render variants in the user's language (rule 11), and wait for an answer before asking the next question.
 >
 > **Inline context (protocol rule 9):** if the user wrote text after `/discovery` (e.g., `/discovery I think there's a need for a tool that helps freelance designers track invoices and chase late payments`), parse it as the lead-in answer, acknowledge it in one line, and skip directly to the first structured question that the inline text doesn't already cover.
 >
@@ -44,7 +44,7 @@ Cover 5–7 topics in 2 rounds. Do not generate the artifact until you can recom
 **Required topics:**
 1. Problem space — what pain point, gap, or opportunity is being explored.
 2. Target audience hypothesis — 1–2 candidate user segments, as concrete as possible.
-3. Domain shortlist — narrow to 1 of the 12 supported domains (or `custom`) with a one-line rationale; mark one row **Recommended** based on the problem/audience answers so far.
+3. Domain shortlist — narrow to 1 of the 12 supported domains (or `custom`) with a one-line rationale; mark one row (recommended) based on the problem/audience answers so far.
 4. Reference products and analogues — what already exists in this space (3–5 examples), and what's missing or done badly.
 5. MVP feature hypotheses — 5–10 candidate features for a first version. Bullet list, not committed scope.
 6. Differentiation angle — why this idea would beat the existing analogues (one or two sentences).

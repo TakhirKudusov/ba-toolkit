@@ -632,10 +632,7 @@ test('interview protocol: every Interview-section SKILL.md enforces the 5-rows-m
   assert.deepEqual(offenders, [], `skills missing "5 rows max" or carrying legacy "3–5 options" wording: ${offenders.join(', ')}`);
 });
 
-test('interview protocol: every Interview-section SKILL.md mentions the Recommended marker', () => {
-  // Regression guard for batch 3 item 1 — exactly one row per question
-  // is marked **Recommended**. Catches a future skill that drops the
-  // marker reminder from its protocol summary.
+test('interview protocol: every Interview-section SKILL.md mentions the (recommended) marker', () => {
   const skillsDir = path.join(__dirname, '..', 'skills');
   const skillFolders = fs.readdirSync(skillsDir, { withFileTypes: true })
     .filter((e) => e.isDirectory() && e.name !== 'references')
@@ -647,11 +644,11 @@ test('interview protocol: every Interview-section SKILL.md mentions the Recommen
     if (!fs.existsSync(skillPath)) continue;
     const content = fs.readFileSync(skillPath, 'utf8');
     if (!interviewHeadingRe.test(content)) continue;
-    if (!content.includes('**Recommended**')) {
+    if (!content.includes('(recommended)')) {
       offenders.push(folder);
     }
   }
-  assert.deepEqual(offenders, [], `skills missing the **Recommended** marker reminder: ${offenders.join(', ')}`);
+  assert.deepEqual(offenders, [], `skills missing the (recommended) marker reminder: ${offenders.join(', ')}`);
 });
 
 test('interview-protocol.md: defines rules 10 (Recommended) and 11 (variant language) plus the 5-rows cap', () => {
@@ -661,7 +658,7 @@ test('interview-protocol.md: defines rules 10 (Recommended) and 11 (variant lang
   const protocolPath = path.join(__dirname, '..', 'skills', 'references', 'interview-protocol.md');
   const content = fs.readFileSync(protocolPath, 'utf8');
   assert.ok(content.includes('5 rows total'), 'protocol must state the "5 rows total" cap');
-  assert.ok(/^10\. \*\*Mark exactly one row as Recommended/m.test(content), 'protocol must define rule 10 (Recommended marker)');
+  assert.ok(/^10\. \*\*Mark exactly one row as recommended/m.test(content), 'protocol must define rule 10 (recommended marker)');
   assert.ok(/^11\. \*\*Variant text in the user's language/m.test(content), 'protocol must define rule 11 (variant language)');
   assert.ok(!/3[–-]5 variants per question/.test(content), 'protocol must not carry the legacy "3–5 variants per question" wording');
 });
