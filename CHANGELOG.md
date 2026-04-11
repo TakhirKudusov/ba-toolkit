@@ -11,6 +11,25 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.10.3] — 2026-04-11
+
+### Added
+
+- **`docs/GLOSSARY.md`** — plain-English glossary covering core concepts (artifact, slug, pipeline, skill, domain, traceability, subcommands), requirement types (FR, US, UC, AC, NFR, SRS, ADR, DAG), and standards (IEEE 830, MoSCoW, BABOK, INVEST, Cockburn, ISO 25010, ISO 31000, PMBOK 7, Michael Nygard ADR format). Synced to the documentation website.
+- **Prerequisites section in getting-started.md** — explains what Node.js is, how to check/install it, what npm/npx is, and what AI agents are with links to Claude Code, Cursor, Codex, Gemini, and Windsurf.
+- **Pipeline diagram in README** — ASCII visual showing the full pipeline flow, optional steps, utility skills sidebar, and lean vs full path distinction.
+- **8 new troubleshooting entries** for first-time users — `/brief` not responding, skill not found, `npx` not found, init fails on Windows, agent timeout, AGENTS.md not found, empty artifacts.
+- **Example project page on the website** — Lumen Goods artifact inventory with GitHub links and "What to look for" callouts (cross-references, traceability, domain-specific content, terminology consistency).
+- **"How to choose your domain" section in DOMAINS.md** — decision table mapping project types to the 13 available domains.
+- **4 beginner FAQ entries** — "Can I use BA Toolkit without technical skills?", "What happens if I skip a pipeline step?", "What if the AI generates something wrong?", "How long does the full pipeline take?"
+
+### Changed
+
+- **README opening rewritten.** Tagline and "What is this" section now lead with a value proposition accessible to both technical and non-technical users. Pointers to getting started guide, example project, and glossary added.
+- **Website landing page simplified.** New tagline, "Industry-standard rigour" card no longer lists raw standard names, "How it works" uses plain English instead of abbreviation chains, new "What does the output look like?" link card added.
+
+---
+
 ## [3.10.2] — 2026-04-11
 
 ### Changed
@@ -757,6 +776,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.10.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.2...v3.10.3
 [3.10.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...v3.10.2
 [3.10.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.0...v3.10.1
 [3.10.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.9.0...v3.10.0
