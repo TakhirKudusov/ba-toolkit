@@ -43,6 +43,54 @@ Each project lives in its own `output/<slug>/` folder with its own `AGENTS.md`. 
 
 ## 3. Run the pipeline
 
+Here is the full pipeline at a glance. Steps marked "(optional)" can be skipped — the lean path takes ~3–4 hours, the full path ~5–8 hours.
+
+```
+  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+  │ /discovery  │────▶│   /brief    │────▶│    /srs     │────▶│  /stories   │
+  │  (optional) │     │  Goals &    │     │ Requirements│     │ User Stories│
+  └─────────────┘     │ Stakeholders│     │  (IEEE 830) │     │  by Epic    │
+                      └─────────────┘     └─────────────┘     └──────┬──────┘
+                                                                     │
+                 ┌───────────────────────────────────────────────────┘
+                 │
+                 ▼
+  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+  │  /usecases  │────▶│    /ac      │────▶│    /nfr     │────▶│  /datadict  │
+  │  (optional) │     │ Acceptance  │     │ Performance,│     │  Entities & │
+  │             │     │  Criteria   │     │  Security…  │     │   Fields    │
+  └─────────────┘     └─────────────┘     └─────────────┘     └──────┬──────┘
+                                                                     │
+                 ┌───────────────────────────────────────────────────┘
+                 │
+                 ▼
+  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+  │  /research  │────▶│/apicontract │────▶│ /wireframes │────▶│ /scenarios  │
+  │  (optional) │     │  Endpoints  │     │   Screens   │     │  (optional) │
+  │  Tech ADRs  │     │ & Schemas   │     │ & Navigation│     │  E2E Flows  │
+  └─────────────┘     └─────────────┘     └─────────────┘     └──────┬──────┘
+                                                                     │
+                 ┌───────────────────────────────────────────────────┘
+                 │
+                 ▼
+  ┌─────────────┐     ┌─────────────┐
+  │  /handoff   │────▶│/implement-  │     ╔═══════════════════════════════╗
+  │  Dev-ready  │     │   plan      │     ║  UTILITY SKILLS (any stage)  ║
+  │  Package    │     │ Task DAG    │     ║                               ║
+  └─────────────┘     │ for AI Agent│     ║  /trace    — coverage matrix  ║
+                      └─────────────┘     ║  /clarify  — fix ambiguities  ║
+                                          ║  /analyze  — quality report   ║
+                                          ║  /estimate — story points     ║
+                                          ║  /glossary — term consistency ║
+                                          ║  /risk     — risk register    ║
+                                          ║  /sprint   — sprint plan      ║
+                                          ║  /export   — Jira/GitHub/CSV  ║
+                                          ║  /publish  — Notion/Confluence║
+                                          ╚═══════════════════════════════╝
+```
+
+Want to see what the output looks like? Browse the [complete example project](/ba-toolkit/example/).
+
 Type `/discovery` in the agent if you have only a vague idea of what to build, or jump straight to `/brief` if the project is clear:
 
 ```text

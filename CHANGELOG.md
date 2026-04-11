@@ -11,6 +11,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.10.6] — 2026-04-11
+
+### Added
+
+- **Pipeline diagram and example link in the website getting-started page.** ASCII pipeline diagram (same as README) now visible on the documentation website before step 3 "Run the pipeline", with a link to the example project page.
+
+---
+
 ## [3.10.5] — 2026-04-11
 
 ### Added
@@ -797,6 +805,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.10.6]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.4...v3.10.5
 [3.10.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.3...v3.10.4
 [3.10.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.2...v3.10.3
