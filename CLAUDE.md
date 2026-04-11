@@ -30,23 +30,28 @@ There is **no build step** — the CLI runs directly with `node`. There are **no
 ## 4. Repository layout
 
 ```
-bin/ba-toolkit.js         # CLI entry point (~550 lines, single file, zero deps)
+bin/ba-toolkit.js         # CLI entry point (~2060 lines, single file, zero deps)
 skills/                   # 24 SKILL.md files + references/ (entry: /discovery → /brief; finish: /handoff → /implement-plan; utility: /trace, /clarify, /analyze, /estimate, /glossary, /export, /publish, /risk, /sprint)
   {skill}/SKILL.md        # Each skill has YAML frontmatter (name, description)
   references/
     domains/              # 12 domain files + placeholder entries for custom
     templates/            # Reference artifact templates (loaded by skills)
+    interview-protocol.md # Rules for interview-phase skills (one question at a time, table format, recommended option)
     environment.md        # Output directory detection logic
     closing-message.md    # Shared closing message for all skills
     prerequisites.md      # Per-step prerequisite checklists
 example/lumen-goods/      # Real end-to-end example project (e-commerce D2C) — do NOT edit
 docs/                     # Extracted from README in v1.2.5
   USAGE.md · TROUBLESHOOTING.md · FAQ.md · DOMAINS.md
+COMMANDS.md               # Quick reference for all 24 skills, subcommands, export formats
+ROADMAP.md                # Mission, now/next, recently shipped, known limitations, removed ideas
 CONTRIBUTING.md           # Extracted from README in v1.2.5
 init.sh · init.ps1        # Zero-dependency shell/PowerShell fallbacks for the CLI
 .github/workflows/
   release.yml             # Tag push → GitHub Release + npm publish via OIDC
   validate.yml            # PR validation (skill frontmatter, artifact structure)
+  website.yml             # Astro Starlight website build + deploy to GitHub Pages
+website/                  # Documentation website (Astro Starlight), auto-deployed on push
 CHANGELOG.md              # Keep a Changelog format, SemVer
 todo.md                   # Planning backlog — keep in sync after task completion
 ```
@@ -148,7 +153,7 @@ If CI fails with `ENEEDAUTH` on a new package, check this first.
 - **Windows Unix-ish shell:** commands run via bash, use `/dev/null` not `NUL`, forward slashes in paths, `/tmp/` for throwaway dirs works.
 - **No `gh` CLI** available on this machine — can't use `gh` for GitHub interactions. Use web links or `git` commands directly.
 - **`init.sh` and `init.ps1`** are zero-dep fallbacks that only create the project structure — they do **not** install skills. They direct users at `npx @kudusov.takhir/ba-toolkit install --for <agent>`. The npm CLI is the single-command path; the shell scripts exist for users who can't run Node.
-- **All five agents use native Agent Skills format.** Every supported agent (Claude Code, Codex, Gemini, Cursor, Windsurf) loads `<skills-root>/<skill-name>/SKILL.md` as folder-per-skill. There is no `.mdc` conversion path anymore — `skillToMdcContent` and the `mdc` branch of `copySkills()` were removed in Unreleased. Cursor's Rules feature (`.cursor/rules/*.mdc`) is a different feature; we do NOT install there. Same for Windsurf rules.
+- **All five agents use native Agent Skills format.** Every supported agent (Claude Code, Codex, Gemini, Cursor, Windsurf) loads `<skills-root>/<skill-name>/SKILL.md` as folder-per-skill. There is no `.mdc` conversion path — all `.mdc`-related code (`skillToMdcContent`, the `mdc` branch of `copySkills()`) was removed in v3.8.0. Cursor's Rules feature (`.cursor/rules/*.mdc`) is a different feature; we do NOT install there. Same for Windsurf rules.
 - **v2.0 install layout:** every install path drops directly into the agent's skills root, NOT under a `ba-toolkit/` wrapper. Versions before v2.0 used a wrapper which made every shipped skill invisible to Claude Code (which scans only one level under `.claude/skills/`). The destination is shared with the user's other skills, so install/uninstall/upgrade are all manifest-driven: `runInstall` writes `.ba-toolkit-manifest.json` listing the items it owns; `removeManifestItems` deletes only those items. Never `rm -rf` the destination root — that would nuke user data.
 - **Manifest format:** `{ version, installedAt, items }` where `items` is an array of folder names relative to the destination root (e.g., `["brief", "srs", ..., "references"]`). Read with `readManifest(destDir)`, write with `writeManifest(destDir, items)`. Older manifests with a `format` field still parse — `readManifest` does plain `JSON.parse` and the field is ignored.
 - **Legacy v1.x detection:** `detectLegacyInstall(agent)` returns paths to any leftover `ba-toolkit/` wrapper folders. Called by `runInstall`, `cmdUpgrade`, `cmdUninstall`, `cmdStatus` to warn the user. We never auto-delete legacy folders — they might contain user state.
