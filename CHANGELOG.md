@@ -11,6 +11,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.13.1] — 2026-04-11
+
+### Added
+
+- **3 skill-template regression tests.** Protect the post-v3.5.0 template discipline from drift: (1) 10 pipeline-stage templates must carry a "Forward traceability" section, (2) the `/nfr` template must have at least 7 ISO 25010 characteristic section headings, (3) the `/stories` template must carry an `**INVEST self-check:**` field. Test count: 188 → 191.
+
+---
+
 ## [3.13.0] — 2026-04-11
 
 ### Added
@@ -839,6 +847,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.13.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.13.0...v3.13.1
 [3.13.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.12.0...v3.13.0
 [3.12.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.11.0...v3.12.0
 [3.11.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.6...v3.11.0
