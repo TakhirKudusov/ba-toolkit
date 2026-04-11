@@ -11,6 +11,18 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.10.5] — 2026-04-11
+
+### Added
+
+- **Domain-reference contribution guide in DOMAINS.md.** Replaced the sparse "Adding a new domain" section with a 5-step checklist: pick a slug, create the reference file (structure template with quality bar), register in the CLI `DOMAINS` array, test locally, open a PR. CONTRIBUTING.md updated with a cross-reference.
+
+### Changed
+
+- **External links on the website now open in a new tab.** Added `rehype-external-links` plugin to the Astro config — all external links in markdown content get `target="_blank" rel="noopener noreferrer"`. Internal navigation stays in the same tab.
+
+---
+
 ## [3.10.4] — 2026-04-11
 
 ### Changed
@@ -785,6 +797,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.10.5]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.4...v3.10.5
 [3.10.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.3...v3.10.4
 [3.10.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.2...v3.10.3
 [3.10.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...v3.10.2
