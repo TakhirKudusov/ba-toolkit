@@ -11,6 +11,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [4.0.1] — 2026-04-12
+
+### Fixed
+
+- **Removed stale v3.x references from skill files.** `/principles` still offered an "Output folder structure" interview topic with a `{slug}/` subfolder option that no longer exists in v4.0 — removed, topics renumbered (8 → 7). `principles-template.md` subfolder section and Decision Authority rows renumbered to match. `/brief`, `/discovery`, `/srs` SKILL.md files still referenced "per-project AGENTS.md" and "legacy v3.0 single-project layouts" — updated to v4.0 wording (project root, flat output).
+
+---
+
 ## [4.0.0] — 2026-04-11
 
 ### Changed
@@ -872,6 +880,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[4.0.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.13.1...v4.0.0
 [3.13.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.13.0...v3.13.1
 [3.13.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.12.0...v3.13.0
