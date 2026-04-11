@@ -4,7 +4,7 @@ description: "AI-powered Business Analyst pipeline — from concept to implement
 template: splash
 hero:
   title: BA Toolkit
-  tagline: "Structured BA pipeline for AI coding agents — concept to a phase-and-DAG implementation plan, 24 skills, 12 domains, one-command Notion + Confluence publish."
+  tagline: "Turn a rough project idea into a complete, structured specification — requirements, user stories, acceptance criteria, API contracts, wireframes, and a step-by-step implementation plan."
   actions:
     - text: Get started
       link: /ba-toolkit/getting-started/
@@ -36,8 +36,8 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
     Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf. All five use native Agent Skills (`SKILL.md`) — no conversion, no `.mdc`, no plugins. Install once, use everywhere.
   </Card>
 
-  <Card title="Senior-BA rigour" icon="approve-check">
-    Standards conformance: BABOK v3, IEEE 830, ISO 25010, ISO 31000, Cockburn use cases, INVEST, MoSCoW, PMBOK 7, Michael Nygard ADRs. Every artifact carries provenance fields, cross-artifact traceability, and document control.
+  <Card title="Industry-standard rigour" icon="approve-check">
+    Every artifact follows established standards used by senior business analysts at top consultancies (BABOK, IEEE 830, ISO 25010, and others — see the [glossary](/ba-toolkit/glossary/) for details). Built-in traceability, provenance fields, and quality checks.
   </Card>
 
   <Card title="Notion + Confluence publish" icon="document">
@@ -49,9 +49,9 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 Most skills follow the same cycle: **Command → Context → Interview → Generate → Refine**. Each skill loads all previous artifacts plus the domain reference, asks targeted questions (one at a time, table of options, one marked **Recommended**), writes a Markdown artifact, and offers refinement subcommands before moving on.
 
-Every artifact links back to its predecessors, forming the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario → Task`. Run `/trace` to verify coverage and `/analyze` for severity-rated findings.
+Every artifact links back to its predecessors — requirements trace to user stories, stories trace to acceptance criteria, and so on through the entire specification. Run `/trace` to verify nothing was lost and `/analyze` to catch quality issues before they become expensive rework.
 
-After `/handoff`, run `/implement-plan` to produce a **phase-and-DAG implementation plan** an AI coding agent can execute step by step — every task references the FR / US / AC it implements and carries its own Definition of Done.
+After `/handoff`, run `/implement-plan` to produce a **dependency-ordered implementation plan** an AI coding agent can execute step by step — every task references the requirements and acceptance criteria it implements.
 
 ## Quick install
 
@@ -70,6 +70,7 @@ Prompts for project name, domain, and AI agent, then creates `output/{slug}/`, `
   <LinkCard title="What if I don't know what to build?" href="/ba-toolkit/faq/" description="Start with /discovery — it runs a structured brainstorm and recommends a domain, name, and MVP scope." />
   <LinkCard title="Can I use it in any language?" href="/ba-toolkit/faq/" description="Yes. The agent detects your language and generates all artifacts accordingly." />
   <LinkCard title="How do I share with stakeholders?" href="/ba-toolkit/faq/" description="Run ba-toolkit publish to bundle artifacts for Notion or Confluence import." />
+  <LinkCard title="What does the output look like?" href="/ba-toolkit/example/" description="Browse a complete example project (Lumen Goods) with all 16 artifacts." />
 </CardGrid>
 
 ## Have a question or found a bug?

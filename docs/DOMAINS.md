@@ -1,4 +1,32 @@
-# Adding a new domain
+# Domains
+
+## How to choose your domain
+
+When you run `ba-toolkit init`, you pick a domain — the industry your project belongs to. The domain affects which questions the agent asks, which entities and glossary terms it suggests, and which compliance or regulatory concerns it flags. Pick the closest match; if none fits, choose **Custom** (the pipeline still works, just with general-purpose questions).
+
+| Domain | Pick this if your project is about... |
+|--------|---------------------------------------|
+| **SaaS** | B2B platforms, CRM, analytics dashboards, internal tools, HRTech |
+| **Fintech** | Banking, payments, crypto, investment, P2P lending, insurance |
+| **E-commerce** | Online stores, marketplaces, D2C brands, digital goods, subscriptions |
+| **Healthcare** | Telemedicine, patient portals, EHR/EMR, clinic management, mental health |
+| **Logistics** | Delivery, courier management, freight tracking, warehousing, fleet management |
+| **On-demand** | Ride-hailing, home services, task marketplaces, beauty, tutoring, pet care |
+| **Social / Media** | Social networks, creator platforms, community forums, newsletters |
+| **Real Estate** | Property portals, rental management, agency CRM, mortgage tools |
+| **iGaming** | Online slots, sports betting, casino lobbies, promo mechanics |
+| **EdTech** | LMS, K-12, MOOC, corporate training, language learning, exam prep |
+| **GovTech** | Citizen e-services, permits, tax filing, benefits, public records |
+| **AI / ML** | LLM apps, RAG pipelines, agents, model serving, fine-tuning, MLOps |
+| **Custom** | Anything else — general interview questions, no industry-specific prompts |
+
+You can always change your domain later by re-running `ba-toolkit init` with a different `--domain` flag.
+
+---
+
+## Adding a new domain
+
+This section is for contributors who want to add a new industry reference to BA Toolkit.
 
 Domain references live in `skills/references/domains/` — one Markdown file per domain, loaded automatically by interview-phase skills based on the domain you picked at `ba-toolkit init` (which writes it into `AGENTS.md`). Each skill reads **only its own section** from the reference file, keeping context usage efficient.
 

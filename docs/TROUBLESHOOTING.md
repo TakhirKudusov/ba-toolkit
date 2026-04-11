@@ -16,3 +16,44 @@ Check that `skills/references/domains/{domain}.md` exists and that the domain na
 
 **`/analyze` reports findings after you already fixed them:**
 Run `/analyze` again — it always re-reads all artifacts fresh. Cached results are never used.
+
+---
+
+## First-time setup issues
+
+**I typed `/brief` but nothing happened:**
+1. Make sure you are typing in the AI agent's chat window (Claude Code, Cursor, etc.), not in a regular terminal.
+2. Wait 10–15 seconds — the first response can take longer while the agent loads the skill files.
+3. If nothing appears after 30 seconds, check that BA Toolkit skills are installed. Run `ba-toolkit status` in your terminal to verify.
+4. Try reloading the agent window (Cmd+Shift+P → "Reload" in Cursor, or restart `claude` in terminal).
+
+**Agent says "skill not found" or "command not recognized":**
+The skills may not be installed in the agent's skills directory. Run:
+```bash
+ba-toolkit install --for claude-code   # or: cursor, codex, gemini, windsurf
+```
+Then reload the agent window. If the problem persists, run `ba-toolkit status` to check whether the skills directory is correct.
+
+**`npx` or `ba-toolkit` command not found:**
+You need Node.js 18 or later installed. Open a terminal and type `node --version`. If you get an error, download Node.js from [nodejs.org](https://nodejs.org/) (LTS version, accept all defaults). After installing, close and reopen your terminal, then try again.
+
+**Init command fails on Windows:**
+If `npx @kudusov.takhir/ba-toolkit init` fails with a permission or path error, try running the terminal as Administrator, or use the PowerShell fallback script:
+```powershell
+irm https://raw.githubusercontent.com/TakhirKudusov/ba-toolkit/main/init.ps1 | iex
+```
+
+**Agent takes too long to respond (over 60 seconds):**
+Large artifacts (especially after `/apicontract` or `/wireframes`) require significant context. Make sure your AI agent has at least 32k tokens of context window available. If the agent times out, try running the skill again — it will pick up where it left off by reading existing artifacts.
+
+**AGENTS.md not found error:**
+The agent expects to find `AGENTS.md` in the current working directory. Make sure you opened the agent inside `output/<slug>/` (not the repo root). Run:
+```bash
+cd output/<your-project-slug>
+claude   # or your agent command
+```
+
+**Artifacts are empty or contain only headers:**
+This usually means the agent's context window was exhausted mid-generation. Try:
+1. Run the skill again — it will detect the incomplete file and offer to regenerate.
+2. If the problem recurs, use `/split` to break large sections into smaller parts, or skip optional pipeline steps to reduce context usage.

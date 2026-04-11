@@ -73,12 +73,18 @@ const SOURCES = [
     title: 'Changelog',
     description: 'Release history for the npm package.',
   },
+  {
+    from: 'docs/GLOSSARY.md',
+    to: 'glossary.md',
+    title: 'Glossary',
+    description: 'Definitions of terms, acronyms, and standards used in BA Toolkit artifacts.',
+  },
 ];
 
 // Hand-written pages that live in the website but are not synced from the
 // repo root. These are not touched by this script — they are committed
 // directly under website/src/content/docs/ and survive the wipe.
-const HAND_WRITTEN = new Set(['getting-started.md', 'index.mdx']);
+const HAND_WRITTEN = new Set(['getting-started.md', 'index.mdx', 'example.md']);
 
 function escapeYaml(value) {
   // Single-line YAML scalar with double quotes. Escape backslashes and
@@ -143,6 +149,8 @@ const LINK_REWRITES = new Map([
   ['./ROADMAP.md', '/roadmap/'],
   ['CHANGELOG.md', '/changelog/'],
   ['./CHANGELOG.md', '/changelog/'],
+  ['docs/GLOSSARY.md', '/glossary/'],
+  ['./docs/GLOSSARY.md', '/glossary/'],
 ]);
 
 function rewriteLinks(body) {

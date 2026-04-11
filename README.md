@@ -2,7 +2,7 @@
 
 # 📋 BA Toolkit
 
-Structured BA pipeline for AI coding agents — concept to a phase-and-DAG implementation plan, 24 skills, 12 domains, one-command Notion + Confluence publish.
+Turn a rough project idea into a complete, structured specification — then hand it to a developer or AI coding agent to build.
 
 <img src="https://img.shields.io/badge/skills-24-blue" alt="Skills">
 <img src="https://img.shields.io/badge/domains-12-green" alt="Domains">
@@ -22,11 +22,17 @@ Structured BA pipeline for AI coding agents — concept to a phase-and-DAG imple
 
 ## What is this
 
-BA Toolkit is a set of 24 interconnected skills that run a full business-analysis pipeline inside your AI coding agent. You can start as early as `/discovery` (a brain-storm step for users who don't yet know what to build) or jump straight to `/brief` if you already have a project in mind, then work all the way through to a development handoff package. Each skill reads the output of the previous ones — maintaining cross-references between artifacts along the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario`. After `/handoff`, run `/implement-plan` to produce a phase-and-DAG implementation plan an AI coding agent (Claude Code, Cursor, Codex) can execute step by step — every task references the FR / US / AC it implements and carries its own Definition of Done. When you're ready to share with non-developer stakeholders, `/publish` (or `ba-toolkit publish`) bundles every artifact into import-ready folders for Notion and Confluence — drag-and-drop, no API tokens.
+BA Toolkit turns a rough project idea into a complete, structured specification — requirements, user stories, acceptance criteria, API contracts, wireframes, and a step-by-step implementation plan. It runs as **24 AI-powered skills** inside your coding agent (Claude Code, Cursor, Codex CLI, Gemini CLI, or Windsurf) and produces Markdown documents that are cross-referenced, traceable, and ready for development or stakeholder review.
 
-Unlike one-shot prompting, every artifact is written to disk as Markdown, every ID links back to its source, and `/trace` verifies coverage across the whole pipeline. `/clarify` and `/analyze` catch ambiguities and quality gaps with CRITICAL/HIGH severity ratings. Domain references for 12 industries (SaaS, Fintech, E-commerce, Healthcare, Logistics, On-demand, Social/Media, Real Estate, iGaming, EdTech, GovTech, AI/ML) plug in automatically at `/brief`.
+**How it works:** you type a slash command (e.g., `/brief`), the agent asks you a series of focused questions about your project, and generates a structured document. Each step builds on the previous ones — requirements link to user stories, stories link to acceptance criteria, and so on through the entire chain. After the last step, you have a complete specification package that a developer or AI coding agent can execute.
+
+**For non-developer stakeholders:** `/publish` bundles every document into import-ready folders for Notion and Confluence — drag-and-drop, no API tokens, no network calls.
+
+**Quality built in:** `/trace` verifies that every requirement is covered end-to-end. `/clarify` and `/analyze` catch ambiguities and quality gaps before they become expensive rework. Domain references for 12 industries (SaaS, Fintech, E-commerce, Healthcare, Logistics, On-demand, Social/Media, Real Estate, iGaming, EdTech, GovTech, AI/ML) add industry-specific questions and terminology automatically.
 
 Artifacts are generated in whatever language you write in — ask in English, get English docs; ask in any other language, the output follows.
+
+> **New to BA Toolkit?** Start with the [getting started guide](https://takhirkudusov.github.io/ba-toolkit/getting-started/) or browse a [complete example project](https://takhirkudusov.github.io/ba-toolkit/example/). For acronyms and standards referenced in the artifacts, see the [glossary](docs/GLOSSARY.md).
 
 ---
 
@@ -257,6 +263,57 @@ The pipeline is domain-agnostic by default. At `ba-toolkit init` you pick a doma
 | **Custom** | Any other domain — works with general interview questions |
 
 Adding a new domain = creating one Markdown file in `skills/references/domains/`. See [docs/DOMAINS.md](docs/DOMAINS.md).
+
+---
+
+## Pipeline at a glance
+
+```
+  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+  │ /discovery  │────▶│   /brief    │────▶│    /srs     │────▶│  /stories   │
+  │  (optional) │     │  Goals &    │     │ Requirements│     │ User Stories│
+  └─────────────┘     │ Stakeholders│     │  (IEEE 830) │     │  by Epic    │
+                      └─────────────┘     └─────────────┘     └──────┬──────┘
+                                                                     │
+                 ┌───────────────────────────────────────────────────┘
+                 │
+                 ▼
+  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+  │  /usecases  │────▶│    /ac      │────▶│    /nfr     │────▶│  /datadict  │
+  │  (optional) │     │ Acceptance  │     │ Performance,│     │  Entities & │
+  │             │     │  Criteria   │     │  Security…  │     │   Fields    │
+  └─────────────┘     └─────────────┘     └─────────────┘     └──────┬──────┘
+                                                                     │
+                 ┌───────────────────────────────────────────────────┘
+                 │
+                 ▼
+  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+  │  /research  │────▶│/apicontract │────▶│ /wireframes │────▶│ /scenarios  │
+  │  (optional) │     │  Endpoints  │     │   Screens   │     │  (optional) │
+  │  Tech ADRs  │     │ & Schemas   │     │ & Navigation│     │  E2E Flows  │
+  └─────────────┘     └─────────────┘     └─────────────┘     └──────┬──────┘
+                                                                     │
+                 ┌───────────────────────────────────────────────────┘
+                 │
+                 ▼
+  ┌─────────────┐     ┌─────────────┐
+  │  /handoff   │────▶│/implement-  │     ╔═══════════════════════════════╗
+  │  Dev-ready  │     │   plan      │     ║  UTILITY SKILLS (any stage)  ║
+  │  Package    │     │ Task DAG    │     ║                               ║
+  └─────────────┘     │ for AI Agent│     ║  /trace    — coverage matrix  ║
+                      └─────────────┘     ║  /clarify  — fix ambiguities  ║
+                                          ║  /analyze  — quality report   ║
+                                          ║  /estimate — story points     ║
+                                          ║  /glossary — term consistency ║
+                                          ║  /risk     — risk register    ║
+                                          ║  /sprint   — sprint plan      ║
+                                          ║  /export   — Jira/GitHub/CSV  ║
+                                          ║  /publish  — Notion/Confluence║
+                                          ╚═══════════════════════════════╝
+```
+
+**Lean path** (~3–4 hours): skip the steps marked "(optional)" and go straight from `/brief` to `/implement-plan`.
+**Full path** (~5–8 hours): run every step for maximum coverage and traceability.
 
 ---
 

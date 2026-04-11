@@ -30,6 +30,18 @@ Pipeline skills (15) advance your project sequentially — each one reads the ou
 **When should I use /analyze vs /clarify vs /trace vs /glossary?**
 `/analyze` is the broadest diagnostic — it checks 8 quality categories across all artifacts (duplicates, ambiguity, coverage gaps, terminology drift, invalid references, inconsistencies, underspecified sources, validation gaps). If `/analyze` flags ambiguity issues, use `/clarify` on the specific artifact for a deep-dive with interactive resolution. If it flags coverage gaps, use `/trace` to see the full traceability matrix. If it flags terminology drift, use `/glossary` to build or refresh the project glossary. Start with `/analyze` for the big picture, then use the specialized tool to fix what it found.
 
+**Can I use BA Toolkit without technical skills?**
+Yes. You do not need to know how to code. The agent asks you questions about your project in plain language, and you answer them — the structured documents are generated automatically. The only technical step is the initial setup: installing Node.js and running `ba-toolkit init` in a terminal. After that, everything happens inside the AI agent's chat window. See the [getting started guide](https://takhirkudusov.github.io/ba-toolkit/getting-started/) for step-by-step instructions.
+
+**What happens if I skip a pipeline step?**
+Most steps are optional. The lean path (`/brief → /srs → /stories → /ac → /handoff → /implement-plan`) skips use cases, research, wireframes, and scenarios. If a later step needs information from a skipped step, the agent will either ask you the relevant questions directly or note that the information is unavailable. You can always go back and run a skipped step later — subsequent skills will pick up the new artifact automatically.
+
+**What if the AI generates something wrong or inaccurate?**
+Use `/revise [section]` to correct a specific section, or `/clarify` to surface and resolve ambiguities. The agent does not guess silently — it asks questions first and generates based on your answers. If you spot an error, tell the agent what is wrong and it will update the artifact. You can also re-run any skill from scratch to regenerate completely.
+
+**How long does the full pipeline take?**
+The lean path takes approximately 3–4 hours. The full path (all 15 pipeline steps plus utility skills) takes 5–8 hours. Most of the time is spent answering the agent's interview questions — generation itself is fast. You do not have to finish in one sitting; the agent reads existing artifacts when you resume.
+
 **Does it work with smaller / faster models?**
 The structured Markdown format and explicit cross-references help smaller models stay on track. For best results, use a model with a context window of at least 32k tokens — the later pipeline steps load multiple large artifacts simultaneously.
 

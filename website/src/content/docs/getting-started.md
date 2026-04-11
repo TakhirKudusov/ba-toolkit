@@ -3,7 +3,21 @@ title: "Getting started"
 description: "Install BA Toolkit, scaffold your first project, and run the BA pipeline end to end."
 ---
 
-BA Toolkit ships as a single npm package with **zero runtime dependencies**. The CLI is one Node.js file; the skills are 24 folder-per-skill `SKILL.md` files. Install once, scaffold a project, then run the pipeline inside any supported AI agent (Claude Code, Codex CLI, Gemini CLI, Cursor, or Windsurf).
+BA Toolkit ships as a single npm package with **zero runtime dependencies**. Install once, scaffold a project, then run the pipeline inside any supported AI agent.
+
+## Prerequisites
+
+Before you start, make sure you have the following:
+
+- **Node.js 18 or later.** Node.js is a free runtime that lets you run JavaScript outside a browser. To check if you have it, open a terminal (Terminal on Mac, Command Prompt or PowerShell on Windows) and type `node --version`. If you see `v18.x.x` or higher, you are ready. If not, download the LTS version from [nodejs.org](https://nodejs.org/) and install it — the defaults are fine.
+- **An AI coding agent.** BA Toolkit skills run inside an AI agent, not in the terminal. You need one of these installed:
+  - [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) — Anthropic's CLI agent (free tier available)
+  - [Cursor](https://www.cursor.com/) — AI-powered code editor (free tier available)
+  - [Codex CLI](https://github.com/openai/codex) — OpenAI's terminal agent
+  - [Gemini CLI](https://github.com/google-gemini/gemini-cli) — Google's terminal agent
+  - [Windsurf](https://windsurf.com/) — AI-powered code editor
+
+You do **not** need to know how to code. The agent asks you questions and generates all the documents for you.
 
 ## 1. Install
 
@@ -58,7 +72,7 @@ You don't have to run every step. The lean path (`/brief → /srs → /stories �
 
 ## 4. Hand off to a coding agent
 
-After `/handoff` and `/implement-plan`, point your AI coding agent at `12_implplan_<slug>.md`. The plan is structured as 9 phases (Foundation → Data → Auth → Core → API → UI → Integrations → Quality → Validation) with atomic tasks that reference the FRs / US / AC they implement and carry their own Definition of Done. The agent can step through it without re-reading the whole pipeline every time.
+After `/handoff` and `/implement-plan`, point your AI coding agent at `12_implplan_<slug>.md`. The plan is structured as 9 phases (Foundation → Data → Auth → Core → API → UI → Integrations → Quality → Validation) with atomic tasks. Each task references the requirements and acceptance criteria it implements, and carries its own checklist for completion. The agent can step through it without re-reading the whole pipeline every time.
 
 ## 5. Optional — share with stakeholders
 
@@ -73,4 +87,5 @@ Drag-and-drop the generated folders into Notion's **Import → Markdown & CSV** 
 - The full [usage guide](/usage/) walks through every skill in detail.
 - The [command reference](/commands/) lists every shipped skill and subcommand.
 - The [FAQ](/faq/) answers common questions about language support, offline use, and editing past artifacts.
+- The [glossary](/glossary/) explains all the acronyms and standards referenced in the artifacts.
 - The [roadmap](/roadmap/) covers what is planned next and what is explicitly out of scope.
