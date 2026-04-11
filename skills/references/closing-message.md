@@ -31,8 +31,9 @@ Next step: /{next_command}
   → Time estimate:    {min}–{max} minutes
   → After that:       /{step_after_next} ({one-line of what it does})
 
-If you're stuck on the next step:
-  - Run `/clarify` here first to surface ambiguities while context is fresh.
+Quality check before moving on:
+  - Run `/analyze` for a cross-artifact quality sweep — catches duplicates, coverage gaps, and terminology drift across all existing artifacts. Especially recommended after `/srs`, `/stories`, and before `/handoff`.
+  - Run `/clarify` to surface ambiguities while context is fresh.
   - Run `/validate` to confirm this artifact is internally consistent.
   - The next skill reads this artifact automatically, so you don't need to paste anything.
 ```

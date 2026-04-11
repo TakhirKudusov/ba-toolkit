@@ -81,3 +81,6 @@ Improvements batch 11:
 
 Improvements batch 12:
 1. ✅ /clarify one-at-a-time question flow. Done in Unreleased — rewrote "Output to the user" section to present ambiguities sequentially with (N/M) numbering instead of a single large table. Binary questions get an options table (interview protocol style); open-ended questions get free-form input. User can `skip` or `defer` any question.
+2. ✅ /analyze recommended as quality gate in closing messages. Done in Unreleased — closing-message.md "If you're stuck" block replaced with "Quality check before moving on" block that recommends /analyze after key pipeline steps (after /srs, /stories, before /handoff).
+3. ✅ [parallel] marker in /implement-plan task DAG. Done in Unreleased — tasks with shared prerequisites and no mutual dependency are marked [parallel] in the title and ✓ in the Task DAG appendix. "How to use this plan" section updated. AI agents can execute parallel tasks concurrently. Inspired by Spec Kit.
+4. Cascading artifact update added to ROADMAP.md Next section. New /cascade utility or /revise extension to propagate requirement changes through downstream artifacts.

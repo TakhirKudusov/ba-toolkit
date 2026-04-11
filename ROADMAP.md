@@ -42,6 +42,10 @@ Planned for the next handful of releases. Items are ordered by intent to ship, n
 - **Skill-template regression tests.** Extend `test/cli.test.js` with three new tests that protect the post-v3.5.0 template discipline from drift: every pipeline-stage template carries a forward traceability matrix; the `/nfr` template aligns with ISO 25010 characteristics; the `/stories` template carries an INVEST self-check line. Auto-fails on any future SKILL.md or template that drifts.
 - **`ba-toolkit migrate-agents` CLI subcommand.** Detects pre-v3.4 `AGENTS.md` files (no row 12 for `/implement-plan`), pre-v3.2 (no row 0 for `/discovery`, no row 0a for `/principles`), and pre-v3.4.1 (stale domain after `/discovery` ran) and surgically migrates them. Today the toolkit relies on AI-skill instructions to do this case by case in every affected SKILL.md — every migration row is compensation for the absence of this CLI tool. The subcommand turns those instructions into deterministic, testable code.
 
+### New capabilities
+
+- **Cascading artifact update.** When a requirement changes in the SRS, downstream artifacts (stories, AC, use cases, data dictionary, API contract) that reference it should be flagged and optionally updated in a single pass. Today `/clarify` offers a ripple-effect check but only identifies affected files — it does not perform the update. A new `/cascade` utility skill (or extension of `/revise`) would propagate a change through the dependency chain, re-running only the affected sections of each downstream artifact. Inspired by Spec Kit's evolving-specs pattern.
+
 ### New skills
 
 - **`/personas` skill.** Extracts persona profiles from `/brief` §3 (audience) and `/stories` (per-story persona field, added in v3.5.0) into a standalone persona library at `00_personas_{slug}.md`. Downstream skills (`/usecases`, `/scenarios`, `/wireframes`) read from the library instead of inlining persona context per-story, eliminating the duplication that v3.5.0 introduced when `/stories` adopted named personas. Single source of truth for "who are the users", composable with everything else in the pipeline.

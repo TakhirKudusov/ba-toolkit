@@ -106,6 +106,7 @@ Each task is one atomic, AI-actionable unit of work. Rules:
 - **id:** `T-<phase>-<seq>`, e.g. `T-04-007`. Phase number → first segment; sequence → second segment, zero-padded to 3 digits.
 - **title:** imperative, ≤ 10 words ("Create `users` table with email-unique constraint", "Implement `POST /auth/login` handler").
 - **dependsOn:** list of task ids that must complete first. Defaults to the previous task in the same phase, plus any explicit cross-phase prerequisites. Empty for the first task in Phase 1.
+- **parallel:** if this task has the same `dependsOn` as one or more sibling tasks (i.e., they share the same prerequisites and do not depend on each other), mark all of them with `**[parallel]**` next to the title. An AI coding agent can execute `[parallel]` tasks concurrently. Only mark tasks parallel when they are genuinely independent — touching different files, different entities, or different API endpoints with no shared state.
 - **references:** list of `FR-NNN`, `US-NNN`, `UC-NNN`, `AC-NNN-NN`, `NFR-NNN`, `Entity:Name`, `Endpoint: METHOD /path`, `WF-NNN`, `SC-NNN` ids that this task implements. **Always at least one.** Phase 1 tasks (Foundation) are the only exception and may reference `01_brief` or `00_principles` as their source.
 - **files:** list of file paths the AI agent should create or modify (best-effort; framework-dependent). Optional. Examples: `src/db/schema.sql`, `apps/api/src/auth/login.controller.ts`. **If unknown, omit rather than guess.**
 - **definitionOfDone:** bullet list of acceptance hooks. Pull from the linked AC where possible ("AC-001-03 passes", "endpoint returns 401 on invalid credentials"). Always include a type-check / lint hook on backend tasks and a render-state hook on UI tasks.
@@ -146,6 +147,7 @@ Within a phase, order tasks so each task's `dependsOn` list points only at tasks
 
 - Phases are ordered. Do not start phase N+1 until every task in phases 1..N is complete (or explicitly waived in writing).
 - Within a phase, follow task ids in ascending order unless `dependsOn` says otherwise.
+- Tasks marked **[parallel]** share the same prerequisites and do not depend on each other — they can be executed concurrently.
 - Every task has a `references` list — read those BA artifact sections before writing code.
 - Every task has a `definitionOfDone` — do not mark a task complete until every box is checked.
 - The Task DAG appendix is the machine-readable source of truth for dependencies.
@@ -233,12 +235,13 @@ Items the plan could not resolve from existing artifacts. The AI coding agent mu
 
 Machine-readable dependency graph. A topological sort of this table yields a valid execution order.
 
-| id | phase | title | dependsOn | references |
-|----|-------|-------|-----------|------------|
-| T-01-001 | 1 | {title} | — | {ids} |
-| T-01-002 | 1 | {title} | T-01-001 | {ids} |
-| T-02-001 | 2 | {title} | T-01-003 | Entity:User, FR-001 |
-| … | … | … | … | … |
+| id | phase | title | dependsOn | parallel | references |
+|----|-------|-------|-----------|----------|------------|
+| T-01-001 | 1 | {title} | — | — | {ids} |
+| T-01-002 | 1 | {title} | T-01-001 | ✓ | {ids} |
+| T-01-003 | 1 | {title} | T-01-001 | ✓ | {ids} |
+| T-02-001 | 2 | {title} | T-01-002, T-01-003 | — | Entity:User, FR-001 |
+| … | … | … | … | … | … |
 ```
 
 ### 8. AGENTS.md update

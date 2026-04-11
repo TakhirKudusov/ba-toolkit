@@ -11,6 +11,16 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.13.0] — 2026-04-11
+
+### Added
+
+- **`[parallel]` marker in `/implement-plan` task DAG.** Tasks that share the same prerequisites and do not depend on each other are now marked `[parallel]` in the title and `✓` in a new `parallel` column in the Task DAG appendix. The "How to use this plan" section instructs AI coding agents that `[parallel]` tasks can be executed concurrently. Inspired by Spec Kit's parallel execution markers.
+- **`/analyze` recommended as quality gate in closing messages.** The "If you're stuck" block in closing messages is replaced with a "Quality check before moving on" block that recommends `/analyze` for a cross-artifact quality sweep, especially after `/srs`, `/stories`, and before `/handoff`.
+- **Cascading artifact update added to ROADMAP.md.** New "Cascading artifact update" item in the Next section — a future `/cascade` utility skill (or `/revise` extension) to propagate requirement changes through downstream artifacts.
+
+---
+
 ## [3.12.0] — 2026-04-11
 
 ### Changed
@@ -829,6 +839,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.13.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.12.0...v3.13.0
 [3.12.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.11.0...v3.12.0
 [3.11.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.6...v3.11.0
 [3.10.6]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.5...v3.10.6
