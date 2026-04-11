@@ -11,6 +11,15 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.10.4] — 2026-04-11
+
+### Changed
+
+- **Glossary links added to README, USAGE.md, and COMMANDS.md.** Abbreviation chains (`FR → US → UC → AC → ...`) now include a parenthetical link to the glossary so first-time readers can look up unfamiliar acronyms without leaving the page.
+- **Website sidebar reordered.** "Example project" and "Glossary" now appear immediately after "Getting started" — before the Documentation group — so new users find them early.
+
+---
+
 ## [3.10.3] — 2026-04-11
 
 ### Added
@@ -776,6 +785,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.10.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.3...v3.10.4
 [3.10.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.2...v3.10.3
 [3.10.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...v3.10.2
 [3.10.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.0...v3.10.1
