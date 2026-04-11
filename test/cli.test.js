@@ -54,7 +54,8 @@ test('sanitiseSlug: mixed case multi-word', () => {
   assert.equal(sanitiseSlug('Acme Corp'), 'acme-corp');
 });
 
-test('sanitiseSlug: collapses runs of dashes', () => {
+test('sanitiseSlug: co' +
+    'llapses runs of dashes', () => {
   assert.equal(sanitiseSlug('a---b'), 'a-b');
 });
 
@@ -1045,7 +1046,7 @@ test('mergeAgentsMd: rendered template always contains both anchor markers', () 
   assert.ok(rendered.includes('<!-- ba-toolkit:end managed -->'));
 });
 
-test('renderAgentsMd: preserves [focus] and [format] in the cross-cutting table', () => {
+test('renderAgentsMd: preserves [focus] and [format] in the utility skills table', () => {
   // These are literal command-syntax markers, not template placeholders.
   // The replace pass must not touch them.
   const out = renderAgentsMd({ name: 'My App', slug: 'my-app', domain: 'saas' });
