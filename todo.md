@@ -79,6 +79,5 @@ Improvements batch 11:
 2. ✅ Remove mandatory language question from /principles. Done in Unreleased — removed topic 1 "Artifact language" from required interview topics. Language is now auto-detected from the user's first message. Renumbered remaining topics (9 → 8).
 3. ✅ Simplify Recommended marker to `(recommended)`. Done in Unreleased — interview-protocol.md rules 10-11 updated. No bold, no emoji, no translation. Always English `(recommended)`. Updated in 22 skill/reference files and 2 regression tests.
 
-Улучшение 2:
-1. /clarify должен следовать тем же правилам вопросов, что и основные команды. Например, выводить вопросы по порядку и ответы в виде таблицы с ожидаем выбора от пользователя.
-2. 
+Improvements batch 12:
+1. ✅ /clarify one-at-a-time question flow. Done in Unreleased — rewrote "Output to the user" section to present ambiguities sequentially with (N/M) numbering instead of a single large table. Binary questions get an options table (interview protocol style); open-ended questions get free-form input. User can `skip` or `defer` any question.

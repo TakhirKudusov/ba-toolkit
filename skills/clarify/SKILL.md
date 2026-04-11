@@ -72,27 +72,41 @@ Inconsistent use of must / shall / should / may. IEEE 830 expects strict modal d
 
 ## Output to the user
 
-Present findings as a structured table the user can answer in-place rather than as a numbered list of free-text questions. Each row references the exact location (section + element ID), the category, the question, and an empty answer cell:
+Present findings **one at a time**, following the same conversational flow as the interview protocol (see `references/interview-protocol.md` rule 1). After the analysis pass, count the total ambiguities found and present them sequentially with `(N/M)` numbering.
+
+Each question shows the location, category, and the specific ambiguity:
 
 ```
-Ambiguities found in {artifact_file} ({N} questions):
+Found {M} ambiguities in {artifact_file}. Resolving one at a time.
 
-| # | Location | Category | Question | Answer |
-|---|----------|----------|----------|--------|
-| 1 | FR-003 | A — Metrics-free | "The system must respond quickly" — what is the acceptable response time in ms under normal load? | _(awaiting answer)_ |
-| 2 | US-007 | B — Undefined term | Role "Manager" used here but not defined in `02_srs_*.md` Roles. Equivalent to "Admin"? Separate role? | _(awaiting answer)_ |
-| 3 | FR-015 vs NFR-002 | C — Conflicting | NFR-002 requires TLS 1.3 only; FR-015 mentions "standard encryption". Reference NFR-002 explicitly? | _(awaiting answer)_ |
-| 4 | AC-005-02 | A — Metrics-free | "Then" clause says "system handles the error correctly" — specific expected behaviour? | _(awaiting answer)_ |
-| 5 | FR-022 | I — Currency gap | "User charged a fee" — currency? per region? | _(awaiting answer)_ |
+(1/5) **FR-003** · Category A — Metrics-free
+"The system must respond quickly" — what is the acceptable response time in ms under normal load?
 ```
 
-The table format lets the user fill in answers in the rightmost column and copy-paste the table back. It also lets the user defer specific questions explicitly by writing `(deferred)` instead of an answer.
+Wait for the user to answer before showing the next question.
+
+For **binary or constrained questions** (e.g., "Is Manager the same as Admin?" or "Which currency?"), present a short options table following the interview protocol format:
+
+```
+(2/5) **US-007** · Category B — Undefined term
+Role "Manager" used here but not defined in Roles. What is it?
+
+| ID | Variant                                          |
+|----|--------------------------------------------------|
+| a  | Same as "Admin" — merge into one role             |
+| b  | Separate role with its own permissions             |
+| c  | Other — type your own answer                       |
+```
+
+For **open-ended questions** (e.g., "What is the response time target?"), ask directly without a table — the user types a free-form answer.
+
+The user can reply `skip` or `defer` to any question to leave it unresolved. Acknowledge each answer in one line before moving to the next question.
 
 If no ambiguities are found, state that clearly and suggest `/analyze` for a broader cross-artifact check.
 
 ## Resolution
 
-After presenting the table, wait for the user to answer. Accept answers inline (the user can reply with the table filled in, or answer free-form by row number). After all answers are received:
+After all questions are answered (or deferred):
 
 1. Apply the answers to update the artifact (rewrite affected elements).
 2. **Ripple-effect check.** Before saving, identify any answer that affects a prior or downstream artifact (a role definition affects `/srs` Roles section AND `/stories` personas AND `/usecases` actors AND `/scenarios` personas; a new business rule affects `/srs` business rules AND `/ac` Given/When/Then conditions AND `/datadict` constraints AND `/apicontract` validation rules). For each ripple, list the affected files and offer to update them with `/revise`. Do not auto-modify unrelated artifacts without confirmation.
