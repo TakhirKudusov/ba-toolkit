@@ -31,7 +31,7 @@ There is **no build step** — the CLI runs directly with `node`. There are **no
 
 ```
 bin/ba-toolkit.js         # CLI entry point (~550 lines, single file, zero deps)
-skills/                   # 24 SKILL.md files + references/ (entry: /discovery → /brief; finish: /handoff → /implement-plan; cross-cut: /publish, /trace, /analyze)
+skills/                   # 24 SKILL.md files + references/ (entry: /discovery → /brief; finish: /handoff → /implement-plan; utility: /trace, /clarify, /analyze, /estimate, /glossary, /export, /publish, /risk, /sprint)
   {skill}/SKILL.md        # Each skill has YAML frontmatter (name, description)
   references/
     domains/              # 12 domain files + placeholder entries for custom

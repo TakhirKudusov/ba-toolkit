@@ -287,7 +287,7 @@ If you re-run `ba-toolkit init --slug <existing-slug>` for an existing project, 
 | 2 | /srs | ⬜ Not started | — |
 | ... | ... | ... | ... |
 
-## Cross-cutting Tools
+## Utility Skills
 | Tool | Purpose |
 |------|---------|
 | /trace | Traceability Matrix + coverage gaps |
@@ -340,6 +340,40 @@ The command produces two folders under `./publish/`:
 - **`publish/confluence/`** — Self-contained HTML files plus `index.html` as the entry point. Zip the folder using your OS, then upload via **Space settings → Content tools → Import → HTML** in Confluence Cloud or Data Center. Tables, code blocks, headings, and cross-references all convert.
 
 No API tokens, no OAuth, no network calls — the conversion happens entirely on your machine and the upload is a manual drag-and-drop. Re-running `ba-toolkit publish` overwrites the previous bundle, so it is safe to publish again after `/clarify`, `/revise`, or any later pipeline step.
+
+---
+
+## 9. Utility skills
+
+The 15 pipeline skills advance your project sequentially from concept to implementation plan. The 9 **utility skills** work across the pipeline at any stage — they verify, estimate, check terminology, assess risks, plan sprints, and publish or export your artifacts. You can use any utility skill as soon as its prerequisites are met, and re-run it as many times as you like.
+
+| Skill | Purpose | When to use |
+|-------|---------|-------------|
+| `/trace` | Traceability matrix + coverage gaps | After `/stories`; re-run after fixes |
+| `/clarify [focus]` | Interactive ambiguity resolution | After any artifact; before `/done` |
+| `/analyze` | Cross-artifact quality report (8 categories) | After `/srs`; re-run after fixes |
+| `/estimate` | Effort estimation (SP / T-shirt / days) | After `/stories` or `/ac` |
+| `/glossary` | Term extraction + terminology drift | After `/brief`; re-run periodically |
+| `/risk` | Risk register (probability x impact) | After `/brief` or `/srs` |
+| `/sprint` | Sprint planning for human teams | After `/estimate` (required) |
+| `/export [format]` | Stories to Jira / GitHub Issues / Linear / CSV | After `/stories` |
+| `/publish [format]` | Artifacts to Notion / Confluence | After `/brief` or later |
+
+### When to use which
+
+- **Something feels vague in the current artifact** — run `/clarify` on that artifact for interactive resolution.
+- **Broad quality check across all artifacts** — run `/analyze` for a severity-rated report covering duplicates, ambiguity, coverage gaps, terminology drift, invalid references, and more.
+- **Verify all requirements are covered end-to-end** — run `/trace` to build the full FR → US → UC → AC → ... traceability matrix.
+- **Terms are inconsistent across artifacts** — run `/glossary` to extract and harmonize terminology.
+- **Need story points or effort estimates** — run `/estimate`.
+- **Plan sprints for a human team** — run `/sprint` (requires `/estimate` first).
+- **Import stories into Jira, GitHub Issues, or Linear** — run `/export`.
+- **Share docs with stakeholders in Notion or Confluence** — run `/publish`.
+- **Identify and score project risks** — run `/risk`.
+
+### How /analyze relates to other utility skills
+
+`/analyze` checks 8 quality categories (Duplication, Ambiguity, Coverage Gap, Terminology Drift, Invalid Reference, Inconsistency, Underspecified Source, Stakeholder Validation Gap). Three of these overlap with dedicated utility skills: Ambiguity with `/clarify`, Coverage Gap with `/trace`, Terminology Drift with `/glossary`. Use `/analyze` first for the broad sweep, then use the dedicated skill to deep-dive into any category that needs attention.
 
 ---
 

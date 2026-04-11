@@ -1,12 +1,12 @@
 ---
 name: trace
 description: >
-  Build and update the traceability matrix across all BA Toolkit pipeline artifacts: FR ↔ US ↔ UC ↔ AC ↔ NFR ↔ Data Entity ↔ API Endpoint ↔ Wireframe. Use on /trace command, or when the user asks for "traceability matrix", "requirements traceability", "coverage check", "uncovered requirements", "artifact links", "check coverage", "find missing requirements", "what is not covered". Cross-cutting command available at any stage after /stories.
+  Build and update the traceability matrix across all BA Toolkit pipeline artifacts: FR ↔ US ↔ UC ↔ AC ↔ NFR ↔ Data Entity ↔ API Endpoint ↔ Wireframe. Use on /trace command, or when the user asks for "traceability matrix", "requirements traceability", "coverage check", "uncovered requirements", "artifact links", "check coverage", "find missing requirements", "what is not covered". Utility skill available at any stage after /stories.
 ---
 
 # /trace — Traceability Matrix
 
-Cross-cutting command of the BA Toolkit pipeline. Available after `/stories` is complete. Builds a traceability matrix across all existing artifacts.
+Utility skill. Available after `/stories` is complete. Builds a traceability matrix across all existing artifacts.
 
 ## Context loading
 

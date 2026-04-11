@@ -59,7 +59,7 @@ Skills use this table as the single source of truth for the `Next step:` block. 
 | /handoff     | /implement-plan | Sequenced implementation plan for AI coding agents              | 10–20 min    | (pipeline complete — hand to Claude Code / Cursor)  |
 | /implement-plan | (none)       | Pipeline complete                                               | —            | Hand 12_implplan_<slug>.md to your AI coding agent  |
 
-## Cross-cutting commands (no Next step line)
+## Utility skills (no Next step line)
 
 These skills do not advance the pipeline — they update or report on existing artifacts. Their closing block omits the `Next step:` block entirely (omit it cleanly — don't write "Next step: none"):
 
@@ -79,7 +79,7 @@ Their closing block ends after the "Available commands" table. Optionally, they 
 
 - `{file_path}` is the full path where the artifact was saved (typically `output/<slug>/{NN}_{name}_{slug}.md`).
 - The summary line is generated dynamically — do not repeat boilerplate; mention actual numbers and decisions ("18 FRs across 3 roles, 4 risks captured", not "the artifact was generated").
-- The "Available commands" table is fixed (5 rows for pipeline skills). Cross-cutting skills omit `/done` from the table since they don't have a "finalize" state.
+- The "Available commands" table is fixed (5 rows for pipeline skills). Utility skills omit `/done` from the table since they don't have a "finalize" state.
 - The "Next step" block is built from the lookup table above. Do not hardcode it in individual SKILL.md files.
 - The "If you're stuck" section is a 2–3-line nudge for users who don't know what to do next. Keep it short.
 - The block is a chat message, not part of the saved Markdown file.

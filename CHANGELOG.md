@@ -11,6 +11,21 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.10.2] — 2026-04-11
+
+### Changed
+
+- **Standardized "Utility skills" terminology across the project.** All 9 utility skills (`/trace`, `/clarify`, `/analyze`, `/estimate`, `/glossary`, `/risk`, `/sprint`, `/export`, `/publish`) now consistently use "Utility skill" as their opener and description label. Previously the codebase mixed "Cross-cutting command", "Cross-cutting utility", "Utility command", and "Cross-cutting Tools" — now unified under a single term that pairs naturally with "Pipeline skills". Updated in 9 SKILL.md files, `closing-message.md`, `agents-template.md`, `handoff-template.md`, `handoff/SKILL.md`, `publish/SKILL.md`, and `prerequisites.md`.
+- **README pipeline table split into two sections.** The single 24-row table is now two: a "Pipeline" table (15 numbered steps) and a "Utility skills" table (9 unnumbered skills) with an explanatory paragraph between them.
+
+### Added
+
+- **USAGE.md § 9 "Utility skills"** — new section with a mental-model paragraph, a quick-reference table (skill / purpose / when to use), a "When to use which" decision tree, and a note explaining how `/analyze` relates to `/clarify`, `/trace`, and `/glossary`.
+- **FAQ: 2 new entries** — "What is the difference between pipeline skills and utility skills?" and "When should I use /analyze vs /clarify vs /trace vs /glossary?"
+- **prerequisites.md: 6 new utility skill sections** — `/estimate`, `/glossary`, `/risk`, `/sprint`, `/export`, `/publish`. Previously only `/trace`, `/clarify`, and `/analyze` had prerequisite entries; now all 9 utility skills are covered. Existing entries relabeled from "(Cross-cutting)" to "(Utility)".
+
+---
+
 ## [3.10.1] — 2026-04-10
 
 ### Fixed
@@ -742,6 +757,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.10.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...v3.10.2
 [3.10.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.0...v3.10.1
 [3.10.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.9.0...v3.10.0
 [3.9.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.8.1...v3.9.0

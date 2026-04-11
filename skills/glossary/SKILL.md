@@ -1,12 +1,12 @@
 ---
 name: glossary
 description: >
-  Unified project glossary extraction and maintenance for BA Toolkit projects. Use on /glossary command, or when the user asks to "build a glossary", "extract terms", "create a glossary", "consolidate terminology", "find terminology drift", "what terms are defined". Cross-cutting command — can run at any pipeline stage once at least one artifact exists.
+  Unified project glossary extraction and maintenance for BA Toolkit projects. Use on /glossary command, or when the user asks to "build a glossary", "extract terms", "create a glossary", "consolidate terminology", "find terminology drift", "what terms are defined". Utility skill — can run at any pipeline stage once at least one artifact exists.
 ---
 
 # /glossary — Unified Project Glossary
 
-Cross-cutting command. Scans all existing artifacts and the domain reference file, extracts defined and used terms, detects terminology drift (same concept, different names), and produces or updates a single `00_glossary_{slug}.md` file.
+Utility skill. Scans all existing artifacts and the domain reference file, extracts defined and used terms, detects terminology drift (same concept, different names), and produces or updates a single `00_glossary_{slug}.md` file.
 
 ## Syntax
 

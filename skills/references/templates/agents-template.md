@@ -32,9 +32,9 @@
 | 11 | /handoff | ⬜ Not started | — |
 | 12 | /implement-plan | ⬜ Not started | — |
 
-## Cross-cutting Tools
+## Utility Skills
 
-Utilities available throughout the pipeline. No fixed stage — invoke whenever they help. See README.md for the prerequisites of each.
+Available at any pipeline stage — no fixed position. Invoke whenever they help. See COMMANDS.md for descriptions and prerequisites.md for input requirements.
 
 | Tool | Purpose |
 |------|---------|

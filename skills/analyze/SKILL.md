@@ -6,7 +6,7 @@ description: >
 
 # /analyze — Cross-Artifact Quality Analysis
 
-Cross-cutting command. Performs a read-only analysis across all existing pipeline artifacts and generates a structured finding report. Does not modify artifacts — use `/clarify` or `/revise` to act on findings.
+Utility skill. Performs a read-only analysis across all existing pipeline artifacts and generates a structured finding report. Does not modify artifacts — use `/clarify` or `/revise` to act on findings.
 
 ## Context loading
 

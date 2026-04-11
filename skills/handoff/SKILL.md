@@ -59,7 +59,7 @@ No interview. All content is derived from the existing artifacts. The full templ
 | 11 | Handoff | `11_handoff_{slug}.md` | This document | — |
 | 12 | Implementation Plan | `12_implplan_{slug}.md` | ✓ / ✗ Missing / — Not run | {n} phases, {n} tasks |
 
-### Cross-cutting artifacts
+### Utility artifacts
 
 | Tool | File | Status | Key numbers |
 |------|------|--------|-------------|

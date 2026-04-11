@@ -148,7 +148,7 @@ Prerequisites marked **Required** block execution — the skill should prompt th
 
 ---
 
-## /trace (Cross-cutting)
+## /trace (Utility)
 
 | Prerequisite | Status | Notes |
 |-------------|--------|-------|
@@ -158,7 +158,7 @@ Prerequisites marked **Required** block execution — the skill should prompt th
 
 ---
 
-## /clarify (Cross-cutting)
+## /clarify (Utility)
 
 | Prerequisite | Status | Notes |
 |-------------|--------|-------|
@@ -167,12 +167,77 @@ Prerequisites marked **Required** block execution — the skill should prompt th
 
 ---
 
-## /analyze (Cross-cutting)
+## /analyze (Utility)
 
 | Prerequisite | Status | Notes |
 |-------------|--------|-------|
 | `02_srs_*.md` | **Required** | Minimum for meaningful analysis |
 | `00_principles_*.md` | Optional | Sections 3–6 used to calibrate severity thresholds |
+
+---
+
+## /estimate (Utility)
+
+| Prerequisite | Status | Notes |
+|-------------|--------|-------|
+| `03_stories_*.md` | **Required** | Primary input — stories to estimate |
+| `05_ac_*.md` | Recommended | AC scenario count is a key complexity signal |
+| `02_srs_*.md` | Recommended | Integration points and technical constraints affect estimates |
+| `07a_research_*.md` | Recommended | ADR-driven complexity signals |
+| `00_principles_*.md` | Optional | Estimation conventions |
+
+---
+
+## /glossary (Utility)
+
+| Prerequisite | Status | Notes |
+|-------------|--------|-------|
+| At least one pipeline artifact | **Required** | Needs terms to extract |
+| `00_principles_*.md` | Optional | Language and naming conventions |
+
+---
+
+## /risk (Utility)
+
+| Prerequisite | Status | Notes |
+|-------------|--------|-------|
+| `01_brief_*.md` | **Required** | Primary source of risks and constraints |
+| `02_srs_*.md` | Recommended | Assumptions, constraints, out-of-scope items |
+| `06_nfr_*.md` | Recommended | Aggressive NFR targets signal risk |
+| `07a_research_*.md` | Recommended | Technology risks, integration unknowns |
+| `08_apicontract_*.md` | Recommended | Third-party API dependencies, SLA gaps |
+| `00_principles_*.md` | Optional | |
+
+---
+
+## /sprint (Utility)
+
+| Prerequisite | Status | Notes |
+|-------------|--------|-------|
+| `00_estimate_*.md` or inline estimates in `03_stories_*.md` | **Required** | Sprint planning needs effort estimates |
+| `03_stories_*.md` | **Required** | Stories to assign to sprints |
+| `00_risks_*.md` | Recommended | Risk scores elevate priority of mitigating stories |
+| `02_srs_*.md` | Recommended | Sequencing constraints beyond explicit dependencies |
+| `00_principles_*.md` | Optional | Team capacity defaults |
+
+---
+
+## /export (Utility)
+
+| Prerequisite | Status | Notes |
+|-------------|--------|-------|
+| `03_stories_*.md` | **Required** | Stories to export |
+| `05_ac_*.md` | Recommended | AC scenarios embedded in issue descriptions |
+| `00_estimate_*.md` | Recommended | Story points included in the export if available |
+| `00_principles_*.md` | Optional | ID conventions, language settings |
+
+---
+
+## /publish (Utility)
+
+| Prerequisite | Status | Notes |
+|-------------|--------|-------|
+| At least one pipeline artifact (`01_brief_*.md` or later) | **Required** | Nothing to publish without artifacts |
 
 ---
 

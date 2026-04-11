@@ -196,15 +196,22 @@ Full traceability: FR → US → UC → AC → NFR → Entity → ADR → API �
 | 10 | `/scenarios` | End-to-end Validation Scenarios — user journeys linking US, AC, WF, API | `10_scenarios_{slug}.md` |
 | 11 | `/handoff` | Development Handoff Package — artifact inventory, MVP scope, open items | `11_handoff_{slug}.md` |
 | 12 | `/implement-plan` | Implementation Plan for AI coding agents — phase ladder + Task DAG, every task references the FR/US/AC it implements | `12_implplan_{slug}.md` |
-| — | `/trace` | Traceability Matrix + coverage gaps | `00_trace_{slug}.md` |
-| — | `/clarify [focus]` | Targeted ambiguity resolution for any artifact | _(updates existing artifact)_ |
-| — | `/analyze` | Cross-artifact quality report with severity table | `00_analyze_{slug}.md` |
-| — | `/estimate` | Effort estimation — Fibonacci SP, T-shirt sizes, or person-days | `00_estimate_{slug}.md` |
-| — | `/glossary` | Unified project glossary with terminology drift detection | `00_glossary_{slug}.md` |
-| — | `/export [format]` | Export User Stories to Jira / GitHub Issues / Linear / CSV | `export_{slug}_{format}.json` / `.csv` |
-| — | `/publish [format]` | Bundle artifacts for Notion (Markdown) and Confluence (HTML) — drag-and-drop import, no API tokens | `publish/notion/`, `publish/confluence/` |
-| — | `/risk` | Risk register — probability × impact matrix, mitigation per risk | `00_risks_{slug}.md` |
-| — | `/sprint` | Sprint plan — stories grouped by velocity and capacity with sprint goals | `00_sprint_{slug}.md` |
+
+### Utility skills
+
+Available at any pipeline stage, not tied to a fixed position. Use them to verify, estimate, publish, or export artifacts whenever needed. Start with `/analyze` for a broad quality sweep, then deep-dive with `/clarify`, `/trace`, or `/glossary` for specific concerns.
+
+| Command | What it generates | Output file |
+|---------|-------------------|-------------|
+| `/trace` | Traceability Matrix + coverage gaps | `00_trace_{slug}.md` |
+| `/clarify [focus]` | Targeted ambiguity resolution for any artifact | _(updates existing artifact)_ |
+| `/analyze` | Cross-artifact quality report with severity table | `00_analyze_{slug}.md` |
+| `/estimate` | Effort estimation — Fibonacci SP, T-shirt sizes, or person-days | `00_estimate_{slug}.md` |
+| `/glossary` | Unified project glossary with terminology drift detection | `00_glossary_{slug}.md` |
+| `/risk` | Risk register — probability × impact matrix, mitigation per risk | `00_risks_{slug}.md` |
+| `/sprint` | Sprint plan — stories grouped by velocity and capacity with sprint goals | `00_sprint_{slug}.md` |
+| `/export [format]` | Export User Stories to Jira / GitHub Issues / Linear / CSV | `export_{slug}_{format}.json` / `.csv` |
+| `/publish [format]` | Bundle artifacts for Notion (Markdown) and Confluence (HTML) — drag-and-drop import, no API tokens | `publish/notion/`, `publish/confluence/` |
 
 The project **slug** (e.g., `nova-analytics`) is set at `ba-toolkit init` (derived from the project name) and reused across all files automatically — every skill reads it from `AGENTS.md`.
 

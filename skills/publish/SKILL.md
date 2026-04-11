@@ -1,12 +1,12 @@
 ---
 name: publish
 description: >
-  Bundle BA Toolkit artifacts into import-ready files for documentation tools — Notion (markdown bundle) and Confluence (HTML bundle). Use on /publish command, or when the user asks to "export to Notion", "export to Confluence", "publish artifacts", "share with stakeholders", "import into Notion", "import into Confluence", "send the docs to product team". Cross-cutting utility — does not advance the pipeline.
+  Bundle BA Toolkit artifacts into import-ready files for documentation tools — Notion (markdown bundle) and Confluence (HTML bundle). Use on /publish command, or when the user asks to "export to Notion", "export to Confluence", "publish artifacts", "share with stakeholders", "import into Notion", "import into Confluence", "send the docs to product team". Utility skill — does not advance the pipeline.
 ---
 
 # /publish — Notion / Confluence Publish
 
-Cross-cutting utility skill. Wraps the `ba-toolkit publish` CLI subcommand, which converts the markdown artifacts in the current `output/<slug>/` folder into folders ready to be dragged into Notion's **Import → Markdown & CSV** dialog or zipped and uploaded via Confluence's **Space settings → Content tools → Import → HTML** tool.
+Utility skill. Wraps the `ba-toolkit publish` CLI subcommand, which converts the markdown artifacts in the current `output/<slug>/` folder into folders ready to be dragged into Notion's **Import → Markdown & CSV** dialog or zipped and uploaded via Confluence's **Space settings → Content tools → Import → HTML** tool.
 
 The conversion happens entirely on disk — **no API calls, no tokens, no network**. The user does the actual upload manually using each tool's native importer.
 
@@ -62,7 +62,7 @@ Capture stdout from the command and report it back to the user. The CLI prints a
 
 ### 5. Closing message
 
-Cross-cutting closing block (no `Next step:` line — see `references/closing-message.md` "Cross-cutting commands" section). Show:
+Utility skill closing block (no `Next step:` line — see `references/closing-message.md` "Utility skills" section). Show:
 
 - Saved bundle paths and counts per format (taken verbatim from the CLI's stdout summary).
 - The two static "Next steps" lines:

@@ -32,7 +32,7 @@
 | 11 | Handoff | `11_handoff_[SLUG].md` | This document | [DATE] |
 | 12 | Implementation Plan | `12_implplan_[SLUG].md` | ✅ Complete / — Not run | [DATE] |
 
-### Cross-cutting artifacts
+### Utility artifacts
 
 | Tool | File | Status | Last Updated |
 |------|------|--------|--------------|

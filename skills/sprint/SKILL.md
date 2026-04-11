@@ -6,7 +6,7 @@ description: >
 
 # /sprint — Sprint Plan
 
-Utility command. Reads estimated User Stories, applies team capacity and velocity constraints, groups stories into sprints by priority and risk weight, and produces `00_sprint_{slug}.md` with a complete sprint breakdown.
+Utility skill. Reads estimated User Stories, applies team capacity and velocity constraints, groups stories into sprints by priority and risk weight, and produces `00_sprint_{slug}.md` with a complete sprint breakdown.
 
 ## Syntax
 

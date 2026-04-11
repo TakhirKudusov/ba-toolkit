@@ -6,7 +6,7 @@ description: >
 
 # /estimate — Effort Estimation
 
-Analyses User Stories, assigns effort estimates using the chosen scale, and produces an estimation table with rationale. Can update the stories artifact in-place or output a standalone estimation report.
+Utility skill. Analyses User Stories, assigns effort estimates using the chosen scale, and produces an estimation table with rationale. Can update the stories artifact in-place or output a standalone estimation report.
 
 ## Syntax
 

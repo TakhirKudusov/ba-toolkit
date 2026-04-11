@@ -6,7 +6,7 @@ description: >
 
 # /export — Artifact Export
 
-Converts User Stories (and optionally Acceptance Criteria) into structured output files ready for import into issue trackers and project management tools.
+Utility skill. Converts User Stories (and optionally Acceptance Criteria) into structured output files ready for import into issue trackers and project management tools.
 
 ## Syntax
 

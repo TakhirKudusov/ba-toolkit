@@ -1,12 +1,12 @@
 ---
 name: risk
 description: >
-  Dedicated risk register for BA Toolkit projects. Use on /risk command, or when the user asks to "identify risks", "create a risk register", "assess project risks", "list risks", "risk matrix". Cross-cutting command — can run at any pipeline stage once Brief or SRS exists. Re-run after Research to capture technical risks.
+  Dedicated risk register for BA Toolkit projects. Use on /risk command, or when the user asks to "identify risks", "create a risk register", "assess project risks", "list risks", "risk matrix". Utility skill — can run at any pipeline stage once Brief or SRS exists. Re-run after Research to capture technical risks.
 ---
 
 # /risk — Risk Register
 
-Cross-cutting command. Extracts risks from existing artifacts, classifies them by category, scores them by probability × impact, and produces or updates `00_risks_{slug}.md` with a full risk register.
+Utility skill. Extracts risks from existing artifacts, classifies them by category, scores them by probability × impact, and produces or updates `00_risks_{slug}.md` with a full risk register.
 
 ## Syntax
 

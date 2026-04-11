@@ -24,6 +24,12 @@ Yes. Select "Custom" at `ba-toolkit init` (or pass `--domain custom`) and the sk
 **Can I go back and edit a previous artifact?**
 Yes. Run `/revise [section]` at any step, or re-invoke the skill command (e.g., `/srs`) to regenerate from scratch. The agent warns before overwriting. Subsequent skills will read the updated version automatically.
 
+**What is the difference between pipeline skills and utility skills?**
+Pipeline skills (15) advance your project sequentially — each one reads the output of the previous step and produces the next artifact. Utility skills (9) are available at any stage and do not advance the pipeline — they verify, estimate, publish, or export existing artifacts. You can run a utility skill whenever its prerequisites are met, and re-run it as many times as you like. See [USAGE.md § 9](USAGE.md#9-utility-skills) for the full list and a decision tree.
+
+**When should I use /analyze vs /clarify vs /trace vs /glossary?**
+`/analyze` is the broadest diagnostic — it checks 8 quality categories across all artifacts (duplicates, ambiguity, coverage gaps, terminology drift, invalid references, inconsistencies, underspecified sources, validation gaps). If `/analyze` flags ambiguity issues, use `/clarify` on the specific artifact for a deep-dive with interactive resolution. If it flags coverage gaps, use `/trace` to see the full traceability matrix. If it flags terminology drift, use `/glossary` to build or refresh the project glossary. Start with `/analyze` for the big picture, then use the specialized tool to fix what it found.
+
 **Does it work with smaller / faster models?**
 The structured Markdown format and explicit cross-references help smaller models stay on track. For best results, use a model with a context window of at least 32k tokens — the later pipeline steps load multiple large artifacts simultaneously.
 
