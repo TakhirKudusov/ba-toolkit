@@ -103,9 +103,9 @@ If a domain reference is loaded, supplement general questions with domain-specif
 
 `ba-toolkit init` already created `AGENTS.md` at the project root. After saving `01_brief_{slug}.md` to `output/`, find the project's `AGENTS.md` (look in cwd first; if cwd is `output/`, check `../AGENTS.md`).
 
-**Update only the `## Pipeline Status` row for `/brief`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename in the `File` column. **Do not touch the managed block** (`<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->`) — that's owned by `ba-toolkit init`. **Do not recreate the file at the repo root.** **Do not add `## Artifacts` / `## Key context` sections** — those are not part of the v3.1+ template and would be ignored by future runs.
+**Update only the `## Pipeline Status` row for `/brief`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename in the `File` column. **Do not touch the managed block** (`<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->`) — that's owned by `ba-toolkit init`.
 
-If you find no `AGENTS.md` at all (neither in cwd nor up the tree), warn the user that the project was likely set up before v3.1 and tell them to run `ba-toolkit init --name "..." --slug {slug}` to scaffold the per-project `AGENTS.md`. Do not create one yourself with arbitrary structure.
+If you find no `AGENTS.md` at all, warn the user that the project was likely not scaffolded with `ba-toolkit init` and tell them to run it. Do not create one yourself with arbitrary structure.
 
 ### 7. Iterative refinement
 

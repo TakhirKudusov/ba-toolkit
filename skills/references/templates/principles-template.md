@@ -165,14 +165,7 @@ For `/analyze` findings:
 - **MEDIUM:** documented and may be deferred.
 - **LOW:** informational only.
 
-## 7. Output Folder Structure
-
-**Mode:** [flat | subfolder]
-
-- `flat` (default) — all artifacts saved directly in the output directory.
-- `subfolder` — all artifacts saved under `{output_dir}/[SLUG]/`.
-
-## 8. Testing Strategy
+## 7. Testing Strategy
 
 **Strategy:** TDD | Tests-after | Integration-only | Manual-only | None
 
@@ -186,13 +179,13 @@ For `/analyze` findings:
 
 `/implement-plan` reads this section to decide whether to embed test specifications in each task. Default is **TDD** for production-grade systems.
 
-## 9. Code Review and Branching
+## 8. Code Review and Branching
 
 **Branching model:** trunk-based | GitHub flow | GitFlow | other
 **Required reviewers per PR:** [N]
 **Merge gate:** [CI green + N reviews / CODEOWNERS approval / specific reviewer]
 
-## 10. Stakeholder Decision Authority
+## 9. Stakeholder Decision Authority
 
 Who can approve a change to these principles, and to which sections.
 
@@ -204,11 +197,10 @@ Who can approve a change to these principles, and to which sections.
 | §4 Definition of Ready | [Role] | |
 | §5 NFR Baseline | [Role] | |
 | §6 Quality Gates | [Role] | |
-| §7 Output Structure | [Role] | |
-| §8 Testing Strategy | [Role] | |
-| §9 Branching | [Role] | |
+| §7 Testing Strategy | [Role] | |
+| §8 Branching | [Role] | |
 
-## 11. Project-Specific Notes
+## 10. Project-Specific Notes
 
 [ADDITIONAL_CONVENTIONS]
 

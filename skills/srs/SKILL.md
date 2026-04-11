@@ -118,9 +118,9 @@ FR numbering: sequential within each feature area, three-digit, with reserved ra
 
 ## AGENTS.md update
 
-After `/done`, find the project's `AGENTS.md` (look in cwd first; fall back to walking up the directory tree for legacy v3.0 single-project layouts). **Update only the `## Pipeline Status` row for `/srs`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename (`02_srs_{slug}.md`) in the `File` column. **Do not touch the managed block** (`<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->`) — that's owned by `ba-toolkit init`. **Do not add `## Artifacts` / `## Key context` sections** — those are not part of the v3.1+ template.
+After `/done`, find the project's `AGENTS.md` (look in cwd first; if cwd is `output/`, check `../AGENTS.md`). **Update only the `## Pipeline Status` row for `/srs`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename (`02_srs_{slug}.md`) in the `File` column. **Do not touch the managed block** (`<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->`) — that's owned by `ba-toolkit init`.
 
-If you find no `AGENTS.md` at all, warn the user that the project was likely set up before v3.1 and tell them to run `ba-toolkit init --name "..." --slug {slug}` to scaffold the per-project file. Do not create one yourself with arbitrary structure.
+If you find no `AGENTS.md` at all, warn the user that the project was likely not scaffolded with `ba-toolkit init` and tell them to run it. Do not create one yourself with arbitrary structure.
 
 ## Iterative refinement
 

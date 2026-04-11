@@ -40,10 +40,9 @@ If `01_brief_*.md` already exists, extract the slug and domain from it. Otherwis
 2. NFR baseline — which **ISO/IEC 25010** quality characteristics are mandatory beyond the domain defaults? (Performance Efficiency / Reliability / Security / Compatibility / Usability / Maintainability / Portability / Functional Suitability — `/nfr` reads this list verbatim and treats it as a checklist).
 3. Definition of Ready — any project-specific acceptance criteria for finalizing an artifact beyond the `v3.7.0+` baseline DoR per artifact type listed in §4 below? (e.g., stakeholder sign-off, specific review steps).
 4. Quality gate — at what severity level should `/analyze` findings block `/done`? (default: CRITICAL only)
-5. Output folder structure — save all artifacts flat in the output directory (default), or inside a `{slug}/` subfolder? (useful when managing multiple projects side by side)
-6. **Testing strategy** — TDD (tests before implementation), tests-after, integration-only, manual-only, none? Drives whether `/implement-plan` task templates embed "Tests to write first" blocks. **Recommended:** TDD for production-grade systems; tests-after for prototypes; manual-only or none for spike work. *(This is the principles-based approach to the testing-discipline question that batch 6 item 2 surfaced — the right place to declare a testing strategy is here, not as a separate skill.)*
-7. **Stakeholder decision authority** — who has sign-off authority on changes to these principles? Captured by name and role. Without this, principle changes become contentious mid-project.
-8. **Code review and branching policy** — trunk-based / GitFlow / GitHub flow? Required reviewers per PR? `/implement-plan` and downstream skills assume one of these defaults but the principles file is the source of truth.
+5. **Testing strategy** — TDD (tests before implementation), tests-after, integration-only, manual-only, none? Drives whether `/implement-plan` task templates embed "Tests to write first" blocks. **Recommended:** TDD for production-grade systems; tests-after for prototypes; manual-only or none for spike work. *(This is the principles-based approach to the testing-discipline question that batch 6 item 2 surfaced — the right place to declare a testing strategy is here, not as a separate skill.)*
+6. **Stakeholder decision authority** — who has sign-off authority on changes to these principles? Captured by name and role. Without this, principle changes become contentious mid-project.
+7. **Code review and branching policy** — trunk-based / GitFlow / GitHub flow? Required reviewers per PR? `/implement-plan` and downstream skills assume one of these defaults but the principles file is the source of truth.
 
 **Note:** Artifact language is **not** an interview topic — it is detected automatically from the user's first message and recorded in `## 1. Artifact Language` of the generated file. The user can override it later by re-running `/principles`.
 
@@ -157,13 +156,7 @@ For `/analyze` findings — action required before `/done` at the current step:
 - **MEDIUM:** documented and may be deferred.
 - **LOW:** informational only.
 
-## 7. Output Folder Structure
-
-**Mode:** {flat | subfolder}
-
-_(flat = all artifacts in the output directory root; subfolder = all artifacts under `{output_dir}/{slug}/`)_
-
-## 8. Project-Specific Notes
+## 7. Project-Specific Notes
 
 {any_additional_conventions_from_interview}
 ```

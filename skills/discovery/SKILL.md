@@ -127,11 +127,11 @@ Things we don't yet know and need to learn before committing real resources.
 
 `ba-toolkit init` already created `AGENTS.md` at the project root. After saving `00_discovery_{slug}.md` to `output/`, find the project's `AGENTS.md` (look in cwd first; if cwd is `output/`, check `../AGENTS.md`).
 
-**Update only the `## Pipeline Status` row for `/discovery`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename in the `File` column. **Do not recreate the file at the repo root.** **Do not add `## Artifacts` / `## Key context` sections** — those are not part of the v3.1+ template and would be ignored by future runs.
+**Update only the `## Pipeline Status` row for `/discovery`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename in the `File` column. **Do not touch the managed block** (`<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->`) — that's owned by `ba-toolkit init`.
 
 **Domain field exception (managed block).** `/discovery` is the canonical source of truth for the project domain after `ba-toolkit init`. After saving `00_discovery_{slug}.md`, compare the recommended domain in §8 of the discovery artifact against the `**Domain:**` line inside the managed block of `AGENTS.md`. **If they differ, surgically update only that single line** to the new value — do not modify any other managed-block field (`**Project:**`, `**Slug:**`, `**Language:**`, `**Output folder:**`, the auto-generated date comment). Mention the change in the user-facing reply: "Updated the project domain in AGENTS.md from `<old>` to `<new>` based on the discovery recommendation." This is the only managed-block field `/discovery` may touch; everything else inside `<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->` remains owned by `ba-toolkit init`.
 
-If you find no `AGENTS.md` at all (neither in cwd nor up the tree), warn the user that the project was likely set up before v3.2 and tell them to run `ba-toolkit init --name "..." --slug {slug}` to scaffold the per-project `AGENTS.md`. Do not create one yourself with arbitrary structure.
+If you find no `AGENTS.md` at all, warn the user that the project was likely not scaffolded with `ba-toolkit init` and tell them to run it. Do not create one yourself with arbitrary structure.
 
 If the existing `AGENTS.md` predates v3.2 and has no `/discovery` row in its Pipeline Status table, prepend a new row at stage `0` (and renumber the existing `/principles` row to `0a`) — same convention used by `/research` at stage `7a`. Mention the migration in your reply so the user knows their AGENTS.md was updated.
 
