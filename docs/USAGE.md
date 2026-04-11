@@ -200,7 +200,7 @@ Re-run `/analyze` after fixes to track progress.
 
 ## 5. Using /trace
 
-Run `/trace` after `/stories` to check traceability coverage. It builds the full FR → US → UC → AC → ... matrix.
+Run `/trace` after `/stories` to check traceability coverage. It builds the full FR → US → UC → AC → ... matrix (see [glossary](GLOSSARY.md) for acronym definitions).
 
 ```
 You:    /trace

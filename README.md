@@ -179,7 +179,7 @@ A complete example project — **Lumen Goods** (sustainable home-goods D2C onlin
 | Risk Register | [`00_risks_lumen-goods.md`](example/lumen-goods/00_risks_lumen-goods.md) |
 | Sprint Plan | [`00_sprint_lumen-goods.md`](example/lumen-goods/00_sprint_lumen-goods.md) |
 
-Full traceability: FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario, plus risk register and sprint plan.
+Full traceability: FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario, plus risk register and sprint plan. (See [glossary](docs/GLOSSARY.md) for acronym definitions.)
 
 ---
 
@@ -321,7 +321,7 @@ Adding a new domain = creating one Markdown file in `skills/references/domains/`
 
 Most pipeline skills follow the same cycle: **Command → Context → Interview → Generate → Refine**. Each skill loads all previous artifacts plus the domain reference and project principles, asks a few rounds of targeted questions, writes a Markdown artifact, and offers refinement subcommands before moving on. `/handoff`, `/trace`, and `/analyze` skip the interview — they extract everything from existing artifacts automatically.
 
-Every artifact links back to its predecessors, forming the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario`. Run `/trace` to verify coverage and `/analyze` for severity-rated findings (duplicates, ambiguous terms, terminology drift, invalid references).
+Every artifact links back to its predecessors, forming the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario` (see [glossary](docs/GLOSSARY.md) for definitions). Run `/trace` to verify coverage and `/analyze` for severity-rated findings (duplicates, ambiguous terms, terminology drift, invalid references).
 
 ### Subcommands
 

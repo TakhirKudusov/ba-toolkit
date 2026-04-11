@@ -1,6 +1,6 @@
 # BA Toolkit — Command Reference
 
-Quick reference for all 24 skills and subcommands.
+Quick reference for all 24 skills and subcommands. For term and acronym definitions (FR, US, AC, IEEE 830, etc.), see the [glossary](docs/GLOSSARY.md).
 
 ---
 

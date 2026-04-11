@@ -65,6 +65,8 @@ export default defineConfig({
       sidebar: [
         { label: 'Home', link: '/' },
         { label: 'Getting started', link: '/getting-started/' },
+        { label: 'Example project', link: '/example/' },
+        { label: 'Glossary', link: '/glossary/' },
         {
           label: 'Documentation',
           items: [
