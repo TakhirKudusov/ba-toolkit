@@ -11,6 +11,19 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [3.11.0] — 2026-04-11
+
+### Added
+
+- **CHANGELOG hygiene CI check.** New `.github/scripts/validate-changelog.mjs` validates CHANGELOG.md on every PR: `[Unreleased]` must be first, every version heading must follow `## [X.Y.Z] — YYYY-MM-DD` format, versions must decrease top-to-bottom (semver monotonicity), no duplicates, every released version must have a compare link at the bottom, and no orphan links are allowed. Runs as a new `validate-changelog` job in `validate.yml` (triggered on CHANGELOG.md changes) and as part of `npm test` locally. Closes the recurring manual-numbering-drift issue that required hand-fixes three times in the recent release history.
+
+### Changed
+
+- **`npm test` now includes CHANGELOG validation.** The test script chains `node .github/scripts/validate-changelog.mjs` after the existing test suite, so local development catches formatting issues before push.
+- **CONTRIBUTING.md** now notes that CHANGELOG.md is CI-validated and includes the local validation command.
+
+---
+
 ## [3.10.6] — 2026-04-11
 
 ### Added
@@ -805,6 +818,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[3.11.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.6...v3.11.0
 [3.10.6]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.5...v3.10.6
 [3.10.5]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.4...v3.10.5
 [3.10.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.3...v3.10.4
