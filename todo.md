@@ -58,6 +58,7 @@ Improvements batch 9:
 
 Improvements batch 10:
 1. ✅ Domain-reference contribution guide. (priority 1) Done in Unreleased — rewrote DOMAINS.md "Adding a new domain" section into a 5-step checklist: pick a slug, create the reference file (with structure template and quality bar), register in CLI DOMAINS array, test locally, open a PR. Cross-referenced from CONTRIBUTING.md.
+2. ✅ CHANGELOG hygiene CI check. (priority 2) Done in Unreleased — `.github/scripts/validate-changelog.mjs` validates: [Unreleased] is first, version format (semver + ISO date), monotonicity (newest first), no duplicates, compare links for every version, no orphan links. Added as `validate-changelog` job in `validate.yml` (triggers on CHANGELOG.md changes) and integrated into `npm test`. CONTRIBUTING.md updated with local validation command. ROADMAP.md Next section updated.
 
 Reported bugs:
 1. ✅ If `/discovery` redefines the domain, `AGENTS.md` still shows the domain entered at init. Done in v3.8.1 — `skills/discovery/SKILL.md` §6 gains a targeted "Domain field exception" that allows `/discovery` to surgically update only the `**Domain:**` line inside the managed block. Every other managed-block field stays owned by `ba-toolkit init`. Content fix only.

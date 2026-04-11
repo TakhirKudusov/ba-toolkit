@@ -16,3 +16,4 @@ Open a GitHub issue with: the skill name, the command you ran, the agent/platfor
 - One PR per domain or skill.
 - Test the skill end-to-end before submitting (run the full command, check the output file).
 - Keep the style consistent with existing skills: formal, neutral, no emoji in artifact body, language follows user input.
+- **CHANGELOG.md** is validated by CI (section ordering, version monotonicity, compare links). Run `node .github/scripts/validate-changelog.mjs` locally before pushing to catch formatting issues early.

@@ -8,6 +8,7 @@ on:
       - 'bin/**'
       - 'test/**'
       - 'package.json'
+      - 'CHANGELOG.md'
 
 jobs:
   validate-artifacts:
@@ -91,6 +92,22 @@ jobs:
             echo "  ✓ $domain_file"
           done
           echo "Domain reference check complete."
+
+  validate-changelog:
+    name: Validate CHANGELOG format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate CHANGELOG.md
+        run: node .github/scripts/validate-changelog.mjs
 
   run-tests:
     name: Run CLI tests
