@@ -86,5 +86,7 @@ Improvements batch 12:
 4. Cascading artifact update added to ROADMAP.md Next section. New /cascade utility or /revise extension to propagate requirement changes through downstream artifacts.
 5. ✅ Skill-template regression tests. Done in Unreleased — 3 new tests in cli.test.js: (a) 10 pipeline-stage templates carry "Forward traceability" section, (b) nfr-template has ≥7 ISO 25010 characteristic sections, (c) stories-template has INVEST self-check field. Test count 188 → 191.
 
-Новые улучшения:
-1. Убрать мультипроектность. Пусть дополняет существующий AGENTS.md, либо создает новый. Секция, посвященная проекту должна быть в конце файла. Также ИИ не должен менять старый контент в существующем AGENTS.md, а лишь дополнять его.
+Improvements batch 13:
+1. ✅ Remove multi-project support (v4.0.0 breaking change). Done in Unreleased — AGENTS.md at project root, artifacts flat in output/, no output/<slug>/ nesting. cmdInit warns on existing artifacts. Updated CLI, 6 SKILL.md files, environment.md, closing-message.md, agents-template.md, handoff-template.md, init.sh, init.ps1, 2 test files (removed multi-project test, added warning + preserve tests), README, USAGE.md, FAQ, GLOSSARY, TROUBLESHOOTING, CLAUDE.md, ROADMAP, getting-started, index.mdx. Website synced.
+2. ✅ Remove ✅ from recommended answer — already done in batch 11 (changed to plain `(recommended)`).
+3. Make prefixes for all commands ba-toolkit. Should be, e.g., /ba-toolkit.brief — **rejected in ROADMAP.md "Removed from the backlog"** (premature optimization, would break muscle memory, require 4.0.0 bump).

@@ -108,7 +108,7 @@ BA Toolkit follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html). T
 
 - **Patch** — content hygiene, docs changes, internal refactors that do not change the CLI surface, reference template rewrites, bug fixes that are content-only.
 - **Minor** — new skill, new `ba-toolkit` subcommand, new CLI flag, new domain reference, new agent in `install --for`, new template sections or fields that are additive.
-- **Major** — renaming or removing a skill, breaking change to `output/{slug}/` file naming, incompatible change to a CLI flag or subcommand, install path layout changes (for example, the v2.0 drop of the legacy `ba-toolkit/` wrapper).
+- **Major** — renaming or removing a skill, breaking change to `output/` file naming, incompatible change to a CLI flag or subcommand, install path layout changes (for example, the v2.0 drop of the legacy `ba-toolkit/` wrapper, the v4.0 removal of multi-project `output/<slug>/` layout).
 
 Releases are automated via `.github/workflows/release.yml` triggered by pushing a version tag. The workflow creates a GitHub Release with notes extracted from `CHANGELOG.md` and publishes to npm via Trusted Publishing (OIDC) — no `NPM_TOKEN` in secrets.
 

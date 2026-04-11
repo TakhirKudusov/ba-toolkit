@@ -4,7 +4,7 @@ Detailed walkthrough of the BA Toolkit pipeline in day-to-day use. For a high-le
 
 ## 1. Starting a project
 
-Setup is two phases: first `ba-toolkit init` scaffolds the project (slug, domain, agent install, `output/<slug>/AGENTS.md`); then you `cd` into the project folder and start the pipeline inside your AI agent with `/brief`.
+Setup is two phases: first `ba-toolkit init` scaffolds the project (slug, domain, agent install, `AGENTS.md`); then you open your AI agent at the project root and start the pipeline with `/brief`.
 
 ```bash
 # Step 1 — in your terminal, anywhere in your repo. Real terminals get
@@ -16,31 +16,13 @@ npx @kudusov.takhir/ba-toolkit init
 # Or non-interactive:
 npx @kudusov.takhir/ba-toolkit init --name "Neobank App" --domain fintech --for claude-code
 
-# Step 2 — open your AI agent inside the project folder. v3.1+ stores
-# each project's AGENTS.md and artifacts under output/<slug>/, so two
-# agent windows in the same repo can work on two completely
-# independent projects with zero collision.
-cd output/neobank-app
+# Step 2 — open your AI agent at the project root.
 claude         # or `cursor .`, `windsurf .`, `gemini`, `codex`, etc.
 ```
 
 After `init`, the slug, domain, and agent are fixed for the rest of the pipeline. Slug is derived from the project name and used as a suffix for every artifact: `01_brief_neobank-app.md`, `02_srs_neobank-app.md`, `03_stories_neobank-app.md`, …
 
-### Multi-project in one repo
-
-Each `ba-toolkit init` run creates a new `output/<slug>/` folder with its own `AGENTS.md`. To work on a different project later (or in a second agent window in parallel), `cd` into that project's folder:
-
-```bash
-# Window 1 — alpha project
-cd output/alpha-shop && claude
-
-# Window 2 — beta project, completely independent
-cd output/beta-portal && claude
-```
-
-Skills look for `AGENTS.md` in `cwd` first, so each window operates on its own project state. There is no shared "active project" pointer to get out of sync.
-
-Now start the pipeline inside the AI agent (cwd is `output/<slug>/`). There are two ways to call any interview-phase skill:
+Now start the pipeline inside your AI agent. Skills look for `AGENTS.md` in the current working directory. There are two ways to call any interview-phase skill:
 
 **(a) Plain slash command** — the agent asks an open-ended lead-in question first, then drills down with structured-option tables:
 
@@ -75,7 +57,7 @@ Agent:  Got it — 100k users, PMF focus. Next: what's the regulatory
 
 Agent:  [generates 01_brief_neobank-app.md]
 
-        Artifact saved: output/neobank-app/01_brief_neobank-app.md
+        Artifact saved: output/01_brief_neobank-app.md
         Covered: 3 business goals, 5 stakeholders, 4 risks.
 
         Available: /clarify · /revise · /expand · /validate · /done
@@ -239,28 +221,17 @@ Agent:  [rewrites US-014 as two stories: US-014 and US-014b]
 
 ---
 
-## 7. Working with multiple projects
+## 7. One project per directory
 
-Each project lives in its own `output/<slug>/` folder, which contains the project's `AGENTS.md` plus all of its artifacts (`01_brief_<slug>.md`, `02_srs_<slug>.md`, …). To work on a project, `cd` into its folder before opening your AI agent — that puts cwd at the project root, so every skill that looks for `AGENTS.md` or for prior artifacts via `01_brief_*.md` glob sees only this project's files.
+As of v4.0, each directory holds exactly one project. `AGENTS.md` lives at the project root (not inside a subfolder), and all artifacts are written to `output/`. To work on a second project, create a separate directory and run `ba-toolkit init` there.
 
-```bash
-# Two parallel projects in the same repo, two agent windows:
-# Window 1
-cd output/alpha-shop && claude       # works on alpha-shop only
-
-# Window 2
-cd output/beta-portal && claude      # works on beta-portal only
-```
-
-The two windows are completely isolated. Switching between projects later is just `cd output/<other-slug>`.
-
-If you re-run `ba-toolkit init --slug <existing-slug>` for an existing project, the per-project `AGENTS.md` is **merged** (managed-block anchors), not overwritten — see §8 for the merge mechanism.
+If you re-run `ba-toolkit init` in an existing project, `AGENTS.md` is **merged** (managed-block anchors), not overwritten — see §8 for the merge mechanism.
 
 ---
 
 ## 8. AGENTS.md — persistent project context
 
-`ba-toolkit init` creates `AGENTS.md` inside `output/<slug>/`, alongside the project's artifacts. The file holds the project name, slug, domain, output folder, and a Pipeline Status table that the AI agent updates as you progress through the pipeline. Any AI agent (Claude Code, Codex, Gemini CLI, Cursor, Windsurf) opened in that folder reads this file to understand the context without rescanning every artifact — useful when resuming work in a new session.
+`ba-toolkit init` creates `AGENTS.md` at the project root. The file holds the project name, slug, domain, output folder, and a Pipeline Status table that the AI agent updates as you progress through the pipeline. Any AI agent (Claude Code, Codex, Gemini CLI, Cursor, Windsurf) opened in the project directory reads this file to understand the context without rescanning every artifact — useful when resuming work in a new session.
 
 ```markdown
 # BA Toolkit — Project Context
@@ -274,7 +245,7 @@ If you re-run `ba-toolkit init --slug <existing-slug>` for an existing project, 
 **Slug:** my-app
 **Domain:** saas
 **Language:** English
-**Output folder:** output/my-app/
+**Output folder:** output/
 <!-- ba-toolkit:end managed -->
 
 ## Pipeline Status
@@ -326,7 +297,7 @@ Once the pipeline is far enough along to be useful (typically after `/brief` or 
 Use `ba-toolkit publish` (or `/publish` inside your AI agent) to bundle the markdown artifacts into import-ready folders:
 
 ```bash
-cd output/<slug>
+cd output
 ba-toolkit publish                       # both formats, default ./publish/
 ba-toolkit publish --format notion       # Notion only
 ba-toolkit publish --format confluence   # Confluence only

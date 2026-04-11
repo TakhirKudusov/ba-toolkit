@@ -30,16 +30,15 @@ npm install -g @kudusov.takhir/ba-toolkit
 ba-toolkit init
 ```
 
-`init` creates `output/<slug>/` with an `AGENTS.md` project context file, then installs the 24 skills into your chosen agent's native skills directory. No conversion step — every supported agent reads `SKILL.md` directly.
+`init` creates `AGENTS.md` at the project root and `output/` for artifacts, then installs the 24 skills into your chosen agent's native skills directory. No conversion step — every supported agent reads `SKILL.md` directly.
 
 ## 2. Open your AI agent in the project folder
 
 ```bash
-cd output/<slug>
 claude   # or: codex / gemini / cursor / windsurf
 ```
 
-Each project lives in its own `output/<slug>/` folder with its own `AGENTS.md`. Two agent windows can work on two different projects in the same repo without colliding.
+Open your AI agent at the project root (where `AGENTS.md` was created). Artifacts are saved to `output/`.
 
 ## 3. Run the pipeline
 

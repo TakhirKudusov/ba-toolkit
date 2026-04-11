@@ -200,8 +200,8 @@ Compatible with Jira CSV import, Trello, Asana, Monday.com, and Google Sheets. I
 Save the export file to the output directory alongside the artifacts:
 
 ```
-output/{slug}/export_{slug}_{format}.json
-output/{slug}/export_{slug}_stories.csv   (CSV format)
+output/export_{slug}_{format}.json
+output/export_{slug}_stories.csv   (CSV format)
 ```
 
 ## Closing message

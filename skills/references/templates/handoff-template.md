@@ -124,7 +124,7 @@ Top architectural decisions from `07a_research_[SLUG].md`. Dev team should read 
 ## 8. Artifact Files Reference
 
 ```
-output/[SLUG]/
+output/
 ├── 00_discovery_[SLUG].md
 ├── 00_principles_[SLUG].md
 ├── 00_analyze_[SLUG].md

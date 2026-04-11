@@ -99,7 +99,7 @@ if (-not $Domain) {
 
 # --- 4. Create folder structure ---
 
-$OutputDir = "output\$Slug"
+$OutputDir = "output"
 
 Write-Host ""
 Write-Host "  Creating project structure..." -ForegroundColor Green
@@ -136,7 +136,7 @@ if ($agentsPath) {
 **Slug:** $Slug
 **Domain:** $Domain
 **Language:** English
-**Output folder:** output/$Slug/
+**Output folder:** output/
 
 ## Pipeline Status
 
@@ -187,5 +187,5 @@ Write-Host "    2. Open your AI assistant (Claude, Cursor, etc.)"
 Write-Host "    3. Optional: run /principles to define project-wide conventions"
 Write-Host "    4. Run /brief to start the BA pipeline"
 Write-Host ""
-Write-Host "  Artifacts will be saved to: output\$Slug\" -ForegroundColor DarkGray
+Write-Host "  AGENTS.md is at the project root. Artifacts are saved to output/" -ForegroundColor DarkGray
 Write-Host ""

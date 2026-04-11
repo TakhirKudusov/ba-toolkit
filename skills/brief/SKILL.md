@@ -101,7 +101,7 @@ If a domain reference is loaded, supplement general questions with domain-specif
 
 ### 6. AGENTS.md update
 
-`ba-toolkit init` already created `AGENTS.md` next to where the artifact lives — typically in the current working directory (the user is expected to `cd output/<slug>` after running init). After saving `01_brief_{slug}.md`, find the project's `AGENTS.md` (look in cwd first; fall back to walking up the directory tree if cwd has none, for legacy v3.0 single-project layouts).
+`ba-toolkit init` already created `AGENTS.md` at the project root. After saving `01_brief_{slug}.md` to `output/`, find the project's `AGENTS.md` (look in cwd first; if cwd is `output/`, check `../AGENTS.md`).
 
 **Update only the `## Pipeline Status` row for `/brief`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename in the `File` column. **Do not touch the managed block** (`<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->`) — that's owned by `ba-toolkit init`. **Do not recreate the file at the repo root.** **Do not add `## Artifacts` / `## Key context` sections** — those are not part of the v3.1+ template and would be ignored by future runs.
 

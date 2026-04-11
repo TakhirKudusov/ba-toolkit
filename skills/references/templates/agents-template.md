@@ -9,7 +9,7 @@
 **Slug:** [SLUG]
 **Domain:** [DOMAIN]
 **Language:** English
-**Output folder:** output/[SLUG]/
+**Output folder:** output/
 <!-- ba-toolkit:end managed -->
 
 ## Pipeline Status

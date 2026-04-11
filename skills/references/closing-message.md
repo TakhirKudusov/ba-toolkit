@@ -78,7 +78,7 @@ Their closing block ends after the "Available commands" table. Optionally, they 
 
 ## Rules
 
-- `{file_path}` is the full path where the artifact was saved (typically `output/<slug>/{NN}_{name}_{slug}.md`).
+- `{file_path}` is the full path where the artifact was saved (typically `output/{NN}_{name}_{slug}.md`).
 - The summary line is generated dynamically — do not repeat boilerplate; mention actual numbers and decisions ("18 FRs across 3 roles, 4 risks captured", not "the artifact was generated").
 - The "Available commands" table is fixed (5 rows for pipeline skills). Utility skills omit `/done` from the table since they don't have a "finalize" state.
 - The "Next step" block is built from the lookup table above. Do not hardcode it in individual SKILL.md files.

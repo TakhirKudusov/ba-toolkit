@@ -47,11 +47,7 @@ irm https://raw.githubusercontent.com/TakhirKudusov/ba-toolkit/main/init.ps1 | i
 Large artifacts (especially after `/apicontract` or `/wireframes`) require significant context. Make sure your AI agent has at least 32k tokens of context window available. If the agent times out, try running the skill again — it will pick up where it left off by reading existing artifacts.
 
 **AGENTS.md not found error:**
-The agent expects to find `AGENTS.md` in the current working directory. Make sure you opened the agent inside `output/<slug>/` (not the repo root). Run:
-```bash
-cd output/<your-project-slug>
-claude   # or your agent command
-```
+The agent expects to find `AGENTS.md` in the current working directory (the project root). Make sure you opened the agent at the project root where `ba-toolkit init` was run, not inside `output/`. If you are inside `output/`, the agent will check `../AGENTS.md` automatically.
 
 **Artifacts are empty or contain only headers:**
 This usually means the agent's context window was exhausted mid-generation. Try:

@@ -246,13 +246,13 @@ Machine-readable dependency graph. A topological sort of this table yields a val
 
 ### 8. AGENTS.md update
 
-`ba-toolkit init` already created `AGENTS.md` next to where the artifact lives. After saving `12_implplan_{slug}.md`, find the project's `AGENTS.md` (look in cwd first; fall back to walking up the directory tree if cwd has none, for legacy single-project layouts).
+`ba-toolkit init` already created `AGENTS.md` at the project root. After saving `12_implplan_{slug}.md` to `output/`, find the project's `AGENTS.md` (look in cwd first; if cwd is `output/`, check `../AGENTS.md`).
 
 **Update only the `## Pipeline Status` row for `/implement-plan`** — toggle its status from `⬜ Not started` to `✅ Done` and fill in the artifact filename in the `File` column. **Do not touch the managed block** (`<!-- ba-toolkit:begin managed -->` … `<!-- ba-toolkit:end managed -->`) — that's owned by `ba-toolkit init`.
 
 If the existing `AGENTS.md` predates v3.4 and has no `/implement-plan` row in its Pipeline Status table, append a new row at stage `12` (the existing rows 0–11 stay as they are, no renumbering). Mention the migration in your reply so the user knows their AGENTS.md was updated.
 
-If you find no `AGENTS.md` at all (neither in cwd nor up the tree), warn the user that the project was likely set up before v3.1 and tell them to run `ba-toolkit init --name "..." --slug {slug}` to scaffold the per-project `AGENTS.md`. Do not create one yourself with arbitrary structure.
+If you find no `AGENTS.md` at all, warn the user that the project was likely not scaffolded with `ba-toolkit init` and tell them to run it. Do not create one yourself with arbitrary structure.
 
 ### 9. Iterative refinement
 

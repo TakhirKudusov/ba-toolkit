@@ -6,7 +6,7 @@ description: >
 
 # /publish — Notion / Confluence Publish
 
-Utility skill. Wraps the `ba-toolkit publish` CLI subcommand, which converts the markdown artifacts in the current `output/<slug>/` folder into folders ready to be dragged into Notion's **Import → Markdown & CSV** dialog or zipped and uploaded via Confluence's **Space settings → Content tools → Import → HTML** tool.
+Utility skill. Wraps the `ba-toolkit publish` CLI subcommand, which converts the markdown artifacts in the current `output/` folder into folders ready to be dragged into Notion's **Import → Markdown & CSV** dialog or zipped and uploaded via Confluence's **Space settings → Content tools → Import → HTML** tool.
 
 The conversion happens entirely on disk — **no API calls, no tokens, no network**. The user does the actual upload manually using each tool's native importer.
 
@@ -20,7 +20,7 @@ This is **not** the same as `/export`. `/export` produces JSON/CSV for issue tra
 
 ### 1. Environment detection
 
-The `ba-toolkit publish` subcommand uses the current working directory as the source — no `references/environment.md` lookup needed. Confirm with the user that they are inside their project's `output/<slug>/` folder before running it. If they are not, ask them to `cd output/<slug>` first.
+The `ba-toolkit publish` subcommand uses the current working directory as the source — no `references/environment.md` lookup needed. Confirm with the user that they are inside their project's `output/` folder before running it. If they are not, ask them to `cd output` first.
 
 ### 2. Pipeline check
 
@@ -47,7 +47,7 @@ Map the answer to a `--format` value: `a` → `both`, `b` → `notion`, `c` → 
 
 ### 4. Execution
 
-Invoke the CLI subcommand via the agent's Bash tool from the project's `output/<slug>/` directory:
+Invoke the CLI subcommand via the agent's Bash tool from the project's `output/` directory:
 
 ```bash
 ba-toolkit publish --format <choice>

@@ -1,4 +1,7 @@
-# Glossary
+---
+title: "Glossary"
+description: "Definitions of terms, acronyms, and standards used in BA Toolkit artifacts."
+---
 
 Quick reference for terms used across BA Toolkit documentation and generated artifacts. If you are new to business analysis or requirements engineering, start here.
 

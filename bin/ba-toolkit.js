@@ -956,22 +956,21 @@ async function cmdInit(args) {
   log('');
   log('  ' + green('Creating project structure...'));
 
-  const outputDir = path.join('output', slug);
+  const outputDir = 'output';
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
-    log(`    created  ${outputDir}`);
+    log(`    created  ${outputDir}/`);
   } else {
-    log(`    exists   ${outputDir}`);
+    // Warn if output/ already contains artifacts from a previous project.
+    const existing = fs.readdirSync(outputDir).filter((f) => ARTIFACT_FILE_RE.test(f));
+    if (existing.length > 0) {
+      log('    ' + yellow(`⚠  output/ already has ${existing.length} artifact(s). Pipeline skills may overwrite them.`));
+    } else {
+      log(`    exists   ${outputDir}/`);
+    }
   }
 
-  // AGENTS.md: per-project, lives inside output/<slug>/. Two agent
-  // windows can now work on two different projects in the same repo
-  // without colliding — each cd-s into its own output/<slug>/ folder
-  // and finds its own AGENTS.md there. The merge-on-reinit behaviour
-  // (managed-block anchors) still applies, just at per-project scope.
-  // See mergeAgentsMd for the three branches (created, merged,
-  // preserved).
-  const agentsPath = path.join(outputDir, 'AGENTS.md');
+  const agentsPath = 'AGENTS.md';
   const existingAgents = fs.existsSync(agentsPath)
     ? fs.readFileSync(agentsPath, 'utf8')
     : null;
@@ -1004,34 +1003,32 @@ async function cmdInit(args) {
 
   // --- 7. Final message ---
   log('');
-  log('  ' + cyan(`Project '${name}' (${slug}) is ready in ${outputDir}/.`));
+  log('  ' + cyan(`Project '${name}' (${slug}) is ready.`));
   log('');
   log('  ' + yellow('Next steps:'));
   if (installed === true) {
     log('    1. ' + AGENTS[agentId].restartHint);
-    log('    2. ' + bold(`cd ${outputDir}`) + ' — open your AI agent in this folder.');
-    log('       Each project has its own AGENTS.md, so two agent windows');
-    log('       can work on two different projects in the same repo.');
+    log('    2. Open your AI agent in this folder.');
     log('    3. Optional: run /discovery if you do not yet know what to build,');
     log('       or /principles to define project-wide conventions');
     log('    4. Run /brief to start the BA pipeline');
   } else if (installed === false) {
     log('    1. Skill install was cancelled. To install later, run:');
     log('         ' + gray(`ba-toolkit install --for ${agentId}`));
-    log('    2. ' + bold(`cd ${outputDir}`) + ' and open your AI agent there.');
+    log('    2. Open your AI agent in this folder.');
     log('    3. Optional: run /discovery if you do not yet know what to build,');
     log('       or /principles to define project-wide conventions');
     log('    4. Run /brief to start the BA pipeline');
   } else {
     log('    1. Install skills for your agent:');
     log('         ' + gray('ba-toolkit install --for claude-code'));
-    log('    2. ' + bold(`cd ${outputDir}`) + ' and open your AI agent there.');
+    log('    2. Open your AI agent in this folder.');
     log('    3. Optional: run /discovery if you do not yet know what to build,');
     log('       or /principles to define project-wide conventions');
     log('    4. Run /brief to start the BA pipeline');
   }
   log('');
-  log('  ' + gray(`Artifacts and AGENTS.md live in: ${outputDir}/`));
+  log('  ' + gray('AGENTS.md is at the project root. Artifacts are saved to output/.'));
   log('');
 }
 
@@ -1744,7 +1741,7 @@ async function cmdPublish(args) {
 
   if (artifacts.length === 0) {
     logError(`No BA Toolkit artifacts found in ${cwd}.`);
-    log('  Run this command from inside ' + cyan('output/<slug>/') + ' after generating artifacts.');
+    log('  Run this command from inside ' + cyan('output/') + ' after generating artifacts.');
     process.exit(1);
   }
 
@@ -1867,7 +1864,7 @@ ${bold('USAGE')}
 ${bold('COMMANDS')}
   init                           One-command project setup: prompts for name,
                                  slug, domain, and AI agent, then creates
-                                 output/{slug}/, AGENTS.md, and installs the
+                                 output/, AGENTS.md, and installs the
                                  skills into the chosen agent's directory.
   install --for <agent>          Install (or re-install) skills into an
                                  agent's directory without creating a project.
@@ -1884,7 +1881,7 @@ ${bold('COMMANDS')}
                                  report which versions are installed where.
                                  Read-only; no flags.
   publish [--format <fmt>]       Bundle the artifacts in the current
-                                 output/<slug>/ folder into import-ready
+                                 output/ folder into import-ready
                                  files for Notion (markdown) and Confluence
                                  (HTML). Format: notion, confluence, or
                                  both (default). No API calls, no tokens —
@@ -1944,7 +1941,7 @@ ${bold('EXAMPLES')}
   ba-toolkit status
 
   # Bundle a project's artifacts for Notion + Confluence import.
-  cd output/my-app
+  cd output
   ba-toolkit publish
   ba-toolkit publish --format notion --out ./share
   ba-toolkit publish --format confluence --dry-run

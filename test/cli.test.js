@@ -988,7 +988,7 @@ test('renderAgentsMd: substitutes the project name', () => {
 test('renderAgentsMd: substitutes the slug (multiple occurrences)', () => {
   const out = renderAgentsMd({ name: 'My App', slug: 'my-app', domain: 'saas' });
   assert.match(out, /\*\*Slug:\*\* my-app/);
-  assert.match(out, /output\/my-app\//);
+  assert.match(out, /output\//);
 });
 
 test('renderAgentsMd: substitutes the domain (multiple occurrences)', () => {

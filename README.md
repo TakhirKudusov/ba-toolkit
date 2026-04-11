@@ -40,8 +40,8 @@ Artifacts are generated in whatever language you write in — ask in English, ge
 
 ```bash
 # Full setup in one command — prompts for project name, domain, and
-# AI agent, then creates output/{slug}/, AGENTS.md, and installs the
-# skills into the chosen agent's directory.
+# AI agent, then creates output/, AGENTS.md, and installs the skills
+# into the chosen agent's directory.
 npx @kudusov.takhir/ba-toolkit init
 
 # Non-interactive (e.g. for CI): pass every choice on the command line.
@@ -54,9 +54,8 @@ ba-toolkit init
 
 Supported agents: `claude-code`, `codex`, `gemini`, `cursor`, `windsurf`. All five use the native Agent Skills format (folder-per-skill with `SKILL.md`) — Claude Code at `.claude/skills/`, Codex at `~/.codex/skills/`, Gemini at `.gemini/skills/`, Cursor at `.cursor/skills/`, Windsurf at `.windsurf/skills/`. Pass `--dry-run` to preview the install step without writing files, or `--no-install` to create only the project structure and install skills later with `ba-toolkit install --for <agent>`.
 
-**New in v3.1** — multi-project + interview UX:
+**New in v3.1** — interview UX:
 
-- **Multi-project: each `ba-toolkit init` creates `output/<slug>/AGENTS.md`**, scoped to that project. Two agent windows in the same repo can `cd output/alpha && claude` and `cd output/beta && claude` independently — no AGENTS.md collision, no shared state.
 - **Interview options as a 2-column table with letter IDs** (`a`, `b`, `c`, …) instead of a numbered list. Renders cleanly across all 5 supported agents, easier to scan, last row is always free-text "Other".
 - **Inline context after slash commands**: `/brief I want to build an online store for construction materials...` is parsed as a lead-in answer; the skill skips redundant questions and jumps straight to what's missing. Works for all 12 interview-phase skills.
 - **Open-ended lead-in question** for `/brief` and `/principles` when there's no inline context — `Tell me about the project in your own words` — instead of dumping a structured table on the first turn.
@@ -140,7 +139,7 @@ bash init.sh
 .\init.ps1
 ```
 
-Equivalent to `npx @kudusov.takhir/ba-toolkit init` — asks for a slug, name, and domain, then creates `output/{slug}/` and an `AGENTS.md` with the pipeline status table.
+Equivalent to `npx @kudusov.takhir/ba-toolkit init` — asks for a slug, name, and domain, then creates `output/` and an `AGENTS.md` with the pipeline status table.
 
 ### Updating a manual install
 
@@ -364,7 +363,7 @@ Use `/clarify` at any step to resolve ambiguities before moving on. Approximate 
 
 ## Usage guide
 
-Full walkthrough of the pipeline in day-to-day use — starting a project, moving between steps, `/clarify`, `/analyze`, `/trace`, `/split`, working with multiple projects, and `AGENTS.md` — lives in [docs/USAGE.md](docs/USAGE.md).
+Full walkthrough of the pipeline in day-to-day use — starting a project, moving between steps, `/clarify`, `/analyze`, `/trace`, `/split`, and `AGENTS.md` — lives in [docs/USAGE.md](docs/USAGE.md).
 
 For common issues and fixes, see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 

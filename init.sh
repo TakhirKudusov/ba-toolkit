@@ -104,7 +104,7 @@ fi
 
 # --- 4. Create folder structure ---
 
-OUTPUT_DIR="output/$SLUG"
+OUTPUT_DIR="output"
 
 echo ""
 echo -e "  ${GREEN}Creating project structure...${RESET}"
@@ -141,7 +141,7 @@ if [ -n "$AGENTS_PATH" ]; then
 **Slug:** $SLUG
 **Domain:** $DOMAIN
 **Language:** English
-**Output folder:** output/$SLUG/
+**Output folder:** output/
 
 ## Pipeline Status
 
@@ -190,5 +190,5 @@ echo "    2. Open your AI assistant (Claude, Cursor, etc.)"
 echo "    3. Optional: run /principles to define project-wide conventions"
 echo "    4. Run /brief to start the BA pipeline"
 echo ""
-echo -e "  ${DARK_GRAY}Artifacts will be saved to: output/$SLUG/${RESET}"
+echo -e "  ${DARK_GRAY}AGENTS.md is at the project root. Artifacts are saved to output/${RESET}"
 echo ""

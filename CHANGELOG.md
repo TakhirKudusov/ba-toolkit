@@ -11,6 +11,31 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [4.0.0] — 2026-04-11
+
+### Changed
+
+- **AGENTS.md now lives at the project root** instead of inside `output/<slug>/`. One directory = one project.
+- **Artifacts save to `output/`** (flat) instead of `output/<slug>/`. The slug is still used in filenames (`01_brief_<slug>.md`) but not in directory structure.
+- **`ba-toolkit init` warns** when `output/` already contains artifacts from a previous project, instead of silently creating a new subfolder.
+- **Skills detect AGENTS.md** at cwd or `../AGENTS.md` (when cwd is `output/`), no longer walking up the full directory tree.
+- **`ba-toolkit publish`** error message and help text updated to reference `output/` instead of `output/<slug>/`.
+- **Shell fallbacks** (`init.sh`, `init.ps1`) updated to match the new layout.
+
+### Removed
+
+- **Multi-project support.** The v3.x `output/<slug>/` per-project subfolder layout is removed. Each directory is now a single project. Running `ba-toolkit init` twice in the same directory merges into the existing root `AGENTS.md` (managed-block merge is preserved).
+
+### Migration from v3.x
+
+If you have an existing v3.x project with `output/<slug>/AGENTS.md`:
+1. Move `output/<slug>/AGENTS.md` to the project root.
+2. Move artifacts from `output/<slug>/*.md` to `output/`.
+3. Remove the empty `output/<slug>/` directory.
+4. Run `ba-toolkit upgrade --for <agent>` to refresh the installed skills.
+
+---
+
 ## [3.13.1] — 2026-04-11
 
 ### Added
@@ -847,6 +872,7 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 ---
 
 [Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.10.1...HEAD
+[4.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.13.1...v4.0.0
 [3.13.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.13.0...v3.13.1
 [3.13.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.12.0...v3.13.0
 [3.12.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.11.0...v3.12.0
