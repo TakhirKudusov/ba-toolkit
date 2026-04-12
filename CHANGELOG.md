@@ -11,6 +11,17 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [4.0.3] — 2026-04-12
+
+### Fixed
+
+- **Shell fallback scripts (`init.sh`, `init.ps1`) were missing three domains** added in v3.3.0 — `edtech`, `govtech`, `ai-ml`. Users who set up projects via the shell scripts only saw 10 domains instead of 13.
+- **Shell fallback scripts generated an outdated AGENTS.md** — missing `/discovery` (stage 0), `/implement-plan` (stage 12), and the Utility Skills section. Stage numbering for `/principles` was `0` instead of `0a`. Both scripts now match the canonical template at `skills/references/templates/agents-template.md`.
+- **`docs/TROUBLESHOOTING.md` listed only 9 of 12 domain reference files** — added `edtech`, `govtech`, `ai-ml` and clarified that `custom` has no reference file.
+- **Removed orphaned `skills/{brief,srs,…}/` directory** — an empty folder with a literal brace-expansion string as its name, shipped in the npm package.
+
+---
+
 ## [4.0.2] — 2026-04-12
 
 ### Fixed
@@ -888,7 +899,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.2...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.3...HEAD
+[4.0.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.2...v4.0.3
 [4.0.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.1...v4.0.2
 [4.0.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v3.13.1...v4.0.0

@@ -22,6 +22,9 @@ $Domains = @(
     @{ id = "social-media"; name = "Social/Media"; desc = "Social networks, creator platforms, community forums" },
     @{ id = "real-estate";  name = "Real Estate";  desc = "Property portals, agency CRM, rental management" },
     @{ id = "igaming";      name = "iGaming";      desc = "Slots, betting, casino, Telegram Mini Apps" },
+    @{ id = "edtech";       name = "EdTech";       desc = "LMS, K-12, higher ed, MOOC, corporate L&D, language learning" },
+    @{ id = "govtech";      name = "GovTech";      desc = "Citizen e-services, permits, tax, benefits, public records" },
+    @{ id = "ai-ml";        name = "AI / ML";      desc = "LLM apps, RAG, agents, model serving, fine-tuning, MLOps" },
     @{ id = "custom";       name = "Custom";       desc = "Any other domain — general interview questions" }
 )
 
@@ -142,7 +145,8 @@ if ($agentsPath) {
 
 | Stage | Skill | Status | File |
 |-------|-------|--------|------|
-| 0 | /principles | ⬜ Not started | — |
+| 0 | /discovery | ⬜ Not started | — |
+| 0a | /principles | ⬜ Not started | — |
 | 1 | /brief | ⬜ Not started | — |
 | 2 | /srs | ⬜ Not started | — |
 | 3 | /stories | ⬜ Not started | — |
@@ -155,6 +159,23 @@ if ($agentsPath) {
 | 9 | /wireframes | ⬜ Not started | — |
 | 10 | /scenarios | ⬜ Not started | — |
 | 11 | /handoff | ⬜ Not started | — |
+| 12 | /implement-plan | ⬜ Not started | — |
+
+## Utility Skills
+
+Available at any pipeline stage — no fixed position. Invoke whenever they help. See COMMANDS.md for descriptions.
+
+| Tool | Purpose |
+|------|---------|
+| /trace | Traceability Matrix + coverage gaps |
+| /clarify [focus] | Targeted ambiguity resolution for any artifact |
+| /analyze | Cross-artifact quality report with severity-rated findings |
+| /estimate | Effort estimation — Fibonacci SP, T-shirt sizes, or person-days |
+| /glossary | Unified project glossary with terminology drift detection |
+| /export [format] | Export User Stories to Jira / GitHub Issues / Linear / CSV |
+| /publish [format] | Bundle artifacts for Notion (Markdown) or Confluence (HTML) |
+| /risk | Risk register — probability x impact matrix, mitigation per risk |
+| /sprint | Sprint plan — stories grouped by velocity and capacity with sprint goals |
 
 ## Key Constraints
 
