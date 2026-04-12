@@ -1,6 +1,6 @@
 ---
 title: BA Toolkit
-description: "AI-powered Business Analyst pipeline — from concept to implementation plan. 24 skills, 12 domains, zero runtime dependencies."
+description: "AI-powered Business Analyst pipeline — from concept to implementation plan. 29 skills, 12 domains, zero runtime dependencies."
 template: splash
 hero:
   title: BA Toolkit
@@ -20,7 +20,7 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 ## Why BA Toolkit?
 
 <CardGrid>
-  <Card title="24 interconnected skills" icon="pencil">
+  <Card title="29 interconnected skills" icon="pencil">
     From `/discovery` (brainstorm an idea) through `/brief`, `/srs`, `/stories`, `/ac`, `/nfr`, `/datadict`, `/apicontract`, `/wireframes`, `/scenarios`, `/handoff` to `/implement-plan` — a complete BA pipeline inside your AI coding agent.
   </Card>
 
@@ -47,7 +47,7 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 ## How it works
 
-Most skills follow the same cycle: **Command → Context → Interview → Generate → Refine**. Each skill loads all previous artifacts plus the domain reference, asks targeted questions (one at a time, table of options, one marked **Recommended**), writes a Markdown artifact, and offers refinement subcommands before moving on.
+Most skills follow the same cycle: **Command → Context → Interview → Generate → Refine**. Each skill loads all previous artifacts plus the domain reference, asks targeted questions (one at a time, table of options, one marked **Recommended**), writes a Markdown artifact, and offers refinement skills before moving on.
 
 Every artifact links back to its predecessors — requirements trace to user stories, stories trace to acceptance criteria, and so on through the entire specification. Run `/trace` to verify nothing was lost and `/analyze` to catch quality issues before they become expensive rework.
 
@@ -59,14 +59,14 @@ After `/handoff`, run `/implement-plan` to produce a **dependency-ordered implem
 npx @kudusov.takhir/ba-toolkit init
 ```
 
-Prompts for project name, domain, and AI agent, then creates `AGENTS.md`, `output/`, and installs the 24 skills into your agent's directory.
+Prompts for project name, domain, and AI agent, then creates `AGENTS.md`, `output/`, and installs the 29 skills into your agent's directory.
 
 **[Read the full getting-started guide →](/ba-toolkit/getting-started/)**
 
 ## Common questions
 
 <CardGrid>
-  <LinkCard title="Do I need all 24 skills?" href="/ba-toolkit/faq/" description="No. The lean pipeline covers essentials in ~3-4 hours. Add more steps when you need deeper coverage." />
+  <LinkCard title="Do I need all 29 skills?" href="/ba-toolkit/faq/" description="No. The lean pipeline covers essentials in ~3-4 hours. Add more steps when you need deeper coverage." />
   <LinkCard title="What if I don't know what to build?" href="/ba-toolkit/faq/" description="Start with /discovery — it runs a structured brainstorm and recommends a domain, name, and MVP scope." />
   <LinkCard title="Can I use it in any language?" href="/ba-toolkit/faq/" description="Yes. The agent detects your language and generates all artifacts accordingly." />
   <LinkCard title="How do I share with stakeholders?" href="/ba-toolkit/faq/" description="Run ba-toolkit publish to bundle artifacts for Notion or Confluence import." />

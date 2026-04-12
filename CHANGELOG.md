@@ -11,6 +11,21 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [4.1.0] — 2026-04-12
+
+### Added
+
+- **5 new refinement skills promoted from inline subcommands to standalone utility skills.** `/validate`, `/revise`, `/expand`, `/split`, and `/done` now have their own `skills/{name}/SKILL.md` files and work as first-class skills in every supported agent. Previously these were documented as "subcommands" but had no SKILL.md — typing them triggered "Unknown skill" errors. Each skill follows the established `/clarify` pattern: YAML frontmatter with trigger phrases, context loading, environment detection, slug source, and closing message format.
+  - **`/validate`** — single-artifact completeness and consistency check: mandatory fields, ID format, cross-references, MoSCoW count verification, Definition of Ready compliance. Reports findings by severity; offers auto-fix.
+  - **`/revise [section]`** — rewrites a specific section based on user feedback or an `/analyze` finding ID (e.g., `/revise A1`). Includes ripple-effect check across downstream artifacts.
+  - **`/expand [section]`** — adds depth and detail to an under-developed section using domain knowledge and prior artifacts. Preserves existing content.
+  - **`/split [element]`** — decomposes an oversized FR, User Story, or Use Case into smaller pieces using INVEST criteria and Mike Cohn's nine story-splitting patterns. Updates cross-references.
+  - **`/done`** — finalizes the current artifact (Version 1.0, Status: Approved), runs a quality gate check (blocks on CRITICAL findings), updates `AGENTS.md` pipeline status, and presents the next pipeline step.
+- **Skill count increased from 24 to 29** across all documentation, package metadata, and test assertions.
+- **"Subcommands" terminology retired** — all references to "subcommands" in documentation updated to "refinement skills". The `## Subcommands` section in COMMANDS.md and README.md replaced with `## Refinement skills` with full skill descriptions.
+
+---
+
 ## [4.0.4] — 2026-04-12
 
 ### Fixed
@@ -907,7 +922,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.4...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.1.0...HEAD
+[4.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.4...v4.1.0
 [4.0.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.3...v4.0.4
 [4.0.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.2...v4.0.3
 [4.0.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.1...v4.0.2

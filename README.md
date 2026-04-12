@@ -22,7 +22,7 @@ Turn a rough project idea into a complete, structured specification — then han
 
 ## What is this
 
-BA Toolkit turns a rough project idea into a complete, structured specification — requirements, user stories, acceptance criteria, API contracts, wireframes, and a step-by-step implementation plan. It runs as **24 AI-powered skills** inside your coding agent (Claude Code, Cursor, Codex CLI, Gemini CLI, or Windsurf) and produces Markdown documents that are cross-referenced, traceable, and ready for development or stakeholder review.
+BA Toolkit turns a rough project idea into a complete, structured specification — requirements, user stories, acceptance criteria, API contracts, wireframes, and a step-by-step implementation plan. It runs as **29 AI-powered skills** inside your coding agent (Claude Code, Cursor, Codex CLI, Gemini CLI, or Windsurf) and produces Markdown documents that are cross-referenced, traceable, and ready for development or stakeholder review.
 
 **How it works:** you type a slash command (e.g., `/brief`), the agent asks you a series of focused questions about your project, and generates a structured document. Each step builds on the previous ones — requirements link to user stories, stories link to acceptance criteria, and so on through the entire chain. After the last step, you have a complete specification package that a developer or AI coding agent can execute.
 
@@ -119,11 +119,11 @@ Reload the CLI after copying.
 
 ### Cursor
 
-Cursor has two separate features — Rules (`.cursor/rules/*.mdc`) and [Agent Skills](https://cursor.com/docs/skills) (`.cursor/skills/<skill>/SKILL.md`). BA Toolkit is a set of skills, not rules, so `ba-toolkit install --for cursor` drops the 24 skills directly into `.cursor/skills/` using the native folder-per-skill `SKILL.md` format — no conversion needed. Reload the Cursor window to pick them up.
+Cursor has two separate features — Rules (`.cursor/rules/*.mdc`) and [Agent Skills](https://cursor.com/docs/skills) (`.cursor/skills/<skill>/SKILL.md`). BA Toolkit is a set of skills, not rules, so `ba-toolkit install --for cursor` drops the 29 skills directly into `.cursor/skills/` using the native folder-per-skill `SKILL.md` format — no conversion needed. Reload the Cursor window to pick them up.
 
 ### Windsurf
 
-Windsurf's [Agent Skills](https://docs.windsurf.com/windsurf/cascade/skills) feature loads skills from `.windsurf/skills/<skill>/SKILL.md`, the same folder-per-skill layout as Claude Code and Cursor. `ba-toolkit install --for windsurf` writes the 24 skills there natively. Reload the Windsurf window to pick them up.
+Windsurf's [Agent Skills](https://docs.windsurf.com/windsurf/cascade/skills) feature loads skills from `.windsurf/skills/<skill>/SKILL.md`, the same folder-per-skill layout as Claude Code and Cursor. `ba-toolkit install --for windsurf` writes the 29 skills there natively. Reload the Windsurf window to pick them up.
 
 ### Aider
 
@@ -318,11 +318,13 @@ Adding a new domain = creating one Markdown file in `skills/references/domains/`
 
 ## How it works
 
-Most pipeline skills follow the same cycle: **Command → Context → Interview → Generate → Refine**. Each skill loads all previous artifacts plus the domain reference and project principles, asks a few rounds of targeted questions, writes a Markdown artifact, and offers refinement subcommands before moving on. `/handoff`, `/trace`, and `/analyze` skip the interview — they extract everything from existing artifacts automatically.
+Most pipeline skills follow the same cycle: **Command → Context → Interview → Generate → Refine**. Each skill loads all previous artifacts plus the domain reference and project principles, asks a few rounds of targeted questions, writes a Markdown artifact, and offers refinement skills before moving on. `/handoff`, `/trace`, and `/analyze` skip the interview — they extract everything from existing artifacts automatically.
 
 Every artifact links back to its predecessors, forming the chain `FR → US → UC → AC → NFR → Entity → ADR → API → WF → Scenario` (see [glossary](docs/GLOSSARY.md) for definitions). Run `/trace` to verify coverage and `/analyze` for severity-rated findings (duplicates, ambiguous terms, terminology drift, invalid references).
 
-### Subcommands
+### Refinement skills
+
+Available at any pipeline stage after the first artifact exists. These skills refine and validate artifacts without advancing the pipeline (except `/done`, which finalizes and moves on).
 
 | Command | What it does |
 |---------|-------------|
@@ -338,7 +340,7 @@ Every artifact links back to its predecessors, forming the chain `FR → US → 
 
 ## Minimum viable pipeline
 
-Not every project needs all 24 skills. Three common paths:
+Not every project needs all 29 skills. Three common paths:
 
 **Concept-first** (when you don't yet know what to build):
 ```

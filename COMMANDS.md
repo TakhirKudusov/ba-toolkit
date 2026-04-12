@@ -1,6 +1,6 @@
 # BA Toolkit — Command Reference
 
-Quick reference for all 24 skills and subcommands. For term and acronym definitions (FR, US, AC, IEEE 830, etc.), see the [glossary](docs/GLOSSARY.md).
+Quick reference for all 29 skills. For term and acronym definitions (FR, US, AC, IEEE 830, etc.), see the [glossary](docs/GLOSSARY.md).
 
 ---
 
@@ -46,17 +46,17 @@ Available at any pipeline stage.
 
 ---
 
-## Subcommands
+## Refinement skills
 
-Available within any active pipeline skill (after generation, before `/done`).
+Available at any pipeline stage after the first artifact exists. These skills refine and validate artifacts without advancing the pipeline (except `/done`, which finalizes and moves on).
 
-| Subcommand | What it does |
-|------------|-------------|
-| `/revise [section]` | Rewrite a specific section with your feedback |
-| `/expand [section]` | Add more detail to a section |
-| `/split [element]` | Break a large element into smaller ones (e.g., split an oversized User Story) |
-| `/validate` | Check completeness, consistency, and alignment with prior artifacts |
-| `/done` | Finalise the current artifact and move to the next pipeline step |
+| Command | Output file | What it generates |
+|---------|-------------|-------------------|
+| `/validate` | _(reports in chat)_ | Completeness and consistency check for a single artifact: mandatory fields, ID format, cross-references, MoSCoW counts, Definition of Ready |
+| `/revise [section]` | _(updates existing artifact)_ | Section rewrite: applies user feedback or resolves an `/analyze` finding, with ripple-effect check across downstream artifacts |
+| `/expand [section]` | _(updates existing artifact)_ | Section expansion: adds depth, detail, and missing elements to an under-developed section |
+| `/split [element]` | _(updates existing artifact)_ | Element decomposition: breaks an oversized FR, User Story, or Use Case into smaller pieces using INVEST criteria and Cohn's splitting patterns |
+| `/done` | _(updates AGENTS.md)_ | Finalize: quality gate check, artifact metadata update (Version 1.0, Status: Approved), AGENTS.md pipeline advancement |
 
 ---
 

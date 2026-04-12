@@ -30,7 +30,7 @@ npm install -g @kudusov.takhir/ba-toolkit
 ba-toolkit init
 ```
 
-`init` creates `AGENTS.md` at the project root and `output/` for artifacts, then installs the 24 skills into your chosen agent's native skills directory. No conversion step — every supported agent reads `SKILL.md` directly.
+`init` creates `AGENTS.md` at the project root and `output/` for artifacts, then installs the 29 skills into your chosen agent's native skills directory. No conversion step — every supported agent reads `SKILL.md` directly.
 
 ## 2. Open your AI agent in the project folder
 
@@ -132,7 +132,7 @@ Drag-and-drop the generated folders into Notion's **Import → Markdown & CSV** 
 ## What's next
 
 - The full [usage guide](/usage/) walks through every skill in detail.
-- The [command reference](/commands/) lists every shipped skill and subcommand.
+- The [command reference](/commands/) lists every shipped skill.
 - The [FAQ](/faq/) answers common questions about language support, offline use, and editing past artifacts.
 - The [glossary](/glossary/) explains all the acronyms and standards referenced in the artifacts.
 - The [roadmap](/roadmap/) covers what is planned next and what is explicitly out of scope.

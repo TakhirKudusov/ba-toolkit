@@ -710,7 +710,7 @@ test('parseSkillFrontmatter: parses every shipped SKILL.md without losing the de
   const skillFolders = fs.readdirSync(skillsDir, { withFileTypes: true })
     .filter((e) => e.isDirectory() && e.name !== 'references')
     .map((e) => e.name);
-  assert.ok(skillFolders.length >= 24, `expected at least 24 skill folders, found ${skillFolders.length}`);
+  assert.ok(skillFolders.length >= 29, `expected at least 29 skill folders, found ${skillFolders.length}`);
   for (const folder of skillFolders) {
     const skillPath = path.join(skillsDir, folder, 'SKILL.md');
     if (!fs.existsSync(skillPath)) continue;

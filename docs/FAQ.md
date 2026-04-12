@@ -1,6 +1,6 @@
 # FAQ
 
-**Do I need all 24 skills?**
+**Do I need all 29 skills?**
 No. The lean pipeline (`/brief → /srs → /stories → /ac → /nfr → /datadict → /apicontract → /wireframes → /handoff → /implement-plan`) covers the essentials and ends with an AI-actionable plan in ~3–4 hours. Add `/usecases`, `/research`, `/scenarios`, `/trace`, and `/analyze` when you need deeper coverage.
 
 **How do I hand the BA pipeline to an AI coding agent so it can actually build the project?**

@@ -44,7 +44,7 @@ export default defineConfig({
     starlight({
       title: 'BA Toolkit',
       description:
-        'AI-powered Business Analyst pipeline — concept to a phase-and-DAG implementation plan an AI coding agent can execute. 24 skills, 12 domains, zero runtime dependencies. Works with Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf.',
+        'AI-powered Business Analyst pipeline — concept to a phase-and-DAG implementation plan an AI coding agent can execute. 29 skills, 12 domains, zero runtime dependencies. Works with Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf.',
       // Social links shown in the header. Per Starlight 0.30+ this is an
       // array of { icon, label, href } objects.
       social: [

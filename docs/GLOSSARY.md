@@ -24,11 +24,12 @@ The industry vertical your project belongs to — for example, SaaS, Fintech, E-
 **Traceability**
 The practice of linking every requirement to its downstream artifacts (user stories, acceptance criteria, API endpoints, wireframes) so you can verify that nothing was lost or duplicated. The `/trace` skill builds the full traceability matrix automatically.
 
-**Subcommands**
-After a skill generates an artifact, you can refine it without re-running the full skill:
+**Refinement skills**
+After a skill generates an artifact, you can refine it using standalone utility skills:
+- `/validate` — check completeness and consistency of the current artifact
 - `/revise [section]` — rewrite a specific section with new feedback
 - `/expand [section]` — add more detail to an under-developed section
-- `/validate` — check completeness and consistency
+- `/split [element]` — break a large element (FR, User Story, Use Case) into smaller pieces
 - `/done` — finalize the artifact and move to the next pipeline step
 
 ---

@@ -4,7 +4,7 @@
 
 ## 1. What this project is
 
-BA Toolkit is an AI-powered Business Analyst pipeline: 24 interconnected skills that take a project from a vague concept through brief, handoff, stakeholder publishing (Notion + Confluence), and a sequenced implementation plan an AI coding agent can execute. Published to npm as **`@kudusov.takhir/ba-toolkit`** (scoped, public). Works with Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf. The CLI is a single-file Node.js script with **zero runtime dependencies**.
+BA Toolkit is an AI-powered Business Analyst pipeline: 29 interconnected skills that take a project from a vague concept through brief, handoff, stakeholder publishing (Notion + Confluence), and a sequenced implementation plan an AI coding agent can execute. Published to npm as **`@kudusov.takhir/ba-toolkit`** (scoped, public). Works with Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf. The CLI is a single-file Node.js script with **zero runtime dependencies**.
 
 ## 2. Language rule — English only
 
@@ -31,7 +31,7 @@ There is **no build step** — the CLI runs directly with `node`. There are **no
 
 ```
 bin/ba-toolkit.js         # CLI entry point (~2060 lines, single file, zero deps)
-skills/                   # 24 SKILL.md files + references/ (entry: /discovery → /brief; finish: /handoff → /implement-plan; utility: /trace, /clarify, /analyze, /estimate, /glossary, /export, /publish, /risk, /sprint)
+skills/                   # 29 SKILL.md files + references/ (entry: /discovery → /brief; finish: /handoff → /implement-plan; utility: /trace, /clarify, /analyze, /estimate, /glossary, /export, /publish, /risk, /sprint; refinement: /validate, /revise, /expand, /split, /done)
   {skill}/SKILL.md        # Each skill has YAML frontmatter (name, description)
   references/
     domains/              # 12 domain files + placeholder entries for custom
@@ -43,7 +43,7 @@ skills/                   # 24 SKILL.md files + references/ (entry: /discovery �
 example/lumen-goods/      # Real end-to-end example project (e-commerce D2C) — do NOT edit
 docs/                     # Extracted from README in v1.2.5
   USAGE.md · TROUBLESHOOTING.md · FAQ.md · DOMAINS.md
-COMMANDS.md               # Quick reference for all 24 skills, subcommands, export formats
+COMMANDS.md               # Quick reference for all 29 skills and export formats
 ROADMAP.md                # Mission, now/next, recently shipped, known limitations, removed ideas
 CONTRIBUTING.md           # Extracted from README in v1.2.5
 init.sh · init.ps1        # Zero-dependency shell/PowerShell fallbacks for the CLI
