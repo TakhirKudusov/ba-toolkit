@@ -152,4 +152,4 @@ Build the `Next step:` block from the pipeline lookup table in `references/closi
 
 ## Style
 
-Formal, neutral. No emoji, slang. Generate in the artifact language. Technical terms (ADR, REST, WebSocket, JWT) remain in English. Architecture option names remain in English.
+Formal, neutral. No emoji, slang. Generate the artifact in the language of the user's request — see `references/language-rule.md` for what to translate and what stays in English. Architecture option names remain in English.

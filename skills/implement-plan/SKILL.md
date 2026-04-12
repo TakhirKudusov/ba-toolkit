@@ -280,4 +280,4 @@ Build the `Next step:` block from the pipeline lookup table in `references/closi
 
 ## Style
 
-Formal, neutral, imperative. No emoji in the saved file. Phase goals are user-outcome sentences, not task lists. Task titles are imperative verbs ("Create", "Implement", "Wire", "Migrate", "Document"). Definition-of-Done bullets are checkable, not aspirational. Generate the artifact in the language of the user's request; section headings, table headers, and labels also in the user's language. ID columns and code identifiers (`T-04-007`, `FR-001`, `Entity:User`, file paths) stay ASCII.
+Formal, neutral, imperative. No emoji in the saved file. Phase goals are user-outcome sentences, not task lists. Task titles are imperative verbs ("Create", "Implement", "Wire", "Migrate", "Document"). Definition-of-Done bullets are checkable, not aspirational. Generate the artifact in the language of the user's request — see `references/language-rule.md` for what to translate and what stays in English.

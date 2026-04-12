@@ -11,6 +11,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [4.1.1] — 2026-04-12
+
+### Fixed
+
+- **Systematic mixed-language output in non-English artifacts** — when users wrote in a non-English language, artifacts got English section headings, table headers, field labels ("**Priority:**", "**Description:**", etc.), and closing summaries ("Artifact saved:", "Next step:", etc.) while body text was in the user's language. Root cause: templates and reference files are English-only (correct per convention), but only 9 of 29 skills had an explicit rule to translate structural elements. Created `skills/references/language-rule.md` — a single shared reference defining exactly what to translate (headings, labels, table headers, closing message text, interview acknowledgments) and what stays in English (element IDs, file paths, slash commands, MoSCoW values, INVEST criteria). All 29 SKILL.md files now reference this file from their Style section. Updated `closing-message.md` with explicit translation guidance for all template labels. Updated `interview-protocol.md` rule 5 to specify acknowledgments are in the user's language. Removed per-template HTML language comments from `stories-template.md` and `ac-template.md` (now covered by the shared rule).
+
+---
+
 ## [4.1.0] — 2026-04-12
 
 ### Added
@@ -922,7 +930,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.1.0...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.1.1...HEAD
+[4.1.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.4...v4.1.0
 [4.0.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.3...v4.0.4
 [4.0.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.2...v4.0.3

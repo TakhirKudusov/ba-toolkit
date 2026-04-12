@@ -17,7 +17,7 @@ Every BA Toolkit skill that gathers information from the user MUST follow this p
 
 4. **Wait for the answer.** Do not generate the next question or any part of the artifact until the user has replied. A non-answer (e.g. "I don't know", "skip") is a valid answer — record it as "unknown" and move on. The user can respond with the letter ID (`a`, `b`, …), the verbatim variant text, or — for the free-text row — any text of their own.
 
-5. **Acknowledge, then proceed.** After each answer, reflect it back in one line (e.g. "Got it — primary user is the Ops team at mid-size logistics companies.") before asking the next question. This catches misunderstandings early.
+5. **Acknowledge, then proceed.** After each answer, reflect it back in one line **in the user's language** (e.g. "Got it — primary user is the Ops team at mid-size logistics companies.") before asking the next question. This catches misunderstandings early.
 
 6. **Batch only when the user asks.** If the user explicitly says "just give me all the questions at once" or "I'll answer in one go", switch to a single numbered list. Otherwise stay one-at-a-time.
 

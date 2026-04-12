@@ -165,4 +165,4 @@ No pipeline advancement — this is a quality checkpoint, not a pipeline step.
 
 ## Style
 
-Formal, neutral. No emoji, slang. Generate output in the language of the artifacts. Element IDs, file names, and table column headers remain in English.
+Formal, neutral. No emoji, slang. Generate output in the language of the artifacts — see `references/language-rule.md` for what to translate and what stays in English.

@@ -220,4 +220,4 @@ Available commands: `/export [format]` (export in another format) · `/estimate`
 
 ## Style
 
-Generate only valid JSON or CSV. Do not include comments inside JSON files. Use double quotes for all JSON strings. Escape newlines in description fields as `\n`. Generate output in English regardless of the artifact language (issue trackers expect English field values unless explicitly told otherwise).
+Generate only valid JSON or CSV. Do not include comments inside JSON files. Use double quotes for all JSON strings. Escape newlines in description fields as `\n`. Generate output in English regardless of the artifact language (issue trackers expect English field values unless explicitly told otherwise). Chat messages (interview questions, closing summary) follow `references/language-rule.md` — use the user's language.

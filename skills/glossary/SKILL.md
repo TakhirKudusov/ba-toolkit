@@ -161,4 +161,4 @@ Available commands: `/glossary drift` (drift report only) · `/glossary add [Ter
 
 ## Style
 
-Neutral, precise. Term definitions should be one sentence, domain-specific, and consistent with the artifact language set in `00_principles_{slug}.md`. Do not invent definitions — only use what is stated or clearly implied in the artifacts.
+Neutral, precise. Term definitions should be one sentence, domain-specific, and consistent with the artifact language. Do not invent definitions — only use what is stated or clearly implied in the artifacts. See `references/language-rule.md` for what to translate and what stays in English.

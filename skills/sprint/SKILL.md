@@ -120,4 +120,4 @@ Available commands: `/sprint [SP-NN]` (re-plan a sprint) · `/split [US-NNN]` (s
 
 ## Style
 
-Be specific about sprint goals — one user-outcome sentence per sprint. Show capacity percentages to make overloading visible at a glance. Flag risks and deadline conflicts explicitly, do not bury them in footnotes. Generate output in the language of the artifact.
+Be specific about sprint goals — one user-outcome sentence per sprint. Show capacity percentages to make overloading visible at a glance. Flag risks and deadline conflicts explicitly, do not bury them in footnotes. Generate output in the language of the artifact — see `references/language-rule.md` for what to translate and what stays in English.

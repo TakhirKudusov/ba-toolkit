@@ -182,4 +182,4 @@ Build the `Next step:` block from the pipeline lookup table in `references/closi
 
 ## Style
 
-Formal, neutral. No emoji, slang. The principles file itself is generated in the artifact language defined in section 1. Section headings and table column headers remain in that language.
+Formal, neutral. No emoji, slang. The principles file itself is generated in the artifact language defined in section 1. See `references/language-rule.md` for what to translate and what stays in English.

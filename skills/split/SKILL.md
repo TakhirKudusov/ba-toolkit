@@ -148,4 +148,4 @@ No pipeline advancement — return to the current artifact's workflow.
 
 ## Style
 
-Formal, neutral. Generate output in the language of the artifact.
+Formal, neutral. Generate output in the language of the artifact — see `references/language-rule.md` for what to translate and what stays in English.

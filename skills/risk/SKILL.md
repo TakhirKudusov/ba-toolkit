@@ -196,4 +196,4 @@ Available commands: `/risk add [description]` · `/risk update RISK-NN` · `/cla
 
 ## Style
 
-Concise, factual. Risk descriptions state the condition and consequence ("If X happens, then Y will occur"). Do not inflate severity — score based on evidence from artifacts, not speculation. Use the artifact language set in `00_principles_{slug}.md`.
+Concise, factual. Risk descriptions state the condition and consequence ("If X happens, then Y will occur"). Do not inflate severity — score based on evidence from artifacts, not speculation. Generate output in the language of the artifact — see `references/language-rule.md` for what to translate and what stays in English.

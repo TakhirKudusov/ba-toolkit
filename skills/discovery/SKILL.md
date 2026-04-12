@@ -160,4 +160,4 @@ Build the `Next step:` block from the pipeline lookup table in `references/closi
 
 ## Style
 
-Formal, neutral, hypothesis-driven. No emoji, slang, or evaluative language ("amazing", "game-changing"). Frame every claim as a hypothesis to validate, not a fact. Generate the artifact in the language of the user's request. Section headings, table headers, and labels also in the user's language.
+Formal, neutral, hypothesis-driven. No emoji, slang, or evaluative language ("amazing", "game-changing"). Frame every claim as a hypothesis to validate, not a fact. Generate the artifact in the language of the user's request — see `references/language-rule.md` for what to translate and what stays in English.

@@ -155,4 +155,4 @@ Available commands: `/estimate [US-NNN]` (re-estimate a story) · `/split [US-NN
 
 ## Style
 
-Be explicit about the rationale for each estimate. Use concise bullet drivers, not paragraphs. Generate output in the language of the artifact.
+Be explicit about the rationale for each estimate. Use concise bullet drivers, not paragraphs. Generate output in the language of the artifact — see `references/language-rule.md` for what to translate and what stays in English.

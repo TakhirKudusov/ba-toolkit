@@ -76,4 +76,4 @@ Do not build a `Next step:` block — `/publish` is cross-cutting and does not a
 
 ## Style
 
-Formal, neutral. No emoji. Generate the chat reply in the language of the user's first message. Keep the report under 10 lines: paths, counts, two next-step lines, optional re-run hint.
+Formal, neutral. No emoji. Generate the chat reply in the language of the user's first message — see `references/language-rule.md` for what to translate and what stays in English. Keep the report under 10 lines: paths, counts, two next-step lines, optional re-run hint.

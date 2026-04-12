@@ -4,7 +4,7 @@ After saving an artifact, every BA Toolkit skill presents a closing summary bloc
 
 ## Format
 
-Present the block in the same language as the artifact.
+Present the block in the same language as the artifact. The template below is written in English because this file follows the project's English-only convention. At generation time, translate all labels ("Artifact saved:", "Available commands:", "Next step:", "What it produces:", "Quality check before moving on:", table headers) to the artifact's language. Slash commands (`/clarify`, `/revise`, etc.) and file paths stay as-is. See `references/language-rule.md` for the full list of what to translate and what stays in English.
 
 ```
 Artifact saved: `{file_path}`

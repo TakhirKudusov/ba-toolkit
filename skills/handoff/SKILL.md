@@ -190,4 +190,4 @@ Build the `Next step:` block from the pipeline lookup table in `references/closi
 
 ## Style
 
-Formal, neutral. No emoji in the saved file. Generate in the artifact language. English for IDs, file names, table column headers, and code.
+Formal, neutral. No emoji in the saved file. Generate the artifact in the language of the user's request — see `references/language-rule.md` for what to translate and what stays in English.
