@@ -40,7 +40,7 @@ Examples:
    - `10_scenarios_{slug}.md` — persona names, scenario types
    - `11_handoff_{slug}.md` — any additional terms
    - `12_implplan_{slug}.md` — phase names, task ids, technology choices from the Tech Stack header
-2. Load `skills/references/domains/{domain}.md` — Domain Glossary section.
+2. Load `references/domains/{domain}.md` — Domain Glossary section.
 3. If `00_glossary_{slug}.md` already exists, load it to merge rather than replace.
 
 ## Environment

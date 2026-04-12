@@ -11,6 +11,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [4.0.4] — 2026-04-12
+
+### Fixed
+
+- **`/risk` and `/glossary` used wrong path prefix for domain references** — `skills/references/domains/{domain}.md` instead of `references/domains/{domain}.md`. The `skills/` prefix pointed to a repo-root-relative path that does not exist in the installed agent directory (e.g., `.claude/skills/`), so AI agents could fail to load the domain file when running these two skills. All other skills already used the correct relative path.
+
+---
+
 ## [4.0.3] — 2026-04-12
 
 ### Fixed
@@ -899,7 +907,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.3...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.4...HEAD
+[4.0.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.3...v4.0.4
 [4.0.3]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.2...v4.0.3
 [4.0.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.1...v4.0.2
 [4.0.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.0...v4.0.1

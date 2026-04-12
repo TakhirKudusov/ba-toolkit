@@ -28,7 +28,7 @@ Examples:
    - `06_nfr_{slug}.md` — NFR targets that are aggressive or uncertain (performance, security, availability)
    - `07a_research_{slug}.md` — ADR alternatives rejected, integration unknowns, technology risks
    - `08_apicontract_{slug}.md` — third-party API dependencies, rate limits, SLA gaps
-2. Load `skills/references/domains/{domain}.md` — note any domain-specific compliance or regulatory risk categories.
+2. Load `references/domains/{domain}.md` — note any domain-specific compliance or regulatory risk categories.
 3. If `00_risks_{slug}.md` already exists, load it to merge rather than replace.
 
 ## Environment
