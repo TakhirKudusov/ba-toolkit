@@ -4,7 +4,7 @@
 #
 # Creates the output folder structure and a starter AGENTS.md for a new
 # project. This is a zero-dependency fallback for environments without
-# Node.js. The recommended one-command setup is `npx @kudusov.takhir/ba-toolkit init`,
+# Node.js. The recommended one-command setup is `npx '@kudusov.takhir/ba-toolkit' init`,
 # which also installs skills into the chosen AI agent's directory.
 
 set -e
@@ -205,7 +205,7 @@ echo -e "  ${CYAN}Project '$NAME' ($SLUG) initialised.${RESET}"
 echo ""
 echo -e "  ${YELLOW}Next steps:${RESET}"
 echo "    1. Install skills into your AI agent. The npm CLI does this in one shot:"
-echo -e "         ${DARK_GRAY}npx @kudusov.takhir/ba-toolkit install --for claude-code${RESET}"
+echo -e "         ${DARK_GRAY}npx '@kudusov.takhir/ba-toolkit' install --for claude-code${RESET}"
 echo "       Or copy \`skills/\` manually — see the Manual install section in README.md."
 echo "    2. Open your AI assistant (Claude, Cursor, etc.)"
 echo "    3. Optional: run /principles to define project-wide conventions"

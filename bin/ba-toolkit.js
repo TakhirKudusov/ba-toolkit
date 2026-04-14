@@ -1939,7 +1939,7 @@ ${bold('EXAMPLES')}
   ba-toolkit uninstall --for claude-code --global
   ba-toolkit uninstall --for cursor --dry-run
 
-  # After 'npm update -g @kudusov.takhir/ba-toolkit', refresh the skills.
+  # After "npm update -g '@kudusov.takhir/ba-toolkit'", refresh the skills.
   ba-toolkit upgrade --for claude-code
   ba-toolkit upgrade --for cursor --dry-run
 

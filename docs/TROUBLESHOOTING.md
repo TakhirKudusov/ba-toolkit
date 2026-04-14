@@ -38,7 +38,7 @@ Then reload the agent window. If the problem persists, run `ba-toolkit status` t
 You need Node.js 18 or later installed. Open a terminal and type `node --version`. If you get an error, download Node.js from [nodejs.org](https://nodejs.org/) (LTS version, accept all defaults). After installing, close and reopen your terminal, then try again.
 
 **Init command fails on Windows:**
-If `npx @kudusov.takhir/ba-toolkit init` fails with a permission or path error, try running the terminal as Administrator, or use the PowerShell fallback script:
+If `npx '@kudusov.takhir/ba-toolkit' init` fails with a permission or path error, try running the terminal as Administrator, or use the PowerShell fallback script:
 ```powershell
 irm https://raw.githubusercontent.com/TakhirKudusov/ba-toolkit/main/init.ps1 | iex
 ```

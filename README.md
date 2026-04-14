@@ -42,13 +42,13 @@ Artifacts are generated in whatever language you write in — ask in English, ge
 # Full setup in one command — prompts for project name, domain, and
 # AI agent, then creates output/, AGENTS.md, and installs the skills
 # into the chosen agent's directory.
-npx @kudusov.takhir/ba-toolkit init
+npx '@kudusov.takhir/ba-toolkit' init
 
 # Non-interactive (e.g. for CI): pass every choice on the command line.
-npx @kudusov.takhir/ba-toolkit init --name "My App" --domain saas --for claude-code
+npx '@kudusov.takhir/ba-toolkit' init --name "My App" --domain saas --for claude-code
 
 # Or install globally and reuse across projects:
-npm install -g @kudusov.takhir/ba-toolkit
+npm install -g '@kudusov.takhir/ba-toolkit'
 ba-toolkit init
 ```
 
@@ -139,7 +139,7 @@ bash init.sh
 .\init.ps1
 ```
 
-Equivalent to `npx @kudusov.takhir/ba-toolkit init` — asks for a slug, name, and domain, then creates `output/` and an `AGENTS.md` with the pipeline status table.
+Equivalent to `npx '@kudusov.takhir/ba-toolkit' init` — asks for a slug, name, and domain, then creates `output/` and an `AGENTS.md` with the pipeline status table.
 
 ### Updating a manual install
 

@@ -11,6 +11,14 @@ Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [4.1.2] — 2026-04-14
+
+### Fixed
+
+- **Install commands now quote the scoped package name** in README, USAGE, TROUBLESHOOTING, ROADMAP, website docs, and the `init.sh`/`init.ps1` next-steps output. Unquoted `@kudusov.takhir/ba-toolkit` can trip shells (notably zsh with globbing/expansion rules) where the `@` or `.` tokens are interpreted; wrapping in single quotes (`'@kudusov.takhir/ba-toolkit'`) works across bash, zsh, and PowerShell. Historical `CHANGELOG.md` entries were not retroactively edited.
+
+---
+
 ## [4.1.1] — 2026-04-12
 
 ### Fixed
@@ -930,7 +938,8 @@ CI scripts that relied on the old behaviour (`init` creates files only, `install
 
 ---
 
-[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.1.1...HEAD
+[Unreleased]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.1.2...HEAD
+[4.1.2]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.1.1...v4.1.2
 [4.1.1]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.4...v4.1.0
 [4.0.4]: https://github.com/TakhirKudusov/ba-toolkit/compare/v4.0.3...v4.0.4

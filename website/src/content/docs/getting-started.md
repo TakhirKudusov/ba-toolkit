@@ -23,10 +23,10 @@ You do **not** need to know how to code. The agent asks you questions and genera
 
 ```bash
 # Full setup in one command — prompts for project name, domain, and AI agent.
-npx @kudusov.takhir/ba-toolkit init
+npx '@kudusov.takhir/ba-toolkit' init
 
 # Or install globally and reuse across projects.
-npm install -g @kudusov.takhir/ba-toolkit
+npm install -g '@kudusov.takhir/ba-toolkit'
 ba-toolkit init
 ```
 

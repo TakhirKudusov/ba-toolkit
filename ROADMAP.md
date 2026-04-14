@@ -10,7 +10,7 @@ For everything that has already shipped, see [`CHANGELOG.md`](CHANGELOG.md).
 
 BA Toolkit is an AI-powered Business Analyst pipeline. It takes a project from a vague concept through a brief, a full requirements specification, a development handoff, stakeholder publishing in Notion or Confluence, and a sequenced implementation plan an AI coding agent can execute step by step.
 
-The toolkit ships **29 interconnected skills** and **12 domain references** as a `SKILL.md`-based package that works natively in Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf. The CLI is a single Node.js file with **zero runtime dependencies** — `npm install -g @kudusov.takhir/ba-toolkit` and you have the whole pipeline available offline.
+The toolkit ships **29 interconnected skills** and **12 domain references** as a `SKILL.md`-based package that works natively in Claude Code, Codex CLI, Gemini CLI, Cursor, and Windsurf. The CLI is a single Node.js file with **zero runtime dependencies** — `npm install -g '@kudusov.takhir/ba-toolkit'` and you have the whole pipeline available offline.
 
 The goal is not to replace the BA. It is to give the BA — or the developer-acting-as-BA, or the AI coding agent — the structure, the standards conformance (BABOK, IEEE 830, ISO 25010, ISO 31000, Cockburn use cases, INVEST, MoSCoW, PMBOK 7), and the cross-artifact traceability that a senior BA at a top-tier consultancy would expect on a serious project.
 

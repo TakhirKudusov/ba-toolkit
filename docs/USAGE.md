@@ -11,10 +11,10 @@ Setup is two phases: first `ba-toolkit init` scaffolds the project (slug, domain
 # an arrow-key menu for the domain and agent prompts (↑/↓ + j/k, a-z
 # jump, Enter to select, Esc to cancel). CI / piped input falls back
 # to a numbered prompt automatically.
-npx @kudusov.takhir/ba-toolkit init
+npx '@kudusov.takhir/ba-toolkit' init
 
 # Or non-interactive:
-npx @kudusov.takhir/ba-toolkit init --name "Neobank App" --domain fintech --for claude-code
+npx '@kudusov.takhir/ba-toolkit' init --name "Neobank App" --domain fintech --for claude-code
 
 # Step 2 — open your AI agent at the project root.
 claude         # or `cursor .`, `windsurf .`, `gemini`, `codex`, etc.
